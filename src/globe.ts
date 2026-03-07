@@ -64,6 +64,8 @@ const MIN_ZOOM = 0.78
 const MAX_ZOOM = 18
 const FOCUS_COUNTRY_RADIUS_PX = 84
 const MIN_COUNTRY_ANGULAR_RADIUS = 0.0025
+const WHEEL_ZOOM_SENSITIVITY = 0.0012
+const MAX_WHEEL_DELTA = 80
 const UNSOLVED_LAND_FILL = '#34393f'
 const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
 const SOLVED_COUNTRY_OUTLINE_COLOR = 'rgba(8, 18, 28, 0.95)'
@@ -659,6 +661,12 @@ export async function createGlobe(
     scheduleRender()
   }
 
+  function wheelZoomFactor(event: WheelEvent): number {
+    const modeScale = event.deltaMode === WheelEvent.DOM_DELTA_LINE ? 18 : event.deltaMode === WheelEvent.DOM_DELTA_PAGE ? 120 : 1
+    const clampedDelta = Math.max(-MAX_WHEEL_DELTA, Math.min(MAX_WHEEL_DELTA, event.deltaY * modeScale))
+    return Math.exp(-clampedDelta * WHEEL_ZOOM_SENSITIVITY)
+  }
+
   function focusCountry(countryId: string): void {
     const centroid = centroidForCountry(countryId)
 
@@ -735,7 +743,7 @@ export async function createGlobe(
       event.preventDefault()
       cancelFlyAnimation()
       enterInteractionMode()
-      applyZoom(currentZoom * (event.deltaY < 0 ? 1.18 : 0.84))
+      applyZoom(currentZoom * wheelZoomFactor(event))
       scheduleInteractionSettle()
     },
     { passive: false },
