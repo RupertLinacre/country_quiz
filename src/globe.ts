@@ -7,6 +7,7 @@ import {
   geoArea,
   geoCentroid,
   geoDistance,
+  geoInterpolate,
   geoGraticule10,
   geoOrthographic,
   geoPath,
@@ -42,9 +43,21 @@ type AtlasBundle = {
 }
 
 type GlobeController = {
-  focusCountry: (countryId: string) => void
   setAnswered: (answeredIds: Set<string>) => void
+  syncFlightPath: (
+    answerOrder: string[],
+    options?: {
+      animate?: boolean
+    },
+  ) => GlobeFlightStatus | null
   zoomBy: (factor: number) => void
+}
+
+export type GlobeFlightStatus = {
+  fromName: string
+  legMiles: number
+  toName: string
+  totalMiles: number
 }
 
 type GlobeLabel = {
@@ -55,16 +68,36 @@ type GlobeLabel = {
   y: number
 }
 
+type FlightSegment = {
+  fromCoordinates: [number, number]
+  fromCountryId: string
+  fromName: string
+  id: string
+  miles: number
+  pathCoordinates: [number, number][]
+  toCoordinates: [number, number]
+  toCountryId: string
+  toName: string
+}
+
 const BASE_SCALE_RATIO = 0.318
-const FLY_DURATION_MS = 850
+const EARTH_RADIUS_MILES = 3958.7613
+const FLIGHT_PATH_SAMPLE_STEP_RADIANS = 0.045
+const FLIGHT_START_COUNTRY_ID = 'GBR'
+const FLY_DURATION_MS = 1700
 const MIN_ZOOM = 0.78
 const MAX_ZOOM = 18
 const FOCUS_COUNTRY_RADIUS_PX = 84
 const MIN_COUNTRY_ANGULAR_RADIUS = 0.0025
+const DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY = '(min-width: 841px)'
+const PLANE_EMOJI_BASE_HEADING_DEGREES = -45
+const PLANE_TANGENT_SAMPLE_STEP = 0.018
 const WHEEL_ZOOM_SENSITIVITY = 0.0034
 const MAX_WHEEL_DELTA = 80
 const MAP_LABEL_NAME_OFFSET_PX = -4
 const MAP_LABEL_FLAG_OFFSET_PX = 17
+const PLANE_LABEL_OFFSET_PX = -MAP_LABEL_FLAG_OFFSET_PX
+const PLANE_EMOJI = '✈️'
 const SEA_FILL = '#126aa6'
 const UNSOLVED_LAND_FILL = '#34393f'
 const LATEST_SOLVED_FILL = '#ffe45c'
@@ -93,6 +126,10 @@ function interpolateNumber(start: number, end: number, t: number): number {
   return start + (end - start) * t
 }
 
+function toMiles(distanceRadians: number): number {
+  return Math.round(distanceRadians * EARTH_RADIUS_MILES)
+}
+
 function normaliseAtlasId(value: string | number | undefined): string | null {
   if (value === undefined) {
     return null
@@ -104,6 +141,27 @@ function normaliseAtlasId(value: string | number | undefined): string | null {
 function shortestLongitudeTarget(startLongitude: number, targetLongitude: number): number {
   const delta = ((targetLongitude - startLongitude + 540) % 360) - 180
   return startLongitude + delta
+}
+
+function greatArcCoordinates(
+  fromCoordinates: [number, number],
+  toCoordinates: [number, number],
+): [number, number][] {
+  const angularDistance = geoDistance(fromCoordinates, toCoordinates)
+
+  if (angularDistance < 0.000001) {
+    return [fromCoordinates, toCoordinates]
+  }
+
+  const sampleCount = Math.max(
+    18,
+    Math.ceil(angularDistance / FLIGHT_PATH_SAMPLE_STEP_RADIANS),
+  )
+  const interpolateCoordinates = geoInterpolate(fromCoordinates, toCoordinates)
+
+  return Array.from({ length: sampleCount + 1 }, (_, index) => {
+    return interpolateCoordinates(index / sampleCount) as [number, number]
+  })
 }
 
 function visitCoordinates(
@@ -315,21 +373,34 @@ export async function createGlobe(
   const countriesLayer = mapLayer.append('g').attr('class', 'globe__countries')
   const fallbackLayer = mapLayer.append('g').attr('class', 'globe__fallbacks')
   const solvedLayer = mapLayer.append('g').attr('class', 'globe__solved')
+  const flightLayer = mapLayer.append('g').attr('class', 'globe__flights')
+  const flightTrailLayer = flightLayer.append('g').attr('class', 'globe__flight-trails')
+  const flightActiveLayer = flightLayer.append('g').attr('class', 'globe__flight-active')
   const coastlinePath = mapLayer.append('path').attr('class', 'globe__coastlines')
   const borderPath = mapLayer.append('path').attr('class', 'globe__borders')
   const fallbackOutlineLayer = mapLayer.append('g').attr('class', 'globe__fallback-outlines')
   const labelLayer = labelsSvg.append('g').attr('class', 'globe__labels')
+  const planeLayer = labelsSvg.append('g').attr('class', 'globe__plane-layer').attr('aria-hidden', 'true')
+  const planeMarker = planeLayer.append('g').attr('class', 'globe__plane')
+  planeMarker.append('circle').attr('class', 'globe__plane-halo')
+  planeMarker.append('text').attr('class', 'globe__plane-emoji').text(PLANE_EMOJI)
   const projection = geoOrthographic().clipAngle(90).precision(0.6).rotate([-12, -18])
   const measurementPath = geoPath(projection)
   const sphere = { type: 'Sphere' } as GeoPermissibleObjects
   const graticule = geoGraticule10()
+  const desktopFlightTrailsMediaQuery = window.matchMedia(DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY)
 
   let answeredIds = new Set<string>()
+  let flightSegments: FlightSegment[] = []
+  let activeFlightSegmentId: string | null = null
+  let activeFlightProgress = 1
   let currentZoom = 1
   let cssWidth = 760
   let cssHeight = 760
   let flyFrame: number | null = null
   let framePending = false
+  let planeCoordinates: [number, number] | null = null
+  let showDesktopFlightTrails = desktopFlightTrailsMediaQuery.matches
 
   function currentScale(): number {
     return Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO * currentZoom
@@ -407,6 +478,176 @@ export async function createGlobe(
     return clampZoom(targetZoom)
   }
 
+  function flightPathGeometry(
+    segment: FlightSegment,
+    progress = 1,
+  ): GeoPermissibleObjects {
+    if (progress >= 1) {
+      return {
+        type: 'LineString',
+        coordinates: segment.pathCoordinates,
+      } as GeoPermissibleObjects
+    }
+
+    const interpolatedCoordinates = geoInterpolate(
+      segment.fromCoordinates,
+      segment.toCoordinates,
+    )(Math.max(0, progress)) as [number, number]
+    const lastIndex = segment.pathCoordinates.length - 1
+    const visiblePointCount = Math.max(1, Math.floor(lastIndex * Math.max(0, progress)))
+    const coordinates = segment.pathCoordinates.slice(0, visiblePointCount + 1)
+    const lastCoordinates = coordinates[coordinates.length - 1]
+
+    if (
+      !lastCoordinates ||
+      lastCoordinates[0] !== interpolatedCoordinates[0] ||
+      lastCoordinates[1] !== interpolatedCoordinates[1]
+    ) {
+      coordinates.push(interpolatedCoordinates)
+    }
+
+    return {
+      type: 'LineString',
+      coordinates,
+    } as GeoPermissibleObjects
+  }
+
+  function buildFlightSegments(answerOrder: string[]): {
+    planePosition: [number, number] | null
+    segments: FlightSegment[]
+    status: GlobeFlightStatus | null
+  } {
+    const startCountry = countryById.get(FLIGHT_START_COUNTRY_ID)
+    let previousCountryId = FLIGHT_START_COUNTRY_ID
+    let previousCoordinates = centroidForCountry(previousCountryId)
+    let totalMiles = 0
+    const segments: FlightSegment[] = []
+
+    for (const [index, countryId] of answerOrder.entries()) {
+      const fromCountry = countryById.get(previousCountryId) ?? startCountry
+      const toCountry = countryById.get(countryId)
+      const toCoordinates = centroidForCountry(countryId)
+
+      if (!fromCountry || !toCountry || !previousCoordinates || !toCoordinates) {
+        previousCountryId = countryId
+        previousCoordinates = toCoordinates
+        continue
+      }
+
+      const miles = toMiles(geoDistance(previousCoordinates, toCoordinates))
+      totalMiles += miles
+      segments.push({
+        fromCoordinates: previousCoordinates,
+        fromCountryId: previousCountryId,
+        fromName: fromCountry.name,
+        id: `${index}-${previousCountryId}-${countryId}`,
+        miles,
+        pathCoordinates: greatArcCoordinates(previousCoordinates, toCoordinates),
+        toCoordinates,
+        toCountryId: countryId,
+        toName: toCountry.name,
+      })
+      previousCountryId = countryId
+      previousCoordinates = toCoordinates
+    }
+
+    const lastSegment = segments.at(-1) ?? null
+
+    return {
+      planePosition: previousCoordinates,
+      segments,
+      status: lastSegment
+        ? {
+          fromName: lastSegment.fromName,
+          legMiles: lastSegment.miles,
+          toName: lastSegment.toName,
+          totalMiles,
+        }
+        : null,
+    }
+  }
+
+  function renderFlights(): void {
+    const renderedSegments = showDesktopFlightTrails ? flightSegments : []
+
+    flightTrailLayer
+      .selectAll<SVGPathElement, FlightSegment>('path.globe__flight-trail')
+      .data(renderedSegments, (segment) => segment.id)
+      .join('path')
+      .attr('class', 'globe__flight-trail')
+      .attr('d', (segment) => projectedPathData(flightPathGeometry(segment)))
+      .attr('fill', 'none')
+      .attr('stroke', (segment) =>
+        segment.id === activeFlightSegmentId
+          ? 'rgba(255, 234, 163, 0.24)'
+          : 'rgba(255, 226, 120, 0.18)',
+      )
+      .attr('stroke-width', (segment) => (segment.id === activeFlightSegmentId ? 1.35 : 1.1))
+      .attr('stroke-linecap', 'round')
+      .attr('stroke-linejoin', 'round')
+      .attr('stroke-dasharray', (segment) =>
+        segment.id === activeFlightSegmentId ? '4.5 7.5' : '3.2 8.2',
+      )
+
+    const activeSegment = showDesktopFlightTrails
+      ? flightSegments.find((segment) => segment.id === activeFlightSegmentId) ?? null
+      : null
+
+    flightActiveLayer
+      .selectAll<SVGPathElement, FlightSegment>('path.globe__flight-progress')
+      .data(activeSegment ? [activeSegment] : [], (segment) => segment.id)
+      .join('path')
+      .attr('class', 'globe__flight-progress')
+      .attr('d', (segment) => projectedPathData(flightPathGeometry(segment, activeFlightProgress)))
+      .attr('fill', 'none')
+      .attr('stroke', 'rgba(255, 239, 187, 0.68)')
+      .attr('stroke-width', 2)
+      .attr('stroke-linecap', 'round')
+      .attr('stroke-linejoin', 'round')
+  }
+
+  function projectedLabelPosition(countryId: string): [number, number] | null {
+    const centroid = centroidForCountry(countryId)
+    const labelFeature = labelFeatureForCountry(countryId)
+
+    if (!centroid || !labelFeature || !isVisible(centroid)) {
+      return null
+    }
+
+    const projected = measurementPath.centroid(labelFeature)
+
+    if (!projected || Number.isNaN(projected[0]) || Number.isNaN(projected[1])) {
+      return null
+    }
+
+    return [projected[0], projected[1]]
+  }
+
+  function planeHeadingDegrees(segment: FlightSegment, progress: number): number {
+    const startProgress = Math.max(0, Math.min(1, progress - PLANE_TANGENT_SAMPLE_STEP))
+    const endProgress = Math.max(0, Math.min(1, progress + PLANE_TANGENT_SAMPLE_STEP))
+
+    if (Math.abs(endProgress - startProgress) < 0.0001) {
+      return 0
+    }
+
+    const interpolateCoordinates = geoInterpolate(
+      segment.fromCoordinates,
+      segment.toCoordinates,
+    )
+    const startPoint = projection(interpolateCoordinates(startProgress) as [number, number])
+    const endPoint = projection(interpolateCoordinates(endProgress) as [number, number])
+
+    if (!startPoint || !endPoint) {
+      return 0
+    }
+
+    return (
+      (Math.atan2(endPoint[1] - startPoint[1], endPoint[0] - startPoint[0]) * 180) / Math.PI -
+      PLANE_EMOJI_BASE_HEADING_DEGREES
+    )
+  }
+
   function renderLabels(): void {
     const visibleLabels = [...answeredIds]
       .map((countryId) => {
@@ -468,6 +709,55 @@ export async function createGlobe(
           .attr('x', 0)
           .attr('y', MAP_LABEL_FLAG_OFFSET_PX)
       })
+  }
+
+  function renderPlane(mostRecentAnsweredId: string | null): void {
+    const activeSegment = flightSegments.find((segment) => segment.id === activeFlightSegmentId) ?? null
+    const latestSegment = flightSegments.at(-1) ?? null
+
+    let anchorPoint: [number, number] | null = null
+    let localOffsetY = 0
+    let headingDegrees = latestSegment ? planeHeadingDegrees(latestSegment, 1) : 0
+
+    if (activeSegment && planeCoordinates && isVisible(planeCoordinates)) {
+      const projected = projection(planeCoordinates)
+
+      if (projected) {
+        anchorPoint = [projected[0], projected[1]]
+        headingDegrees = planeHeadingDegrees(activeSegment, activeFlightProgress)
+      }
+    } else if (mostRecentAnsweredId) {
+      anchorPoint = projectedLabelPosition(mostRecentAnsweredId)
+      localOffsetY = PLANE_LABEL_OFFSET_PX
+    } else if (planeCoordinates && isVisible(planeCoordinates)) {
+      const projected = projection(planeCoordinates)
+
+      if (projected) {
+        anchorPoint = [projected[0], projected[1]]
+      }
+    }
+
+    if (!anchorPoint) {
+      planeLayer.attr('display', 'none')
+      return
+    }
+
+    planeLayer.attr('display', null)
+    planeMarker
+      .attr('transform', `translate(${anchorPoint[0]} ${anchorPoint[1]})`)
+      .attr('data-moving', activeFlightSegmentId && activeFlightProgress < 1 ? 'true' : 'false')
+
+    planeMarker
+      .select<SVGCircleElement>('.globe__plane-halo')
+      .attr('cx', 0)
+      .attr('cy', localOffsetY)
+      .attr('r', activeFlightSegmentId && activeFlightProgress < 1 ? 15 : 12)
+
+    planeMarker
+      .select<SVGTextElement>('.globe__plane-emoji')
+      .attr('x', 0)
+      .attr('y', localOffsetY)
+      .attr('transform', `rotate(${headingDegrees} 0 ${localOffsetY})`)
   }
 
   function renderNow(): void {
@@ -539,6 +829,8 @@ export async function createGlobe(
       .attr('stroke-linejoin', 'round')
       .attr('stroke-linecap', 'round')
 
+    renderFlights()
+
     coastlinePath
       .attr('d', projectedPathData(atlas.landFeature))
       .attr('fill', 'none')
@@ -577,6 +869,7 @@ export async function createGlobe(
       .attr('stroke-width', (entry) => (entry.answered ? 0.85 : 0.95))
 
     renderLabels()
+    renderPlane(mostRecentAnsweredId)
   }
 
   function scheduleRender(): void {
@@ -591,11 +884,28 @@ export async function createGlobe(
     })
   }
 
+  function settleActiveFlight(): void {
+    if (!activeFlightSegmentId) {
+      return
+    }
+
+    const activeSegment = flightSegments.find((segment) => segment.id === activeFlightSegmentId)
+
+    if (activeSegment) {
+      planeCoordinates = activeSegment.toCoordinates
+    }
+
+    activeFlightSegmentId = null
+    activeFlightProgress = 1
+  }
+
   function cancelFlyAnimation(): void {
     if (flyFrame !== null) {
       window.cancelAnimationFrame(flyFrame)
       flyFrame = null
     }
+
+    settleActiveFlight()
   }
 
   function applyZoom(nextZoom: number): void {
@@ -609,21 +919,39 @@ export async function createGlobe(
     return Math.exp(-clampedDelta * WHEEL_ZOOM_SENSITIVITY)
   }
 
-  function focusCountry(countryId: string): void {
+  function snapToCountry(countryId: string): void {
     const centroid = centroidForCountry(countryId)
 
     if (!centroid) {
       return
     }
 
+    const [, , gamma] = projection.rotate()
+    projection.rotate([
+      shortestLongitudeTarget(projection.rotate()[0], -centroid[0]),
+      -centroid[1],
+      gamma,
+    ])
+    currentZoom = zoomForCountry(countryId)
+  }
+
+  function animateFlight(segment: FlightSegment): void {
     cancelFlyAnimation()
 
     const [startLongitude, startLatitude, startGamma] = projection.rotate()
-    const targetLongitude = shortestLongitudeTarget(startLongitude, -centroid[0])
-    const targetLatitude = -centroid[1]
+    const targetLongitude = shortestLongitudeTarget(startLongitude, -segment.toCoordinates[0])
+    const targetLatitude = -segment.toCoordinates[1]
     const startZoom = currentZoom
-    const targetZoom = zoomForCountry(countryId)
+    const targetZoom = zoomForCountry(segment.toCountryId)
     const startTime = performance.now()
+    const interpolatePlaneCoordinates = geoInterpolate(
+      segment.fromCoordinates,
+      segment.toCoordinates,
+    )
+
+    activeFlightSegmentId = segment.id
+    activeFlightProgress = 0
+    planeCoordinates = segment.fromCoordinates
 
     const tick = (now: number) => {
       const progress = Math.min(1, (now - startTime) / FLY_DURATION_MS)
@@ -635,6 +963,8 @@ export async function createGlobe(
         startGamma,
       ])
       currentZoom = clampZoom(interpolateNumber(startZoom, targetZoom, eased))
+      activeFlightProgress = eased
+      planeCoordinates = interpolatePlaneCoordinates(eased) as [number, number]
       renderNow()
 
       if (progress < 1) {
@@ -642,11 +972,21 @@ export async function createGlobe(
         return
       }
 
+      planeCoordinates = segment.toCoordinates
+      activeFlightProgress = 1
+      activeFlightSegmentId = null
       flyFrame = null
+      renderNow()
     }
 
     flyFrame = window.requestAnimationFrame(tick)
   }
+
+  planeCoordinates = centroidForCountry(FLIGHT_START_COUNTRY_ID)
+  desktopFlightTrailsMediaQuery.addEventListener('change', (event) => {
+    showDesktopFlightTrails = event.matches
+    scheduleRender()
+  })
 
   const resizeObserver = new ResizeObserver(() => {
     syncCanvasSize()
@@ -690,10 +1030,33 @@ export async function createGlobe(
   )
 
   return {
-    focusCountry,
     setAnswered(nextAnsweredIds: Set<string>) {
       answeredIds = new Set(nextAnsweredIds)
       scheduleRender()
+    },
+    syncFlightPath(answerOrder: string[], options) {
+      const previousLastSegmentId = flightSegments.at(-1)?.id ?? null
+      const nextFlightState = buildFlightSegments(answerOrder)
+      const lastSegment = nextFlightState.segments.at(-1) ?? null
+
+      cancelFlyAnimation()
+      flightSegments = nextFlightState.segments
+      planeCoordinates =
+        nextFlightState.planePosition ?? centroidForCountry(FLIGHT_START_COUNTRY_ID)
+
+      if (!lastSegment) {
+        scheduleRender()
+        return null
+      }
+
+      if (options?.animate && lastSegment.id !== previousLastSegmentId) {
+        animateFlight(lastSegment)
+        return nextFlightState.status
+      }
+
+      snapToCountry(lastSegment.toCountryId)
+      scheduleRender()
+      return nextFlightState.status
     },
     zoomBy(factor: number) {
       cancelFlyAnimation()

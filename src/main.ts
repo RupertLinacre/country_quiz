@@ -8,9 +8,10 @@ import {
   quizCountries,
   totalCountryCount,
 } from './quiz-data'
-import { createGlobe } from './globe'
+import { createGlobe, type GlobeFlightStatus } from './globe'
 
-const QUIZ_DURATION_MS = 15 * 60 * 1000
+const QUIZ_DURATION_MS = 30 * 60 * 1000
+const STARTING_COUNTRY_ID = 'GBR'
 
 function requireElement<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector)
@@ -41,7 +42,7 @@ app.innerHTML = `
           </article>
           <article class="stat-card stat-card--timer">
             <span class="stat-card__label">Time Left</span>
-            <strong id="timer" class="stat-card__value">15:00</strong>
+            <strong id="timer" class="stat-card__value">30:00</strong>
             <span id="remaining" class="stat-card__meta">${totalCountryCount} left</span>
           </article>
         </div>
@@ -71,6 +72,12 @@ app.innerHTML = `
           </div>
         </div>
         <div id="globe" class="globe-frame"></div>
+        <section class="flight-panel" aria-live="polite">
+          <p class="flight-panel__eyebrow">Flight Path</p>
+          <strong id="flight-route" class="flight-panel__route">Plane standing by in the United Kingdom</strong>
+          <span id="flight-distance" class="flight-panel__meta">Leg distance: 0 miles</span>
+          <span id="flight-total" class="flight-panel__meta">Total distance flown: 0 miles</span>
+        </section>
       </div>
     </section>
     <section class="tracker">
@@ -87,12 +94,16 @@ const timerElement = requireElement<HTMLElement>('#timer')
 const remainingElement = requireElement<HTMLElement>('#remaining')
 const statusElement = requireElement<HTMLElement>('#status')
 const answerInput = requireElement<HTMLInputElement>('#guess-input')
+const flightRouteElement = requireElement<HTMLElement>('#flight-route')
+const flightDistanceElement = requireElement<HTMLElement>('#flight-distance')
+const flightTotalElement = requireElement<HTMLElement>('#flight-total')
 const continentBoard = requireElement<HTMLElement>('#continent-board')
 const zoomInButton = requireElement<HTMLButtonElement>('#zoom-in')
 const zoomOutButton = requireElement<HTMLButtonElement>('#zoom-out')
 const globeContainer = requireElement<HTMLElement>('#globe')
 
-const answeredIds = new Set<string>()
+const answeredIds = new Set<string>([STARTING_COUNTRY_ID])
+const answerOrder: string[] = []
 const deadline = Date.now() + QUIZ_DURATION_MS
 let statusTone: 'neutral' | 'success' | 'muted' = 'neutral'
 let intervalHandle = window.setInterval(tick, 250)
@@ -135,6 +146,10 @@ function formatTime(milliseconds: number): string {
   const seconds = totalSeconds % 60
 
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
+
+function formatMiles(miles: number): string {
+  return `${new Intl.NumberFormat('en-GB').format(miles)} miles`
 }
 
 function solvedCountByContinent(continent: string): number {
@@ -191,6 +206,19 @@ function renderStatus(message: string): void {
   statusElement.dataset.tone = statusTone
 }
 
+function renderFlightStatus(status: GlobeFlightStatus | null): void {
+  if (!status) {
+    flightRouteElement.textContent = 'Plane standing by in the United Kingdom'
+    flightDistanceElement.textContent = 'Leg distance: 0 miles'
+    flightTotalElement.textContent = 'Total distance flown: 0 miles'
+    return
+  }
+
+  flightRouteElement.textContent = `${status.fromName} to ${status.toName}`
+  flightDistanceElement.textContent = `Leg distance: ${formatMiles(status.legMiles)}`
+  flightTotalElement.textContent = `Total distance flown: ${formatMiles(status.totalMiles)}`
+}
+
 function finishQuiz(message: string): void {
   if (quizFinished) {
     return
@@ -212,9 +240,10 @@ function solveCountry(countryId: string): void {
   }
 
   answeredIds.add(countryId)
+  answerOrder.push(countryId)
   answerInput.value = ''
   globe?.setAnswered(answeredIds)
-  globe?.focusCountry(countryId)
+  renderFlightStatus(globe?.syncFlightPath(answerOrder, { animate: true }) ?? null)
   renderScore()
   renderTracker()
 
@@ -300,8 +329,10 @@ zoomOutButton.addEventListener('click', () => globe?.zoomBy(0.8))
 
 renderScore()
 renderTracker()
+renderFlightStatus(null)
 tick()
 answerInput.focus()
 
 globe = await createGlobe(globeContainer, quizCountries)
 globe.setAnswered(answeredIds)
+renderFlightStatus(globe.syncFlightPath(answerOrder, { animate: false }))
