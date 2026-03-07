@@ -399,5 +399,5 @@ tick()
 answerInput.focus()
 
 globe = await createGlobe(globeContainer, quizCountries)
-globe.setAnswered(answeredIds)
+globe.setAnswered(answeredIds, { focusLatest: true })
 renderFlightStatus(globe.syncFlightPath(answerOrder, { animate: false }))

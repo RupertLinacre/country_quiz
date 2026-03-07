@@ -43,7 +43,12 @@ type AtlasBundle = {
 }
 
 type GlobeController = {
-  setAnswered: (answeredIds: Set<string>) => void
+  setAnswered: (
+    answeredIds: Set<string>,
+    options?: {
+      focusLatest?: boolean
+    },
+  ) => void
   syncFlightPath: (
     answerOrder: string[],
     options?: {
@@ -1126,8 +1131,18 @@ export async function createGlobe(
   )
 
   return {
-    setAnswered(nextAnsweredIds: Set<string>) {
+    setAnswered(nextAnsweredIds: Set<string>, options) {
       answeredIds = new Set(nextAnsweredIds)
+
+      if (options?.focusLatest) {
+        const mostRecentAnsweredId = latestAnsweredId(answeredIds)
+
+        if (mostRecentAnsweredId) {
+          cancelFlyAnimation()
+          snapToCountry(mostRecentAnsweredId)
+        }
+      }
+
       scheduleRender()
     },
     syncFlightPath(answerOrder: string[], options) {
