@@ -269,7 +269,7 @@ h1 {
   border: 1px solid rgba(244, 240, 226, 0.08);
 }
 
-.globe__canvas,
+.globe__map-svg,
 .globe__labels-svg {
   position: absolute;
   inset: 0;
@@ -278,11 +278,11 @@ h1 {
   display: block;
 }
 
-.globe__canvas {
+.globe__map-svg {
   cursor: grab;
 }
 
-.globe__canvas:active {
+.globe__map-svg:active {
   cursor: grabbing;
 }
 
