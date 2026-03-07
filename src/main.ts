@@ -32,12 +32,7 @@ app.innerHTML = `
   <main class="shell">
     <section class="hero">
       <div class="hero__copy">
-        <p class="eyebrow">Countries of the World</p>
-        <h1>Spin the globe and name all 197 countries before the clock runs out.</h1>
-        <p class="hero__lede">
-          Correct answers register instantly. Solved countries light up on the globe and fill
-          into the continent tracker below.
-        </p>
+        <h1>Can you name all 197 countries of the world?</h1>
         <div class="hero__stats">
           <article class="stat-card">
             <span class="stat-card__label">Score</span>
@@ -61,16 +56,11 @@ app.innerHTML = `
             spellcheck="false"
             placeholder="Start typing a country name..."
           />
-          <p class="answer-panel__hint">Drag to spin. Scroll or use the zoom buttons to inspect tight regions.</p>
-          <p id="status" class="status" aria-live="polite">The timer starts now.</p>
+          <p id="status" class="status" aria-live="polite"></p>
         </div>
       </div>
       <div class="globe-card">
         <div class="globe-card__toolbar">
-          <div>
-            <p class="globe-card__title">Solved countries fill in gold</p>
-            <p class="globe-card__subtitle">Hover tracker flags for a larger preview.</p>
-          </div>
           <div class="zoom-controls" aria-label="Globe zoom controls">
             <button id="zoom-out" class="zoom-controls__button" type="button" aria-label="Zoom out">−</button>
             <button id="zoom-in" class="zoom-controls__button" type="button" aria-label="Zoom in">+</button>
@@ -81,13 +71,7 @@ app.innerHTML = `
     </section>
     <section class="tracker">
       <div class="tracker__header">
-        <div>
-          <p class="eyebrow">Continent Tracker</p>
-          <h2>Every answer fills its slot immediately.</h2>
-        </div>
-        <p class="tracker__summary">
-          Tracker flags and map-label flags both come from the quiz data, while the globe fill stays simple and readable.
-        </p>
+        <p class="eyebrow">Continent Tracker</p>
       </div>
       <div id="continent-board" class="continent-board"></div>
     </section>

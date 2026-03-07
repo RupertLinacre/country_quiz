@@ -95,18 +95,12 @@ h1 {
   text-wrap: balance;
 }
 
-.hero__lede,
-.answer-panel__hint,
-.globe-card__subtitle,
-.tracker__summary,
 .stat-card__meta {
   color: var(--ink-soft);
 }
 
-.hero__lede {
-  max-width: 58ch;
-  margin: 1rem 0 1.3rem;
-  font-size: 1.03rem;
+.hero__copy h1 {
+  margin-bottom: 1.3rem;
 }
 
 .hero__stats {
@@ -188,7 +182,6 @@ h1 {
   cursor: not-allowed;
 }
 
-.answer-panel__hint,
 .status {
   margin: 0.7rem 0 0;
   font-size: 0.95rem;
@@ -216,19 +209,9 @@ h1 {
 
 .globe-card__toolbar {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 1rem;
   padding: 0.4rem 0.2rem 0;
-}
-
-.globe-card__title,
-.globe-card__subtitle {
-  margin: 0;
-}
-
-.globe-card__title {
-  font-size: 1.15rem;
 }
 
 .zoom-controls {
@@ -287,29 +270,42 @@ h1 {
 }
 
 .globe__labels-svg,
-.globe__labels {
+.globe__labels,
+.globe__label,
+.globe__label-name {
   pointer-events: none;
-}
-
-.globe__label {
-  fill: #fff4c8;
-  font-family: "Avenir Next Condensed", "Arial Narrow", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  paint-order: stroke;
-  stroke: rgba(6, 15, 24, 0.92);
-  stroke-width: 3px;
-  letter-spacing: 0.04em;
 }
 
 .globe__label-name,
 .globe__label-flag {
+  fill: #fff4c8;
+  font-family: "Avenir Next Condensed", "Arial Narrow", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  font-weight: 700;
+  paint-order: stroke;
+  stroke: rgba(6, 15, 24, 0.92);
+  stroke-width: 3px;
   text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.globe__label-name {
+  font-size: 13px;
+  letter-spacing: 0.04em;
 }
 
 .globe__label-flag {
+  pointer-events: auto;
   font-size: 2em;
   letter-spacing: 0;
+  cursor: default;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 180ms ease;
+  will-change: transform;
+}
+
+.globe__label-flag:hover {
+  transform: scale(3);
 }
 
 .tracker {
@@ -318,22 +314,7 @@ h1 {
 }
 
 .tracker__header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
   margin-bottom: 1rem;
-}
-
-h2 {
-  margin: 0;
-  font-size: clamp(1.7rem, 2.6vw, 2.5rem);
-  line-height: 1;
-}
-
-.tracker__summary {
-  max-width: 44ch;
-  margin: 0;
 }
 
 .continent-board {
@@ -422,8 +403,7 @@ h2 {
   flex: 0 0 auto;
 }
 
-.country-slot__flag-icon,
-.country-slot__flag-preview-image {
+.country-slot__flag-icon {
   display: block;
   object-fit: cover;
   border-radius: 4px;
@@ -469,8 +449,12 @@ h2 {
 }
 
 .country-slot__flag-preview-image {
+  display: block;
   width: 5.4rem;
   aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
 }
 
 .country-slot__flag-preview-label {
@@ -506,7 +490,6 @@ h2 {
     grid-template-columns: 1fr;
   }
 
-  .tracker__header,
   .globe-card__toolbar {
     flex-direction: column;
     align-items: flex-start;

@@ -64,8 +64,10 @@ const MIN_ZOOM = 0.78
 const MAX_ZOOM = 18
 const FOCUS_COUNTRY_RADIUS_PX = 84
 const MIN_COUNTRY_ANGULAR_RADIUS = 0.0025
-const WHEEL_ZOOM_SENSITIVITY = 0.0012
+const WHEEL_ZOOM_SENSITIVITY = 0.0034
 const MAX_WHEEL_DELTA = 80
+const MAP_LABEL_NAME_OFFSET_PX = -4
+const MAP_LABEL_FLAG_OFFSET_PX = 17
 const SEA_FILL = '#126aa6'
 const UNSOLVED_LAND_FILL = '#34393f'
 const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
@@ -360,7 +362,7 @@ export async function createGlobe(
   }
 
   function clearLabels(): void {
-    labelLayer.selectAll('text').remove()
+    labelLayer.selectAll('.globe__label').remove()
   }
 
   function projectedPathData(geometry: GeoPermissibleObjects): string {
@@ -449,33 +451,38 @@ export async function createGlobe(
       .filter((label): label is GlobeLabel => Boolean(label))
 
     labelLayer
-      .selectAll<SVGTextElement, GlobeLabel>('text')
+      .selectAll<SVGGElement, GlobeLabel>('g.globe__label')
       .data(visibleLabels, (label: GlobeLabel) => label.id)
       .join(
         (enter: Selection<EnterElement, GlobeLabel, SVGGElement, unknown>) =>
-          enter.append('text')
+          enter.append('g')
             .attr('class', 'globe__label')
-            .attr('text-anchor', 'middle')
-            .call((textSelection) => {
-              textSelection.append('tspan').attr('class', 'globe__label-name')
-              textSelection
-                .append('tspan')
+            .call((groupSelection) => {
+              groupSelection
+                .append('text')
+                .attr('class', 'globe__label-name')
+                .attr('text-anchor', 'middle')
+              groupSelection
+                .append('text')
                 .attr('class', 'globe__label-flag')
-                .attr('x', 0)
-                .attr('dy', '1.25em')
+                .attr('text-anchor', 'middle')
             }),
-        (update: Selection<SVGTextElement, GlobeLabel, SVGGElement, unknown>) => update,
-        (exit: Selection<SVGTextElement, GlobeLabel, SVGGElement, unknown>) => exit.remove(),
+        (update: Selection<SVGGElement, GlobeLabel, SVGGElement, unknown>) => update,
+        (exit: Selection<SVGGElement, GlobeLabel, SVGGElement, unknown>) => exit.remove(),
       )
-      .attr('x', (label: GlobeLabel) => label.x)
-      .attr('y', (label: GlobeLabel) => label.y)
+      .attr('transform', (label: GlobeLabel) => `translate(${label.x} ${label.y})`)
       .each(function (label: GlobeLabel) {
-        const textSelection = select(this)
-        textSelection.select<SVGTSpanElement>('.globe__label-name').text(label.name).attr('x', label.x)
-        textSelection
-          .select<SVGTSpanElement>('.globe__label-flag')
+        const groupSelection = select(this)
+        groupSelection
+          .select<SVGTextElement>('.globe__label-name')
+          .text(label.name)
+          .attr('x', 0)
+          .attr('y', MAP_LABEL_NAME_OFFSET_PX)
+        groupSelection
+          .select<SVGTextElement>('.globe__label-flag')
           .text(label.flagEmoji)
-          .attr('x', label.x)
+          .attr('x', 0)
+          .attr('y', MAP_LABEL_FLAG_OFFSET_PX)
       })
   }
 
