@@ -103,6 +103,7 @@ const UNSOLVED_LAND_FILL = '#34393f'
 const LATEST_SOLVED_FILL = '#ffe45c'
 const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
 const SOLVED_COUNTRY_OUTLINE_COLOR = 'rgba(8, 18, 28, 0.95)'
+const MAX_COUNTRY_POLYGON_AREA = Math.PI * 2
 
 function appearanceFill(appearance: SolvedAppearance): string {
   return appearance.kind === 'flag' ? appearance.fallbackFill : appearance.fill
@@ -136,6 +137,61 @@ function normaliseAtlasId(value: string | number | undefined): string | null {
   }
 
   return String(value).padStart(3, '0')
+}
+
+function normalisePolygonCoordinates(
+  coordinates: number[][][],
+): number[][][] {
+  const polygon = {
+    type: 'Polygon',
+    coordinates,
+  } as GeoPermissibleObjects
+
+  if (geoArea(polygon) <= MAX_COUNTRY_POLYGON_AREA) {
+    return coordinates
+  }
+
+  return coordinates.map((ring) => [...ring].reverse())
+}
+
+function normaliseCountryFeature(feature: AtlasFeature): AtlasFeature {
+  if (!('geometry' in feature) || !feature.geometry) {
+    return feature
+  }
+
+  if (feature.geometry.type === 'Polygon') {
+    const geometry = feature.geometry as {
+      type: 'Polygon'
+      coordinates: number[][][]
+    }
+
+    return {
+      ...feature,
+      geometry: {
+        ...geometry,
+        coordinates: normalisePolygonCoordinates(geometry.coordinates),
+      },
+    }
+  }
+
+  if (feature.geometry.type === 'MultiPolygon') {
+    const geometry = feature.geometry as {
+      type: 'MultiPolygon'
+      coordinates: number[][][][]
+    }
+
+    return {
+      ...feature,
+      geometry: {
+        ...geometry,
+        coordinates: geometry.coordinates.map((polygonCoordinates) =>
+          normalisePolygonCoordinates(polygonCoordinates),
+        ),
+      },
+    }
+  }
+
+  return feature
 }
 
 function shortestLongitudeTarget(startLongitude: number, targetLongitude: number): number {
@@ -298,13 +354,15 @@ function buildAtlasBundle(topology: Topology, countries: QuizCountry[]): AtlasBu
   const countryAngularRadiusById = new Map<string, number>()
 
   for (const country of countries) {
-    const matchedFeature =
+    const matchedFeatureSource =
       byName.get(country.atlasName) ??
       (country.ccn3 ? byCcn3.get(country.ccn3.padStart(3, '0')) : undefined)
 
-    if (!matchedFeature) {
+    if (!matchedFeatureSource) {
       continue
     }
+
+    const matchedFeature = normaliseCountryFeature(matchedFeatureSource)
 
     featureByCountryId.set(country.id, matchedFeature)
     const labelFeature = primaryLabelFeature(matchedFeature)
@@ -337,6 +395,7 @@ export async function createGlobe(
   const countryById = new Map(countries.map((country) => [country.id, country]))
 
   for (const rawFeature of fallbackFeatures as AtlasFeature[]) {
+    const normalizedFeature = normaliseCountryFeature(rawFeature)
     const atlasId = normaliseAtlasId(rawFeature.id)
     const country = countries.find((candidate) => {
       return candidate.ccn3 === atlasId || candidate.atlasName === rawFeature.properties?.name
@@ -346,8 +405,8 @@ export async function createGlobe(
       continue
     }
 
-    fallbackFeatureByCountryId.set(country.id, rawFeature)
-    const labelFeature = primaryLabelFeature(rawFeature)
+    fallbackFeatureByCountryId.set(country.id, normalizedFeature)
+    const labelFeature = primaryLabelFeature(normalizedFeature)
     fallbackLabelFeatureByCountryId.set(country.id, labelFeature)
     const centroid = geoCentroid(labelFeature) as [number, number]
     fallbackCentroidByCountryId.set(country.id, centroid)

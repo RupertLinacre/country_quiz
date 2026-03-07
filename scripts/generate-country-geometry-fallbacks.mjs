@@ -11,6 +11,46 @@ import quizCountries from '../src/generated/quiz-country-records.json' with { ty
 const TINY_COUNTRY_AREA_THRESHOLD = 0.0001
 const ULTRA_TINY_COUNTRY_AREA_THRESHOLD = 0.000001
 const VISIBILITY_BOOST_RADIUS_DEGREES = 0.08
+const MAX_COUNTRY_POLYGON_AREA = Math.PI * 2
+
+function normalisePolygonCoordinates(coordinates) {
+  const polygon = {
+    type: 'Polygon',
+    coordinates,
+  }
+
+  if (geoArea(polygon) <= MAX_COUNTRY_POLYGON_AREA) {
+    return coordinates
+  }
+
+  return coordinates.map((ring) => [...ring].reverse())
+}
+
+function normaliseCountryGeometry(geometry) {
+  if (geometry.geometry.type === 'Polygon') {
+    return {
+      ...geometry,
+      geometry: {
+        ...geometry.geometry,
+        coordinates: normalisePolygonCoordinates(geometry.geometry.coordinates),
+      },
+    }
+  }
+
+  if (geometry.geometry.type === 'MultiPolygon') {
+    return {
+      ...geometry,
+      geometry: {
+        ...geometry.geometry,
+        coordinates: geometry.geometry.coordinates.map((polygonCoordinates) =>
+          normalisePolygonCoordinates(polygonCoordinates),
+        ),
+      },
+    }
+  }
+
+  return geometry
+}
 
 function atlasMatchesCountry(geometry, country) {
   const atlasId = geometry.id === undefined ? null : String(geometry.id).padStart(3, '0')
@@ -67,8 +107,10 @@ const atlas10Features = feature(atlas10, atlas10.objects.countries).features
 
 const fallbackFeatures = quizCountries
   .map((country) => {
-    const geometry50 = atlas50Features.find((geometry) => atlasMatchesCountry(geometry, country))
-    const geometry10 = atlas10Features.find((geometry) => atlasMatchesCountry(geometry, country))
+    const geometry50Source = atlas50Features.find((geometry) => atlasMatchesCountry(geometry, country))
+    const geometry10Source = atlas10Features.find((geometry) => atlasMatchesCountry(geometry, country))
+    const geometry50 = geometry50Source ? normaliseCountryGeometry(geometry50Source) : null
+    const geometry10 = geometry10Source ? normaliseCountryGeometry(geometry10Source) : null
 
     if (!geometry10) {
       return geometry50 && needsVisibilityBoost(geometry50) ? createVisibilityBoostFeature(geometry50) : null
