@@ -1,0 +1,3217 @@
+[
+  {
+    "id": "DZA",
+    "ccn3": "012",
+    "name": "Algeria",
+    "atlasName": "Algeria",
+    "continent": "Africa",
+    "aliases": [
+      "algeria",
+      "people s democratic republic of algeria",
+      "dzayer",
+      "algerie"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "AGO",
+    "ccn3": "024",
+    "name": "Angola",
+    "atlasName": "Angola",
+    "continent": "Africa",
+    "aliases": [
+      "angola",
+      "republic of angola",
+      "republica de angola",
+      "publika de an la"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BEN",
+    "ccn3": "204",
+    "name": "Benin",
+    "atlasName": "Benin",
+    "continent": "Africa",
+    "aliases": [
+      "benin",
+      "republic of benin",
+      "republique du benin"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BWA",
+    "ccn3": "072",
+    "name": "Botswana",
+    "atlasName": "Botswana",
+    "continent": "Africa",
+    "aliases": [
+      "botswana",
+      "republic of botswana",
+      "lefatshe la botswana"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BFA",
+    "ccn3": "854",
+    "name": "Burkina Faso",
+    "atlasName": "Burkina Faso",
+    "continent": "Africa",
+    "aliases": [
+      "burkina faso"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BDI",
+    "ccn3": "108",
+    "name": "Burundi",
+    "atlasName": "Burundi",
+    "continent": "Africa",
+    "aliases": [
+      "burundi",
+      "republic of burundi",
+      "republika y uburundi",
+      "republique du burundi"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CMR",
+    "ccn3": "120",
+    "name": "Cameroon",
+    "atlasName": "Cameroon",
+    "continent": "Africa",
+    "aliases": [
+      "cameroon",
+      "republic of cameroon",
+      "republique du cameroun"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CPV",
+    "ccn3": "132",
+    "name": "Cape Verde",
+    "atlasName": "Cape Verde",
+    "continent": "Africa",
+    "aliases": [
+      "cape verde",
+      "republic of cabo verde",
+      "republica de cabo verde"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CAF",
+    "ccn3": "140",
+    "name": "Central African Republic",
+    "atlasName": "Central African Republic",
+    "continent": "Africa",
+    "aliases": [
+      "central african republic",
+      "republique centrafricaine"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TCD",
+    "ccn3": "148",
+    "name": "Chad",
+    "atlasName": "Chad",
+    "continent": "Africa",
+    "aliases": [
+      "chad",
+      "republic of chad",
+      "tchad",
+      "republique du tchad"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "COM",
+    "ccn3": "174",
+    "name": "Comoros",
+    "atlasName": "Comoros",
+    "continent": "Africa",
+    "aliases": [
+      "comoros",
+      "union of the comoros",
+      "union des comores",
+      "udzima wa komori",
+      "al ittihad al qumuri"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "DJI",
+    "ccn3": "262",
+    "name": "Djibouti",
+    "atlasName": "Djibouti",
+    "continent": "Africa",
+    "aliases": [
+      "djibouti",
+      "republic of djibouti",
+      "jabuuti",
+      "gabuuti",
+      "republique de djibouti",
+      "gabuutih ummuuno",
+      "jamhuuriyadda jabuuti"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "COD",
+    "ccn3": "180",
+    "name": "DR Congo",
+    "atlasName": "DR Congo",
+    "continent": "Africa",
+    "aliases": [
+      "dr congo",
+      "democratic republic of the congo",
+      "congo kinshasa",
+      "congo the democratic republic of the",
+      "democratic republic of congo",
+      "drc"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "EGY",
+    "ccn3": "818",
+    "name": "Egypt",
+    "atlasName": "Egypt",
+    "continent": "Africa",
+    "aliases": [
+      "egypt",
+      "arab republic of egypt"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GNQ",
+    "ccn3": "226",
+    "name": "Equatorial Guinea",
+    "atlasName": "Equatorial Guinea",
+    "continent": "Africa",
+    "aliases": [
+      "equatorial guinea",
+      "republic of equatorial guinea",
+      "republica de guinea ecuatorial",
+      "republique de guinee equatoriale",
+      "republica da guine equatorial"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ERI",
+    "ccn3": "232",
+    "name": "Eritrea",
+    "atlasName": "Eritrea",
+    "continent": "Africa",
+    "aliases": [
+      "eritrea",
+      "state of eritrea",
+      "dawlat iritriya",
+      "ertra",
+      "iritriya"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SWZ",
+    "ccn3": "748",
+    "name": "Eswatini",
+    "atlasName": "Eswatini",
+    "continent": "Africa",
+    "aliases": [
+      "eswatini",
+      "kingdom of eswatini",
+      "swaziland",
+      "weswatini",
+      "swatini",
+      "ngwane",
+      "umbuso weswatini"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ETH",
+    "ccn3": "231",
+    "name": "Ethiopia",
+    "atlasName": "Ethiopia",
+    "continent": "Africa",
+    "aliases": [
+      "ethiopia",
+      "federal democratic republic of ethiopia",
+      "ityoppya"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GAB",
+    "ccn3": "266",
+    "name": "Gabon",
+    "atlasName": "Gabon",
+    "continent": "Africa",
+    "aliases": [
+      "gabon",
+      "gabonese republic",
+      "republique gabonaise"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GMB",
+    "ccn3": "270",
+    "name": "Gambia",
+    "atlasName": "Gambia",
+    "continent": "Africa",
+    "aliases": [
+      "gambia",
+      "republic of the gambia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GHA",
+    "ccn3": "288",
+    "name": "Ghana",
+    "atlasName": "Ghana",
+    "continent": "Africa",
+    "aliases": [
+      "ghana",
+      "republic of ghana"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GIN",
+    "ccn3": "324",
+    "name": "Guinea",
+    "atlasName": "Guinea",
+    "continent": "Africa",
+    "aliases": [
+      "guinea",
+      "republic of guinea",
+      "republique de guinee"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GNB",
+    "ccn3": "624",
+    "name": "Guinea-Bissau",
+    "atlasName": "Guinea-Bissau",
+    "continent": "Africa",
+    "aliases": [
+      "guinea bissau",
+      "republic of guinea bissau",
+      "republica da guine bissau"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CIV",
+    "ccn3": "384",
+    "name": "Ivory Coast",
+    "atlasName": "Ivory Coast",
+    "continent": "Africa",
+    "aliases": [
+      "ivory coast",
+      "republic of cote d ivoire",
+      "cote d ivoire",
+      "republique de cote d ivoire"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "KEN",
+    "ccn3": "404",
+    "name": "Kenya",
+    "atlasName": "Kenya",
+    "continent": "Africa",
+    "aliases": [
+      "kenya",
+      "republic of kenya",
+      "jamhuri ya kenya"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LSO",
+    "ccn3": "426",
+    "name": "Lesotho",
+    "atlasName": "Lesotho",
+    "continent": "Africa",
+    "aliases": [
+      "lesotho",
+      "kingdom of lesotho",
+      "muso oa lesotho"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LBR",
+    "ccn3": "430",
+    "name": "Liberia",
+    "atlasName": "Liberia",
+    "continent": "Africa",
+    "aliases": [
+      "liberia",
+      "republic of liberia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LBY",
+    "ccn3": "434",
+    "name": "Libya",
+    "atlasName": "Libya",
+    "continent": "Africa",
+    "aliases": [
+      "libya",
+      "state of libya",
+      "dawlat libya"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MDG",
+    "ccn3": "450",
+    "name": "Madagascar",
+    "atlasName": "Madagascar",
+    "continent": "Africa",
+    "aliases": [
+      "madagascar",
+      "republic of madagascar",
+      "repoblikan i madagasikara",
+      "republique de madagascar"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MWI",
+    "ccn3": "454",
+    "name": "Malawi",
+    "atlasName": "Malawi",
+    "continent": "Africa",
+    "aliases": [
+      "malawi",
+      "republic of malawi"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MLI",
+    "ccn3": "466",
+    "name": "Mali",
+    "atlasName": "Mali",
+    "continent": "Africa",
+    "aliases": [
+      "mali",
+      "republic of mali",
+      "republique du mali"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MRT",
+    "ccn3": "478",
+    "name": "Mauritania",
+    "atlasName": "Mauritania",
+    "continent": "Africa",
+    "aliases": [
+      "mauritania",
+      "islamic republic of mauritania",
+      "al jumhuriyyah al islamiyyah al muritaniyyah"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MUS",
+    "ccn3": "480",
+    "name": "Mauritius",
+    "atlasName": "Mauritius",
+    "continent": "Africa",
+    "aliases": [
+      "mauritius",
+      "republic of mauritius",
+      "republique de maurice"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MAR",
+    "ccn3": "504",
+    "name": "Morocco",
+    "atlasName": "Morocco",
+    "continent": "Africa",
+    "aliases": [
+      "morocco",
+      "kingdom of morocco",
+      "al mamlakah al magribiyah"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MOZ",
+    "ccn3": "508",
+    "name": "Mozambique",
+    "atlasName": "Mozambique",
+    "continent": "Africa",
+    "aliases": [
+      "mozambique",
+      "republic of mozambique",
+      "republica de mocambique"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "NAM",
+    "ccn3": "516",
+    "name": "Namibia",
+    "atlasName": "Namibia",
+    "continent": "Africa",
+    "aliases": [
+      "namibia",
+      "republic of namibia",
+      "namibie"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "NER",
+    "ccn3": "562",
+    "name": "Niger",
+    "atlasName": "Niger",
+    "continent": "Africa",
+    "aliases": [
+      "niger",
+      "republic of niger",
+      "nijar"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "NGA",
+    "ccn3": "566",
+    "name": "Nigeria",
+    "atlasName": "Nigeria",
+    "continent": "Africa",
+    "aliases": [
+      "nigeria",
+      "federal republic of nigeria",
+      "nijeriya",
+      "naijiria"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "COG",
+    "ccn3": "178",
+    "name": "Republic of the Congo",
+    "atlasName": "Republic of the Congo",
+    "continent": "Africa",
+    "aliases": [
+      "republic of the congo",
+      "congo",
+      "congo brazzaville"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "RWA",
+    "ccn3": "646",
+    "name": "Rwanda",
+    "atlasName": "Rwanda",
+    "continent": "Africa",
+    "aliases": [
+      "rwanda",
+      "republic of rwanda",
+      "repubulika y u rwanda",
+      "republique du rwanda"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "STP",
+    "ccn3": "678",
+    "name": "São Tomé and Príncipe",
+    "atlasName": "São Tomé and Príncipe",
+    "continent": "Africa",
+    "aliases": [
+      "sao tome and principe",
+      "democratic republic of sao tome and principe",
+      "republica democratica de sao tome e principe",
+      "sao tome"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SEN",
+    "ccn3": "686",
+    "name": "Senegal",
+    "atlasName": "Senegal",
+    "continent": "Africa",
+    "aliases": [
+      "senegal",
+      "republic of senegal",
+      "republique du senegal"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SYC",
+    "ccn3": "690",
+    "name": "Seychelles",
+    "atlasName": "Seychelles",
+    "continent": "Africa",
+    "aliases": [
+      "seychelles",
+      "republic of seychelles",
+      "repiblik sesel",
+      "republique des seychelles"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SLE",
+    "ccn3": "694",
+    "name": "Sierra Leone",
+    "atlasName": "Sierra Leone",
+    "continent": "Africa",
+    "aliases": [
+      "sierra leone",
+      "republic of sierra leone"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SOM",
+    "ccn3": "706",
+    "name": "Somalia",
+    "atlasName": "Somalia",
+    "continent": "Africa",
+    "aliases": [
+      "somalia",
+      "federal republic of somalia",
+      "as sumal",
+      "jamhuuriyadda federaalka soomaaliya",
+      "jumhuriyyat as sumal al fideraliyya"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ZAF",
+    "ccn3": "710",
+    "name": "South Africa",
+    "atlasName": "South Africa",
+    "continent": "Africa",
+    "aliases": [
+      "south africa",
+      "republic of south africa",
+      "suid afrika"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SSD",
+    "ccn3": "728",
+    "name": "South Sudan",
+    "atlasName": "South Sudan",
+    "continent": "Africa",
+    "aliases": [
+      "south sudan",
+      "republic of south sudan"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SDN",
+    "ccn3": "729",
+    "name": "Sudan",
+    "atlasName": "Sudan",
+    "continent": "Africa",
+    "aliases": [
+      "sudan",
+      "republic of the sudan",
+      "jumhuriyat as sudan"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TZA",
+    "ccn3": "834",
+    "name": "Tanzania",
+    "atlasName": "Tanzania",
+    "continent": "Africa",
+    "aliases": [
+      "tanzania",
+      "united republic of tanzania",
+      "tanzania united republic of",
+      "jamhuri ya muungano wa tanzania"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TGO",
+    "ccn3": "768",
+    "name": "Togo",
+    "atlasName": "Togo",
+    "continent": "Africa",
+    "aliases": [
+      "togo",
+      "togolese republic",
+      "togolese",
+      "republique togolaise"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TUN",
+    "ccn3": "788",
+    "name": "Tunisia",
+    "atlasName": "Tunisia",
+    "continent": "Africa",
+    "aliases": [
+      "tunisia",
+      "tunisian republic",
+      "republic of tunisia",
+      "al jumhuriyyah at tunisiyyah"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "UGA",
+    "ccn3": "800",
+    "name": "Uganda",
+    "atlasName": "Uganda",
+    "continent": "Africa",
+    "aliases": [
+      "uganda",
+      "republic of uganda",
+      "jamhuri ya uganda"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ZMB",
+    "ccn3": "894",
+    "name": "Zambia",
+    "atlasName": "Zambia",
+    "continent": "Africa",
+    "aliases": [
+      "zambia",
+      "republic of zambia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ZWE",
+    "ccn3": "716",
+    "name": "Zimbabwe",
+    "atlasName": "Zimbabwe",
+    "continent": "Africa",
+    "aliases": [
+      "zimbabwe",
+      "republic of zimbabwe"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "AFG",
+    "ccn3": "004",
+    "name": "Afghanistan",
+    "atlasName": "Afghanistan",
+    "continent": "Asia",
+    "aliases": [
+      "afghanistan",
+      "islamic republic of afghanistan",
+      "afganistan"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ARM",
+    "ccn3": "051",
+    "name": "Armenia",
+    "atlasName": "Armenia",
+    "continent": "Asia",
+    "aliases": [
+      "armenia",
+      "republic of armenia",
+      "hayastan"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "AZE",
+    "ccn3": "031",
+    "name": "Azerbaijan",
+    "atlasName": "Azerbaijan",
+    "continent": "Asia",
+    "aliases": [
+      "azerbaijan",
+      "republic of azerbaijan",
+      "az rbaycan respublikas"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BHR",
+    "ccn3": "048",
+    "name": "Bahrain",
+    "atlasName": "Bahrain",
+    "continent": "Asia",
+    "aliases": [
+      "bahrain",
+      "kingdom of bahrain",
+      "mamlakat al bahrayn"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BGD",
+    "ccn3": "050",
+    "name": "Bangladesh",
+    "atlasName": "Bangladesh",
+    "continent": "Asia",
+    "aliases": [
+      "bangladesh",
+      "people s republic of bangladesh",
+      "gonoprojatontri bangladesh"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BTN",
+    "ccn3": "064",
+    "name": "Bhutan",
+    "atlasName": "Bhutan",
+    "continent": "Asia",
+    "aliases": [
+      "bhutan",
+      "kingdom of bhutan"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BRN",
+    "ccn3": "096",
+    "name": "Brunei",
+    "atlasName": "Brunei",
+    "continent": "Asia",
+    "aliases": [
+      "brunei",
+      "nation of brunei abode of peace",
+      "brunei darussalam",
+      "nation of brunei",
+      "abode of peace"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "KHM",
+    "ccn3": "116",
+    "name": "Cambodia",
+    "atlasName": "Cambodia",
+    "continent": "Asia",
+    "aliases": [
+      "cambodia",
+      "kingdom of cambodia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CHN",
+    "ccn3": "156",
+    "name": "China",
+    "atlasName": "China",
+    "continent": "Asia",
+    "aliases": [
+      "china",
+      "people s republic of china",
+      "zhongguo",
+      "zhonghua",
+      "zhonghua renmin gongheguo"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GEO",
+    "ccn3": "268",
+    "name": "Georgia",
+    "atlasName": "Georgia",
+    "continent": "Asia",
+    "aliases": [
+      "georgia",
+      "sakartvelo"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "IND",
+    "ccn3": "356",
+    "name": "India",
+    "atlasName": "India",
+    "continent": "Asia",
+    "aliases": [
+      "india",
+      "republic of india",
+      "bharat",
+      "bharat ganrajya"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "IDN",
+    "ccn3": "360",
+    "name": "Indonesia",
+    "atlasName": "Indonesia",
+    "continent": "Asia",
+    "aliases": [
+      "indonesia",
+      "republic of indonesia",
+      "republik indonesia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "IRN",
+    "ccn3": "364",
+    "name": "Iran",
+    "atlasName": "Iran",
+    "continent": "Asia",
+    "aliases": [
+      "iran",
+      "islamic republic of iran",
+      "iran islamic republic of",
+      "jomhuri ye eslami ye iran"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "IRQ",
+    "ccn3": "368",
+    "name": "Iraq",
+    "atlasName": "Iraq",
+    "continent": "Asia",
+    "aliases": [
+      "iraq",
+      "republic of iraq",
+      "jumhuriyyat al iraq"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ISR",
+    "ccn3": "376",
+    "name": "Israel",
+    "atlasName": "Israel",
+    "continent": "Asia",
+    "aliases": [
+      "israel",
+      "state of israel",
+      "medinat yisra el"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "JPN",
+    "ccn3": "392",
+    "name": "Japan",
+    "atlasName": "Japan",
+    "continent": "Asia",
+    "aliases": [
+      "japan",
+      "nippon",
+      "nihon"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "JOR",
+    "ccn3": "400",
+    "name": "Jordan",
+    "atlasName": "Jordan",
+    "continent": "Asia",
+    "aliases": [
+      "jordan",
+      "hashemite kingdom of jordan",
+      "al mamlakah al urduniyah al hashimiyah"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "KAZ",
+    "ccn3": "398",
+    "name": "Kazakhstan",
+    "atlasName": "Kazakhstan",
+    "continent": "Asia",
+    "aliases": [
+      "kazakhstan",
+      "republic of kazakhstan",
+      "qazaqstan",
+      "qazaqstan respublikas",
+      "respublika kazakhstan"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "KWT",
+    "ccn3": "414",
+    "name": "Kuwait",
+    "atlasName": "Kuwait",
+    "continent": "Asia",
+    "aliases": [
+      "kuwait",
+      "state of kuwait",
+      "dawlat al kuwait"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "KGZ",
+    "ccn3": "417",
+    "name": "Kyrgyzstan",
+    "atlasName": "Kyrgyzstan",
+    "continent": "Asia",
+    "aliases": [
+      "kyrgyzstan",
+      "kyrgyz republic",
+      "kyrgyz respublikasy"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LAO",
+    "ccn3": "418",
+    "name": "Laos",
+    "atlasName": "Laos",
+    "continent": "Asia",
+    "aliases": [
+      "laos",
+      "lao people s democratic republic",
+      "sathalanalat paxathipatai paxaxon lao"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LBN",
+    "ccn3": "422",
+    "name": "Lebanon",
+    "atlasName": "Lebanon",
+    "continent": "Asia",
+    "aliases": [
+      "lebanon",
+      "lebanese republic",
+      "al jumhuriyah al libnaniyah"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MYS",
+    "ccn3": "458",
+    "name": "Malaysia",
+    "atlasName": "Malaysia",
+    "continent": "Asia",
+    "aliases": [
+      "malaysia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MDV",
+    "ccn3": "462",
+    "name": "Maldives",
+    "atlasName": "Maldives",
+    "continent": "Asia",
+    "aliases": [
+      "maldives",
+      "republic of the maldives",
+      "maldive islands",
+      "dhivehi raajjeyge jumhooriyya"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MNG",
+    "ccn3": "496",
+    "name": "Mongolia",
+    "atlasName": "Mongolia",
+    "continent": "Asia",
+    "aliases": [
+      "mongolia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MMR",
+    "ccn3": "104",
+    "name": "Myanmar",
+    "atlasName": "Myanmar",
+    "continent": "Asia",
+    "aliases": [
+      "myanmar",
+      "republic of the union of myanmar",
+      "burma",
+      "pyidaunzu thanmada myama nainngandaw"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "NPL",
+    "ccn3": "524",
+    "name": "Nepal",
+    "atlasName": "Nepal",
+    "continent": "Asia",
+    "aliases": [
+      "nepal",
+      "federal democratic republic of nepal",
+      "loktantrik ganatantra nepal"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "PRK",
+    "ccn3": "408",
+    "name": "North Korea",
+    "atlasName": "North Korea",
+    "continent": "Asia",
+    "aliases": [
+      "north korea",
+      "democratic people s republic of korea",
+      "dprk",
+      "choson minjujuui inmin konghwaguk",
+      "korea democratic people s republic of"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "OMN",
+    "ccn3": "512",
+    "name": "Oman",
+    "atlasName": "Oman",
+    "continent": "Asia",
+    "aliases": [
+      "oman",
+      "sultanate of oman",
+      "saltanat uman"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "PAK",
+    "ccn3": "586",
+    "name": "Pakistan",
+    "atlasName": "Pakistan",
+    "continent": "Asia",
+    "aliases": [
+      "pakistan",
+      "islamic republic of pakistan",
+      "islami jumhuriya eh pakistan"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "PSE",
+    "ccn3": "275",
+    "name": "Palestine",
+    "atlasName": "Palestine",
+    "continent": "Asia",
+    "aliases": [
+      "palestine",
+      "state of palestine",
+      "palestine state of",
+      "dawlat filastin"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "PHL",
+    "ccn3": "608",
+    "name": "Philippines",
+    "atlasName": "Philippines",
+    "continent": "Asia",
+    "aliases": [
+      "philippines",
+      "republic of the philippines",
+      "republika ng pilipinas"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "QAT",
+    "ccn3": "634",
+    "name": "Qatar",
+    "atlasName": "Qatar",
+    "continent": "Asia",
+    "aliases": [
+      "qatar",
+      "state of qatar",
+      "dawlat qatar"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SAU",
+    "ccn3": "682",
+    "name": "Saudi Arabia",
+    "atlasName": "Saudi Arabia",
+    "continent": "Asia",
+    "aliases": [
+      "saudi arabia",
+      "kingdom of saudi arabia",
+      "saudi",
+      "al mamlakah al arabiyyah as su udiyyah"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SGP",
+    "ccn3": "702",
+    "name": "Singapore",
+    "atlasName": "Singapore",
+    "continent": "Asia",
+    "aliases": [
+      "singapore",
+      "republic of singapore",
+      "singapura",
+      "republik singapura"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "KOR",
+    "ccn3": "410",
+    "name": "South Korea",
+    "atlasName": "South Korea",
+    "continent": "Asia",
+    "aliases": [
+      "south korea",
+      "republic of korea",
+      "korea republic of"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LKA",
+    "ccn3": "144",
+    "name": "Sri Lanka",
+    "atlasName": "Sri Lanka",
+    "continent": "Asia",
+    "aliases": [
+      "sri lanka",
+      "democratic socialist republic of sri lanka",
+      "ilankai"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SYR",
+    "ccn3": "760",
+    "name": "Syria",
+    "atlasName": "Syria",
+    "continent": "Asia",
+    "aliases": [
+      "syria",
+      "syrian arab republic",
+      "al jumhuriyah al arabiyah as suriyah"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TWN",
+    "ccn3": "158",
+    "name": "Taiwan",
+    "atlasName": "Taiwan",
+    "continent": "Asia",
+    "aliases": [
+      "taiwan",
+      "republic of china taiwan",
+      "republic of china",
+      "zhonghua minguo",
+      "chinese taipei"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TJK",
+    "ccn3": "762",
+    "name": "Tajikistan",
+    "atlasName": "Tajikistan",
+    "continent": "Asia",
+    "aliases": [
+      "tajikistan",
+      "republic of tajikistan",
+      "tocikiston",
+      "cumhuriyi tocikiston"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "THA",
+    "ccn3": "764",
+    "name": "Thailand",
+    "atlasName": "Thailand",
+    "continent": "Asia",
+    "aliases": [
+      "thailand",
+      "kingdom of thailand",
+      "prathet",
+      "thai",
+      "ratcha anachak thai"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TLS",
+    "ccn3": "626",
+    "name": "Timor-Leste",
+    "atlasName": "Timor-Leste",
+    "continent": "Asia",
+    "aliases": [
+      "timor leste",
+      "democratic republic of timor leste",
+      "east timor",
+      "timor",
+      "republica democratica de timor leste",
+      "republika demokratika timor leste",
+      "timor lorosa e",
+      "timor lorosae"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TUR",
+    "ccn3": "792",
+    "name": "Türkiye",
+    "atlasName": "Türkiye",
+    "continent": "Asia",
+    "aliases": [
+      "turkiye",
+      "republic of turkiye",
+      "republic of turkey",
+      "turkiye cumhuriyeti"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TKM",
+    "ccn3": "795",
+    "name": "Turkmenistan",
+    "atlasName": "Turkmenistan",
+    "continent": "Asia",
+    "aliases": [
+      "turkmenistan"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ARE",
+    "ccn3": "784",
+    "name": "United Arab Emirates",
+    "atlasName": "United Arab Emirates",
+    "continent": "Asia",
+    "aliases": [
+      "united arab emirates",
+      "emirates",
+      "uae"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "UZB",
+    "ccn3": "860",
+    "name": "Uzbekistan",
+    "atlasName": "Uzbekistan",
+    "continent": "Asia",
+    "aliases": [
+      "uzbekistan",
+      "republic of uzbekistan",
+      "o zbekiston respublikasi"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "VNM",
+    "ccn3": "704",
+    "name": "Vietnam",
+    "atlasName": "Vietnam",
+    "continent": "Asia",
+    "aliases": [
+      "vietnam",
+      "socialist republic of vietnam",
+      "cong hoa xa hoi chu nghia viet nam",
+      "viet nam"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "YEM",
+    "ccn3": "887",
+    "name": "Yemen",
+    "atlasName": "Yemen",
+    "continent": "Asia",
+    "aliases": [
+      "yemen",
+      "republic of yemen",
+      "yemeni republic",
+      "al jumhuriyyah al yamaniyyah"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ALB",
+    "ccn3": "008",
+    "name": "Albania",
+    "atlasName": "Albania",
+    "continent": "Europe",
+    "aliases": [
+      "albania",
+      "republic of albania",
+      "shqiperi",
+      "shqiperia",
+      "shqipnia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "AND",
+    "ccn3": "020",
+    "name": "Andorra",
+    "atlasName": "Andorra",
+    "continent": "Europe",
+    "aliases": [
+      "andorra",
+      "principality of andorra",
+      "principat d andorra"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "AUT",
+    "ccn3": "040",
+    "name": "Austria",
+    "atlasName": "Austria",
+    "continent": "Europe",
+    "aliases": [
+      "austria",
+      "republic of austria",
+      "osterreich",
+      "oesterreich"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BLR",
+    "ccn3": "112",
+    "name": "Belarus",
+    "atlasName": "Belarus",
+    "continent": "Europe",
+    "aliases": [
+      "belarus",
+      "republic of belarus",
+      "bielarus"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BEL",
+    "ccn3": "056",
+    "name": "Belgium",
+    "atlasName": "Belgium",
+    "continent": "Europe",
+    "aliases": [
+      "belgium",
+      "kingdom of belgium",
+      "belgie",
+      "belgien",
+      "belgique",
+      "koninkrijk belgie",
+      "royaume de belgique",
+      "konigreich belgien"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BIH",
+    "ccn3": "070",
+    "name": "Bosnia and Herzegovina",
+    "atlasName": "Bosnia and Herzegovina",
+    "continent": "Europe",
+    "aliases": [
+      "bosnia and herzegovina",
+      "bosnia herzegovina"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BGR",
+    "ccn3": "100",
+    "name": "Bulgaria",
+    "atlasName": "Bulgaria",
+    "continent": "Europe",
+    "aliases": [
+      "bulgaria",
+      "republic of bulgaria"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "HRV",
+    "ccn3": "191",
+    "name": "Croatia",
+    "atlasName": "Croatia",
+    "continent": "Europe",
+    "aliases": [
+      "croatia",
+      "republic of croatia",
+      "hrvatska",
+      "republika hrvatska"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CYP",
+    "ccn3": "196",
+    "name": "Cyprus",
+    "atlasName": "Cyprus",
+    "continent": "Europe",
+    "aliases": [
+      "cyprus",
+      "republic of cyprus",
+      "kypros",
+      "k br s",
+      "k br s cumhuriyeti"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CZE",
+    "ccn3": "203",
+    "name": "Czechia",
+    "atlasName": "Czechia",
+    "continent": "Europe",
+    "aliases": [
+      "czechia",
+      "czech republic",
+      "ceska republika",
+      "cesko"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "DNK",
+    "ccn3": "208",
+    "name": "Denmark",
+    "atlasName": "Denmark",
+    "continent": "Europe",
+    "aliases": [
+      "denmark",
+      "kingdom of denmark",
+      "danmark",
+      "kongeriget danmark"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "EST",
+    "ccn3": "233",
+    "name": "Estonia",
+    "atlasName": "Estonia",
+    "continent": "Europe",
+    "aliases": [
+      "estonia",
+      "republic of estonia",
+      "eesti",
+      "eesti vabariik"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "FIN",
+    "ccn3": "246",
+    "name": "Finland",
+    "atlasName": "Finland",
+    "continent": "Europe",
+    "aliases": [
+      "finland",
+      "republic of finland",
+      "suomi",
+      "suomen tasavalta",
+      "republiken finland"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "FRA",
+    "ccn3": "250",
+    "name": "France",
+    "atlasName": "France",
+    "continent": "Europe",
+    "aliases": [
+      "france",
+      "french republic",
+      "republique francaise"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "DEU",
+    "ccn3": "276",
+    "name": "Germany",
+    "atlasName": "Germany",
+    "continent": "Europe",
+    "aliases": [
+      "germany",
+      "federal republic of germany",
+      "bundesrepublik deutschland"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GRC",
+    "ccn3": "300",
+    "name": "Greece",
+    "atlasName": "Greece",
+    "continent": "Europe",
+    "aliases": [
+      "greece",
+      "hellenic republic",
+      "ellada"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "HUN",
+    "ccn3": "348",
+    "name": "Hungary",
+    "atlasName": "Hungary",
+    "continent": "Europe",
+    "aliases": [
+      "hungary"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ISL",
+    "ccn3": "352",
+    "name": "Iceland",
+    "atlasName": "Iceland",
+    "continent": "Europe",
+    "aliases": [
+      "iceland",
+      "island",
+      "republic of iceland",
+      "ly veldi island"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "IRL",
+    "ccn3": "372",
+    "name": "Ireland",
+    "atlasName": "Ireland",
+    "continent": "Europe",
+    "aliases": [
+      "ireland",
+      "republic of ireland",
+      "eire",
+      "poblacht na heireann"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ITA",
+    "ccn3": "380",
+    "name": "Italy",
+    "atlasName": "Italy",
+    "continent": "Europe",
+    "aliases": [
+      "italy",
+      "italian republic",
+      "repubblica italiana"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "UNK",
+    "ccn3": null,
+    "name": "Kosovo",
+    "atlasName": "Kosovo",
+    "continent": "Europe",
+    "aliases": [
+      "kosovo",
+      "republic of kosovo"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LVA",
+    "ccn3": "428",
+    "name": "Latvia",
+    "atlasName": "Latvia",
+    "continent": "Europe",
+    "aliases": [
+      "latvia",
+      "republic of latvia",
+      "latvijas republika"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LIE",
+    "ccn3": "438",
+    "name": "Liechtenstein",
+    "atlasName": "Liechtenstein",
+    "continent": "Europe",
+    "aliases": [
+      "liechtenstein",
+      "principality of liechtenstein",
+      "furstentum liechtenstein"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LTU",
+    "ccn3": "440",
+    "name": "Lithuania",
+    "atlasName": "Lithuania",
+    "continent": "Europe",
+    "aliases": [
+      "lithuania",
+      "republic of lithuania",
+      "lietuvos respublika"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LUX",
+    "ccn3": "442",
+    "name": "Luxembourg",
+    "atlasName": "Luxembourg",
+    "continent": "Europe",
+    "aliases": [
+      "luxembourg",
+      "grand duchy of luxembourg",
+      "grand duche de luxembourg",
+      "gro herzogtum luxemburg",
+      "groussherzogtum letzebuerg"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MLT",
+    "ccn3": "470",
+    "name": "Malta",
+    "atlasName": "Malta",
+    "continent": "Europe",
+    "aliases": [
+      "malta",
+      "republic of malta",
+      "repubblika ta malta"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MDA",
+    "ccn3": "498",
+    "name": "Moldova",
+    "atlasName": "Moldova",
+    "continent": "Europe",
+    "aliases": [
+      "moldova",
+      "republic of moldova",
+      "moldova republic of",
+      "republica moldova"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MCO",
+    "ccn3": "492",
+    "name": "Monaco",
+    "atlasName": "Monaco",
+    "continent": "Europe",
+    "aliases": [
+      "monaco",
+      "principality of monaco",
+      "principaute de monaco"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MNE",
+    "ccn3": "499",
+    "name": "Montenegro",
+    "atlasName": "Montenegro",
+    "continent": "Europe",
+    "aliases": [
+      "montenegro",
+      "crna gora"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "NLD",
+    "ccn3": "528",
+    "name": "Netherlands",
+    "atlasName": "Netherlands",
+    "continent": "Europe",
+    "aliases": [
+      "netherlands",
+      "kingdom of the netherlands",
+      "holland",
+      "nederland"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MKD",
+    "ccn3": "807",
+    "name": "North Macedonia",
+    "atlasName": "North Macedonia",
+    "continent": "Europe",
+    "aliases": [
+      "north macedonia",
+      "republic of north macedonia",
+      "former yugoslav republic of macedonia",
+      "macedonia the former yugoslav republic of",
+      "macedonia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "NOR",
+    "ccn3": "578",
+    "name": "Norway",
+    "atlasName": "Norway",
+    "continent": "Europe",
+    "aliases": [
+      "norway",
+      "kingdom of norway",
+      "norge",
+      "noreg",
+      "kongeriket norge",
+      "kongeriket noreg"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "POL",
+    "ccn3": "616",
+    "name": "Poland",
+    "atlasName": "Poland",
+    "continent": "Europe",
+    "aliases": [
+      "poland",
+      "republic of poland",
+      "rzeczpospolita polska"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "PRT",
+    "ccn3": "620",
+    "name": "Portugal",
+    "atlasName": "Portugal",
+    "continent": "Europe",
+    "aliases": [
+      "portugal",
+      "portuguese republic",
+      "portuguesa",
+      "republica portuguesa"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ROU",
+    "ccn3": "642",
+    "name": "Romania",
+    "atlasName": "Romania",
+    "continent": "Europe",
+    "aliases": [
+      "romania",
+      "rumania",
+      "roumania"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "RUS",
+    "ccn3": "643",
+    "name": "Russia",
+    "atlasName": "Russia",
+    "continent": "Europe",
+    "aliases": [
+      "russia",
+      "russian federation"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SMR",
+    "ccn3": "674",
+    "name": "San Marino",
+    "atlasName": "San Marino",
+    "continent": "Europe",
+    "aliases": [
+      "san marino",
+      "most serene republic of san marino",
+      "republic of san marino",
+      "repubblica di san marino"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SRB",
+    "ccn3": "688",
+    "name": "Serbia",
+    "atlasName": "Serbia",
+    "continent": "Europe",
+    "aliases": [
+      "serbia",
+      "republic of serbia",
+      "srbija",
+      "republika srbija"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SVK",
+    "ccn3": "703",
+    "name": "Slovakia",
+    "atlasName": "Slovakia",
+    "continent": "Europe",
+    "aliases": [
+      "slovakia",
+      "slovak republic",
+      "slovenska republika"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SVN",
+    "ccn3": "705",
+    "name": "Slovenia",
+    "atlasName": "Slovenia",
+    "continent": "Europe",
+    "aliases": [
+      "slovenia",
+      "republic of slovenia",
+      "republika slovenija"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ESP",
+    "ccn3": "724",
+    "name": "Spain",
+    "atlasName": "Spain",
+    "continent": "Europe",
+    "aliases": [
+      "spain",
+      "kingdom of spain",
+      "reino de espana"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SWE",
+    "ccn3": "752",
+    "name": "Sweden",
+    "atlasName": "Sweden",
+    "continent": "Europe",
+    "aliases": [
+      "sweden",
+      "kingdom of sweden",
+      "konungariket sverige"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CHE",
+    "ccn3": "756",
+    "name": "Switzerland",
+    "atlasName": "Switzerland",
+    "continent": "Europe",
+    "aliases": [
+      "switzerland",
+      "swiss confederation",
+      "schweiz",
+      "suisse",
+      "svizzera",
+      "svizra"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "UKR",
+    "ccn3": "804",
+    "name": "Ukraine",
+    "atlasName": "Ukraine",
+    "continent": "Europe",
+    "aliases": [
+      "ukraine",
+      "ukrayina"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GBR",
+    "ccn3": "826",
+    "name": "United Kingdom",
+    "atlasName": "United Kingdom",
+    "continent": "Europe",
+    "aliases": [
+      "united kingdom",
+      "united kingdom of great britain and northern ireland",
+      "great britain",
+      "uk",
+      "britain"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "VAT",
+    "ccn3": "336",
+    "name": "Vatican City",
+    "atlasName": "Vatican",
+    "continent": "Europe",
+    "aliases": [
+      "vatican city",
+      "vatican city state",
+      "holy see vatican city state",
+      "vatican",
+      "stato della citta del vaticano",
+      "holy see"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ATG",
+    "ccn3": "028",
+    "name": "Antigua and Barbuda",
+    "atlasName": "Antigua and Barbuda",
+    "continent": "North America",
+    "aliases": [
+      "antigua and barbuda"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BHS",
+    "ccn3": "044",
+    "name": "Bahamas",
+    "atlasName": "Bahamas",
+    "continent": "North America",
+    "aliases": [
+      "bahamas",
+      "commonwealth of the bahamas"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BRB",
+    "ccn3": "052",
+    "name": "Barbados",
+    "atlasName": "Barbados",
+    "continent": "North America",
+    "aliases": [
+      "barbados"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BLZ",
+    "ccn3": "084",
+    "name": "Belize",
+    "atlasName": "Belize",
+    "continent": "North America",
+    "aliases": [
+      "belize"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CAN",
+    "ccn3": "124",
+    "name": "Canada",
+    "atlasName": "Canada",
+    "continent": "North America",
+    "aliases": [
+      "canada"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CRI",
+    "ccn3": "188",
+    "name": "Costa Rica",
+    "atlasName": "Costa Rica",
+    "continent": "North America",
+    "aliases": [
+      "costa rica",
+      "republic of costa rica",
+      "republica de costa rica"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CUB",
+    "ccn3": "192",
+    "name": "Cuba",
+    "atlasName": "Cuba",
+    "continent": "North America",
+    "aliases": [
+      "cuba",
+      "republic of cuba",
+      "republica de cuba"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "DMA",
+    "ccn3": "212",
+    "name": "Dominica",
+    "atlasName": "Dominica",
+    "continent": "North America",
+    "aliases": [
+      "dominica",
+      "commonwealth of dominica",
+      "dominique",
+      "wai tu kubuli"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "DOM",
+    "ccn3": "214",
+    "name": "Dominican Republic",
+    "atlasName": "Dominican Republic",
+    "continent": "North America",
+    "aliases": [
+      "dominican republic"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SLV",
+    "ccn3": "222",
+    "name": "El Salvador",
+    "atlasName": "El Salvador",
+    "continent": "North America",
+    "aliases": [
+      "el salvador",
+      "republic of el salvador",
+      "republica de el salvador"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GRD",
+    "ccn3": "308",
+    "name": "Grenada",
+    "atlasName": "Grenada",
+    "continent": "North America",
+    "aliases": [
+      "grenada"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GTM",
+    "ccn3": "320",
+    "name": "Guatemala",
+    "atlasName": "Guatemala",
+    "continent": "North America",
+    "aliases": [
+      "guatemala",
+      "republic of guatemala"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "HTI",
+    "ccn3": "332",
+    "name": "Haiti",
+    "atlasName": "Haiti",
+    "continent": "North America",
+    "aliases": [
+      "haiti",
+      "republic of haiti",
+      "republique d haiti",
+      "repiblik ayiti"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "HND",
+    "ccn3": "340",
+    "name": "Honduras",
+    "atlasName": "Honduras",
+    "continent": "North America",
+    "aliases": [
+      "honduras",
+      "republic of honduras",
+      "republica de honduras"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "JAM",
+    "ccn3": "388",
+    "name": "Jamaica",
+    "atlasName": "Jamaica",
+    "continent": "North America",
+    "aliases": [
+      "jamaica"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MEX",
+    "ccn3": "484",
+    "name": "Mexico",
+    "atlasName": "Mexico",
+    "continent": "North America",
+    "aliases": [
+      "mexico",
+      "united mexican states",
+      "mexicanos",
+      "estados unidos mexicanos"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "NIC",
+    "ccn3": "558",
+    "name": "Nicaragua",
+    "atlasName": "Nicaragua",
+    "continent": "North America",
+    "aliases": [
+      "nicaragua",
+      "republic of nicaragua",
+      "republica de nicaragua"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "PAN",
+    "ccn3": "591",
+    "name": "Panama",
+    "atlasName": "Panama",
+    "continent": "North America",
+    "aliases": [
+      "panama",
+      "republic of panama",
+      "republica de panama"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "KNA",
+    "ccn3": "659",
+    "name": "Saint Kitts and Nevis",
+    "atlasName": "Saint Kitts and Nevis",
+    "continent": "North America",
+    "aliases": [
+      "saint kitts and nevis",
+      "federation of saint christopher and nevis",
+      "saint kitts"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "LCA",
+    "ccn3": "662",
+    "name": "Saint Lucia",
+    "atlasName": "Saint Lucia",
+    "continent": "North America",
+    "aliases": [
+      "saint lucia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "VCT",
+    "ccn3": "670",
+    "name": "Saint Vincent and the Grenadines",
+    "atlasName": "Saint Vincent and the Grenadines",
+    "continent": "North America",
+    "aliases": [
+      "saint vincent and the grenadines",
+      "saint vincent"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TTO",
+    "ccn3": "780",
+    "name": "Trinidad and Tobago",
+    "atlasName": "Trinidad and Tobago",
+    "continent": "North America",
+    "aliases": [
+      "trinidad and tobago",
+      "republic of trinidad and tobago"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "USA",
+    "ccn3": "840",
+    "name": "United States",
+    "atlasName": "United States",
+    "continent": "North America",
+    "aliases": [
+      "united states",
+      "united states of america",
+      "us",
+      "usa",
+      "america"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ARG",
+    "ccn3": "032",
+    "name": "Argentina",
+    "atlasName": "Argentina",
+    "continent": "South America",
+    "aliases": [
+      "argentina",
+      "argentine republic",
+      "republica argentina"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BOL",
+    "ccn3": "068",
+    "name": "Bolivia",
+    "atlasName": "Bolivia",
+    "continent": "South America",
+    "aliases": [
+      "bolivia",
+      "plurinational state of bolivia",
+      "buliwya",
+      "wuliwya",
+      "bolivia plurinational state of",
+      "estado plurinacional de bolivia",
+      "buliwya mamallaqta",
+      "wuliwya suyu",
+      "teta volivia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "BRA",
+    "ccn3": "076",
+    "name": "Brazil",
+    "atlasName": "Brazil",
+    "continent": "South America",
+    "aliases": [
+      "brazil",
+      "federative republic of brazil",
+      "brasil",
+      "republica federativa do brasil"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "CHL",
+    "ccn3": "152",
+    "name": "Chile",
+    "atlasName": "Chile",
+    "continent": "South America",
+    "aliases": [
+      "chile",
+      "republic of chile",
+      "republica de chile"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "COL",
+    "ccn3": "170",
+    "name": "Colombia",
+    "atlasName": "Colombia",
+    "continent": "South America",
+    "aliases": [
+      "colombia",
+      "republic of colombia",
+      "republica de colombia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "ECU",
+    "ccn3": "218",
+    "name": "Ecuador",
+    "atlasName": "Ecuador",
+    "continent": "South America",
+    "aliases": [
+      "ecuador",
+      "republic of ecuador",
+      "republica del ecuador"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "GUY",
+    "ccn3": "328",
+    "name": "Guyana",
+    "atlasName": "Guyana",
+    "continent": "South America",
+    "aliases": [
+      "guyana",
+      "co operative republic of guyana"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "PRY",
+    "ccn3": "600",
+    "name": "Paraguay",
+    "atlasName": "Paraguay",
+    "continent": "South America",
+    "aliases": [
+      "paraguay",
+      "republic of paraguay",
+      "republica del paraguay",
+      "teta paraguai"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "PER",
+    "ccn3": "604",
+    "name": "Peru",
+    "atlasName": "Peru",
+    "continent": "South America",
+    "aliases": [
+      "peru",
+      "republic of peru",
+      "republica del peru"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SUR",
+    "ccn3": "740",
+    "name": "Suriname",
+    "atlasName": "Suriname",
+    "continent": "South America",
+    "aliases": [
+      "suriname",
+      "republic of suriname",
+      "sarnam",
+      "sranangron",
+      "republiek suriname"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "URY",
+    "ccn3": "858",
+    "name": "Uruguay",
+    "atlasName": "Uruguay",
+    "continent": "South America",
+    "aliases": [
+      "uruguay",
+      "oriental republic of uruguay",
+      "republica oriental del uruguay"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "VEN",
+    "ccn3": "862",
+    "name": "Venezuela",
+    "atlasName": "Venezuela",
+    "continent": "South America",
+    "aliases": [
+      "venezuela",
+      "bolivarian republic of venezuela",
+      "venezuela bolivarian republic of",
+      "republica bolivariana de venezuela"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "AUS",
+    "ccn3": "036",
+    "name": "Australia",
+    "atlasName": "Australia",
+    "continent": "Oceania",
+    "aliases": [
+      "australia",
+      "commonwealth of australia"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "FJI",
+    "ccn3": "242",
+    "name": "Fiji",
+    "atlasName": "Fiji",
+    "continent": "Oceania",
+    "aliases": [
+      "fiji",
+      "republic of fiji",
+      "viti",
+      "matanitu ko viti",
+      "fiji ganarajya"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "KIR",
+    "ccn3": "296",
+    "name": "Kiribati",
+    "atlasName": "Kiribati",
+    "continent": "Oceania",
+    "aliases": [
+      "kiribati",
+      "independent and sovereign republic of kiribati",
+      "republic of kiribati",
+      "ribaberiki kiribati"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "MHL",
+    "ccn3": "584",
+    "name": "Marshall Islands",
+    "atlasName": "Marshall Islands",
+    "continent": "Oceania",
+    "aliases": [
+      "marshall islands",
+      "republic of the marshall islands",
+      "aolepan aorokin majel"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "FSM",
+    "ccn3": "583",
+    "name": "Micronesia",
+    "atlasName": "Micronesia",
+    "continent": "Oceania",
+    "aliases": [
+      "micronesia",
+      "federated states of micronesia",
+      "micronesia federated states of"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "NRU",
+    "ccn3": "520",
+    "name": "Nauru",
+    "atlasName": "Nauru",
+    "continent": "Oceania",
+    "aliases": [
+      "nauru",
+      "republic of nauru",
+      "naoero",
+      "pleasant island",
+      "ripublik naoero"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "NZL",
+    "ccn3": "554",
+    "name": "New Zealand",
+    "atlasName": "New Zealand",
+    "continent": "Oceania",
+    "aliases": [
+      "new zealand",
+      "aotearoa"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "PLW",
+    "ccn3": "585",
+    "name": "Palau",
+    "atlasName": "Palau",
+    "continent": "Oceania",
+    "aliases": [
+      "palau",
+      "republic of palau",
+      "beluu er a belau"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "PNG",
+    "ccn3": "598",
+    "name": "Papua New Guinea",
+    "atlasName": "Papua New Guinea",
+    "continent": "Oceania",
+    "aliases": [
+      "papua new guinea",
+      "independent state of papua new guinea",
+      "independen stet bilong papua niugini"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "WSM",
+    "ccn3": "882",
+    "name": "Samoa",
+    "atlasName": "Samoa",
+    "continent": "Oceania",
+    "aliases": [
+      "samoa",
+      "independent state of samoa",
+      "malo saoloto tutoatasi o samoa"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "SLB",
+    "ccn3": "090",
+    "name": "Solomon Islands",
+    "atlasName": "Solomon Islands",
+    "continent": "Oceania",
+    "aliases": [
+      "solomon islands"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TON",
+    "ccn3": "776",
+    "name": "Tonga",
+    "atlasName": "Tonga",
+    "continent": "Oceania",
+    "aliases": [
+      "tonga",
+      "kingdom of tonga"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "TUV",
+    "ccn3": "798",
+    "name": "Tuvalu",
+    "atlasName": "Tuvalu",
+    "continent": "Oceania",
+    "aliases": [
+      "tuvalu"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  },
+  {
+    "id": "VUT",
+    "ccn3": "548",
+    "name": "Vanuatu",
+    "atlasName": "Vanuatu",
+    "continent": "Oceania",
+    "aliases": [
+      "vanuatu",
+      "republic of vanuatu",
+      "ripablik blong vanuatu",
+      "republique de vanuatu"
+    ],
+    "appearance": {
+      "kind": "color",
+      "fill": "#f6c64d"
+    }
+  }
+]
