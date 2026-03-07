@@ -623,6 +623,48 @@ export async function createGlobe(
     return [projected[0], projected[1]]
   }
 
+  function projectedPlaneLabelAnchor(countryId: string): [number, number] | null {
+    const projectedLabel = projectedLabelPosition(countryId)
+
+    if (!projectedLabel) {
+      return null
+    }
+
+    return [projectedLabel[0], projectedLabel[1] + PLANE_LABEL_OFFSET_PX]
+  }
+
+  function correctedProjectedPlanePosition(
+    segment: FlightSegment,
+    progress: number,
+  ): [number, number] | null {
+    const projectedFlightPoint = projection(
+      geoInterpolate(segment.fromCoordinates, segment.toCoordinates)(progress) as [number, number],
+    )
+
+    if (!projectedFlightPoint) {
+      return null
+    }
+
+    const projectedStart = projection(segment.fromCoordinates)
+    const projectedEnd = projection(segment.toCoordinates)
+    const startAnchor = projectedPlaneLabelAnchor(segment.fromCountryId)
+    const endAnchor = projectedPlaneLabelAnchor(segment.toCountryId)
+
+    if (!projectedStart || !projectedEnd || !startAnchor || !endAnchor) {
+      return [projectedFlightPoint[0], projectedFlightPoint[1]]
+    }
+
+    const startDx = startAnchor[0] - projectedStart[0]
+    const startDy = startAnchor[1] - projectedStart[1]
+    const endDx = endAnchor[0] - projectedEnd[0]
+    const endDy = endAnchor[1] - projectedEnd[1]
+
+    return [
+      projectedFlightPoint[0] + interpolateNumber(startDx, endDx, progress),
+      projectedFlightPoint[1] + interpolateNumber(startDy, endDy, progress),
+    ]
+  }
+
   function planeHeadingDegrees(segment: FlightSegment, progress: number): number {
     const startProgress = Math.max(0, Math.min(1, progress - PLANE_TANGENT_SAMPLE_STEP))
     const endProgress = Math.max(0, Math.min(1, progress + PLANE_TANGENT_SAMPLE_STEP))
@@ -720,15 +762,10 @@ export async function createGlobe(
     let headingDegrees = latestSegment ? planeHeadingDegrees(latestSegment, 1) : 0
 
     if (activeSegment && planeCoordinates && isVisible(planeCoordinates)) {
-      const projected = projection(planeCoordinates)
-
-      if (projected) {
-        anchorPoint = [projected[0], projected[1]]
-        headingDegrees = planeHeadingDegrees(activeSegment, activeFlightProgress)
-      }
+      anchorPoint = correctedProjectedPlanePosition(activeSegment, activeFlightProgress)
+      headingDegrees = planeHeadingDegrees(activeSegment, activeFlightProgress)
     } else if (mostRecentAnsweredId) {
-      anchorPoint = projectedLabelPosition(mostRecentAnsweredId)
-      localOffsetY = PLANE_LABEL_OFFSET_PX
+      anchorPoint = projectedPlaneLabelAnchor(mostRecentAnsweredId)
     } else if (planeCoordinates && isVisible(planeCoordinates)) {
       const projected = projection(planeCoordinates)
 
