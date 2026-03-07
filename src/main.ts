@@ -46,14 +46,18 @@ app.innerHTML = `
           </article>
         </div>
         <div class="answer-panel">
-          <label class="answer-panel__label" for="country-input">Enter a country</label>
+          <label class="answer-panel__label" for="guess-input">Enter a country</label>
           <input
-            id="country-input"
+            id="guess-input"
+            name="guess"
             class="answer-panel__input"
-            type="text"
+            type="search"
             autocomplete="off"
+            autocorrect="off"
             autocapitalize="words"
             spellcheck="false"
+            inputmode="search"
+            enterkeyhint="done"
             placeholder="Start typing a country name..."
           />
           <p id="status" class="status" aria-live="polite"></p>
@@ -82,7 +86,7 @@ const scoreElement = requireElement<HTMLElement>('#score')
 const timerElement = requireElement<HTMLElement>('#timer')
 const remainingElement = requireElement<HTMLElement>('#remaining')
 const statusElement = requireElement<HTMLElement>('#status')
-const answerInput = requireElement<HTMLInputElement>('#country-input')
+const answerInput = requireElement<HTMLInputElement>('#guess-input')
 const continentBoard = requireElement<HTMLElement>('#continent-board')
 const zoomInButton = requireElement<HTMLButtonElement>('#zoom-in')
 const zoomOutButton = requireElement<HTMLButtonElement>('#zoom-out')

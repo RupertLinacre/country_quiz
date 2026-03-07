@@ -27,6 +27,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 button,
@@ -40,6 +41,7 @@ button {
 
 #app {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .shell {
@@ -141,6 +143,8 @@ h1 {
 }
 
 .answer-panel {
+  display: flex;
+  flex-direction: column;
   padding: 1rem;
   border-radius: 24px;
   background: linear-gradient(180deg, rgba(11, 34, 55, 0.82), rgba(7, 25, 41, 0.9));
@@ -482,7 +486,29 @@ h1 {
 @media (max-width: 840px) {
   .shell {
     width: min(100vw - 1rem, 100%);
-    padding-top: 0.55rem;
+    padding: 0.35rem 0 1rem;
+  }
+
+  .hero {
+    gap: 0.45rem;
+  }
+
+  .hero__copy,
+  .globe-card,
+  .tracker {
+    border-radius: 22px;
+  }
+
+  .hero__copy {
+    padding: 0.85rem 0.8rem 0.55rem;
+  }
+
+  .hero__copy h1 {
+    margin-bottom: 0.85rem;
+  }
+
+  .hero__stats {
+    margin-bottom: 0.7rem;
   }
 
   .hero__stats,
@@ -490,14 +516,49 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  .globe-card__toolbar {
-    flex-direction: column;
-    align-items: flex-start;
+  .stat-card {
+    padding: 0.85rem 0.95rem;
   }
 
-  .hero__copy,
-  .globe-card,
+  .answer-panel {
+    padding: 0.7rem 0.75rem 0.45rem;
+  }
+
+  .answer-panel__label {
+    order: 0;
+    margin-bottom: 0.35rem;
+  }
+
+  .status {
+    order: 1;
+    margin: 0 0 0.35rem;
+    min-height: 1.2rem;
+  }
+
+  .answer-panel__input {
+    order: 2;
+    padding: 0.85rem 0.95rem;
+  }
+
+  .globe-card {
+    gap: 0.35rem;
+    padding: 0.45rem;
+  }
+
+  .globe-card__toolbar {
+    display: none;
+  }
+
   .tracker {
-    border-radius: 22px;
+    margin-top: 0.55rem;
+    padding: 0.8rem;
+  }
+
+  .tracker__header {
+    margin-bottom: 0.7rem;
+  }
+
+  .continent-section {
+    padding: 0.8rem;
   }
 }
