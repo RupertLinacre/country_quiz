@@ -12,8 +12,10 @@ import {
   select,
 } from 'd3'
 import { feature, mesh } from 'topojson-client'
-import atlasUrl from 'world-atlas/countries-10m.json?url'
 
+import interactionAtlasUrl from './generated/globe-atlas-interaction.json?url'
+import settledAtlasUrl from './generated/globe-atlas-settled.json?url'
+import fallbackFeatures from './generated/country-geometry-fallbacks.json'
 import type { QuizCountry, SolvedAppearance } from './quiz-data'
 
 type AtlasFeature = GeoPermissibleObjects & {
@@ -23,7 +25,23 @@ type AtlasFeature = GeoPermissibleObjects & {
   }
 }
 
+type Topology = {
+  objects: {
+    countries: object
+    land: object
+  }
+}
+
+type AtlasBundle = {
+  borderMesh: GeoPermissibleObjects
+  countryCentroidById: Map<string, [number, number]>
+  countryAngularRadiusById: Map<string, number>
+  featureByCountryId: Map<string, AtlasFeature>
+  landFeature: GeoPermissibleObjects
+}
+
 type GlobeController = {
+  focusCountry: (countryId: string) => void
   setAnswered: (answeredIds: Set<string>) => void
   zoomBy: (factor: number) => void
 }
@@ -35,17 +53,26 @@ type GlobeLabel = {
   y: number
 }
 
-const VIEWBOX_SIZE = 760
-const BASE_SCALE = 242
-const MIN_SCALE = 190
-const MAX_SCALE = 420
+const BASE_SCALE_RATIO = 0.318
+const FLY_DURATION_MS = 850
+const INTERACTION_SETTLE_DELAY_MS = 120
+const MAX_SETTLED_PIXEL_RATIO = 1.5
+const MIN_ZOOM = 0.78
+const MAX_ZOOM = 18
+const FOCUS_COUNTRY_RADIUS_PX = 84
+const MIN_COUNTRY_ANGULAR_RADIUS = 0.0025
+const UNSOLVED_LAND_FILL = '#34393f'
 
 function appearanceFill(appearance: SolvedAppearance): string {
-  if (appearance.kind === 'flag') {
-    return appearance.fallbackFill
-  }
+  return appearance.kind === 'flag' ? appearance.fallbackFill : appearance.fill
+}
 
-  return appearance.fill
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+}
+
+function interpolateNumber(start: number, end: number, t: number): number {
+  return start + (end - start) * t
 }
 
 function normaliseAtlasId(value: string | number | undefined): string | null {
@@ -56,16 +83,68 @@ function normaliseAtlasId(value: string | number | undefined): string | null {
   return String(value).padStart(3, '0')
 }
 
-export async function createGlobe(
-  container: HTMLElement,
-  countries: QuizCountry[],
-): Promise<GlobeController> {
-  const topology = (await fetch(atlasUrl).then((response) => response.json())) as {
-    objects: {
-      countries: object
-      land: object
+function shortestLongitudeTarget(startLongitude: number, targetLongitude: number): number {
+  const delta = ((targetLongitude - startLongitude + 540) % 360) - 180
+  return startLongitude + delta
+}
+
+function visitCoordinates(
+  value: unknown,
+  visitor: (coordinates: [number, number]) => void,
+): void {
+  if (Array.isArray(value)) {
+    if (
+      value.length >= 2 &&
+      typeof value[0] === 'number' &&
+      typeof value[1] === 'number'
+    ) {
+      visitor([value[0], value[1]])
+      return
+    }
+
+    for (const entry of value) {
+      visitCoordinates(entry, visitor)
+    }
+
+    return
+  }
+
+  if (!value || typeof value !== 'object') {
+    return
+  }
+
+  const candidate = value as {
+    coordinates?: unknown
+    geometries?: unknown[]
+    geometry?: unknown
+  }
+
+  if (candidate.coordinates !== undefined) {
+    visitCoordinates(candidate.coordinates, visitor)
+  }
+
+  if (Array.isArray(candidate.geometries)) {
+    for (const geometry of candidate.geometries) {
+      visitCoordinates(geometry, visitor)
     }
   }
+
+  if (candidate.geometry !== undefined) {
+    visitCoordinates(candidate.geometry, visitor)
+  }
+}
+
+function featureAngularRadius(feature: AtlasFeature, centroid: [number, number]): number {
+  let maxDistance = 0
+
+  visitCoordinates(feature, (coordinates) => {
+    maxDistance = Math.max(maxDistance, geoDistance(centroid, coordinates))
+  })
+
+  return Math.max(maxDistance, MIN_COUNTRY_ANGULAR_RADIUS)
+}
+
+function buildAtlasBundle(topology: Topology, countries: QuizCountry[]): AtlasBundle {
   const countryFeatures = (feature(topology as never, topology.objects.countries as never) as unknown as {
     features: AtlasFeature[]
   }).features
@@ -97,7 +176,8 @@ export async function createGlobe(
   }
 
   const featureByCountryId = new Map<string, AtlasFeature>()
-  const countryByFeature = new Map<AtlasFeature, QuizCountry>()
+  const countryCentroidById = new Map<string, [number, number]>()
+  const countryAngularRadiusById = new Map<string, number>()
 
   for (const country of countries) {
     const matchedFeature =
@@ -109,50 +189,152 @@ export async function createGlobe(
     }
 
     featureByCountryId.set(country.id, matchedFeature)
-    countryByFeature.set(matchedFeature, country)
+    const centroid = geoCentroid(matchedFeature) as [number, number]
+    countryCentroidById.set(country.id, centroid)
+    countryAngularRadiusById.set(country.id, featureAngularRadius(matchedFeature, centroid))
   }
 
-  const projection = geoOrthographic()
-    .translate([VIEWBOX_SIZE / 2, VIEWBOX_SIZE / 2])
-    .scale(BASE_SCALE)
-    .clipAngle(90)
-    .precision(0.3)
-    .rotate([-12, -18])
-  const path = geoPath(projection)
-  const graticule = geoGraticule10()
-  const sphere = { type: 'Sphere' } as GeoPermissibleObjects
+  return {
+    borderMesh,
+    countryCentroidById,
+    countryAngularRadiusById,
+    featureByCountryId,
+    landFeature,
+  }
+}
 
-  const svg = select(container)
+export async function createGlobe(
+  container: HTMLElement,
+  countries: QuizCountry[],
+): Promise<GlobeController> {
+  const [interactionTopology, settledTopology] = (await Promise.all([
+    fetch(interactionAtlasUrl).then((response) => response.json()),
+    fetch(settledAtlasUrl).then((response) => response.json()),
+  ])) as [Topology, Topology]
+
+  const interactionAtlas = buildAtlasBundle(interactionTopology, countries)
+  const settledAtlas = buildAtlasBundle(settledTopology, countries)
+  const fallbackFeatureByCountryId = new Map<string, AtlasFeature>()
+  const fallbackCentroidByCountryId = new Map<string, [number, number]>()
+  const fallbackAngularRadiusByCountryId = new Map<string, number>()
+  const countryById = new Map(countries.map((country) => [country.id, country]))
+
+  for (const rawFeature of fallbackFeatures as AtlasFeature[]) {
+    const atlasId = normaliseAtlasId(rawFeature.id)
+    const country = countries.find((candidate) => {
+      return candidate.ccn3 === atlasId || candidate.atlasName === rawFeature.properties?.name
+    })
+
+    if (!country) {
+      continue
+    }
+
+    fallbackFeatureByCountryId.set(country.id, rawFeature)
+    const centroid = geoCentroid(rawFeature) as [number, number]
+    fallbackCentroidByCountryId.set(country.id, centroid)
+    fallbackAngularRadiusByCountryId.set(country.id, featureAngularRadius(rawFeature, centroid))
+  }
+
+  container.replaceChildren()
+
+  const canvas = document.createElement('canvas')
+  canvas.className = 'globe__canvas'
+  canvas.setAttribute('aria-hidden', 'true')
+  container.append(canvas)
+
+  const labelsSvg = select(container)
     .append('svg')
-    .attr('class', 'globe__svg')
-    .attr('viewBox', `0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`)
+    .attr('class', 'globe__labels-svg')
     .attr('role', 'img')
     .attr('aria-label', 'Interactive globe showing countries of the world')
 
-  const defs = svg.append('defs')
-  defs
-    .append('clipPath')
-    .attr('id', 'globe-clip')
-    .append('path')
-    .attr('class', 'globe__clip')
+  const labelLayer = labelsSvg.append('g').attr('class', 'globe__labels')
+  const renderingContext = canvas.getContext('2d')
 
-  const sphereLayer = svg.append('g').attr('class', 'globe__sphere')
-  const mapLayer = svg.append('g').attr('clip-path', 'url(#globe-clip)')
-  const labelLayer = svg.append('g').attr('class', 'globe__labels').attr('clip-path', 'url(#globe-clip)')
+  if (!renderingContext) {
+    throw new Error('Canvas rendering is unavailable in this browser')
+  }
 
-  const spherePath = sphereLayer.append('path').attr('class', 'globe__water')
-  const glowPath = sphereLayer.append('path').attr('class', 'globe__rim')
-  const graticulePath = mapLayer.append('path').attr('class', 'globe__graticule')
-  const landPath = mapLayer.append('path').attr('class', 'globe__land')
-  const countriesSelection = mapLayer
-    .selectAll<SVGPathElement, AtlasFeature>('path.globe__country')
-    .data(countryFeatures)
-    .join('path')
-    .attr('class', 'globe__country')
-  const bordersPath = mapLayer.append('path').attr('class', 'globe__borders')
+  const context = renderingContext
+  const projection = geoOrthographic().clipAngle(90).precision(0.3).rotate([-12, -18])
+  const path = geoPath(projection, context)
+  const sphere = { type: 'Sphere' } as GeoPermissibleObjects
+  const graticule = geoGraticule10()
 
-  let currentScale = BASE_SCALE
   let answeredIds = new Set<string>()
+  let currentZoom = 1
+  let cssWidth = 760
+  let cssHeight = 760
+  let flyFrame: number | null = null
+  let framePending = false
+  let interactionActive = false
+  let interactionTimeout: number | null = null
+  let appliedPixelRatio = 0
+
+  function activeAtlas(): AtlasBundle {
+    return interactionActive ? interactionAtlas : settledAtlas
+  }
+
+  function targetPixelRatio(): number {
+    const baseRatio = window.devicePixelRatio || 1
+    return interactionActive ? 1 : Math.min(baseRatio, MAX_SETTLED_PIXEL_RATIO)
+  }
+
+  function currentScale(): number {
+    return Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO * currentZoom
+  }
+
+  function clampZoom(nextZoom: number): number {
+    return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, nextZoom))
+  }
+
+  function writeRenderState(): void {
+    const [rotationLongitude, rotationLatitude] = projection.rotate()
+    container.dataset.detailMode = interactionActive ? 'interaction' : 'settled'
+    container.dataset.rotationLon = rotationLongitude.toFixed(2)
+    container.dataset.rotationLat = rotationLatitude.toFixed(2)
+    container.dataset.zoom = currentZoom.toFixed(3)
+  }
+
+  function syncCanvasSize(force = false): void {
+    const bounds = container.getBoundingClientRect()
+    cssWidth = Math.max(1, bounds.width)
+    cssHeight = Math.max(1, bounds.height)
+
+    const pixelRatio = targetPixelRatio()
+    const nextCanvasWidth = Math.round(cssWidth * pixelRatio)
+    const nextCanvasHeight = Math.round(cssHeight * pixelRatio)
+
+    if (
+      !force &&
+      canvas.width === nextCanvasWidth &&
+      canvas.height === nextCanvasHeight &&
+      appliedPixelRatio === pixelRatio
+    ) {
+      projection.translate([cssWidth / 2, cssHeight / 2]).scale(currentScale())
+      labelsSvg.attr('viewBox', `0 0 ${cssWidth} ${cssHeight}`)
+      scheduleRender()
+      return
+    }
+
+    canvas.width = nextCanvasWidth
+    canvas.height = nextCanvasHeight
+    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
+    appliedPixelRatio = pixelRatio
+
+    projection.translate([cssWidth / 2, cssHeight / 2]).scale(currentScale())
+    labelsSvg.attr('viewBox', `0 0 ${cssWidth} ${cssHeight}`)
+    scheduleRender()
+  }
+
+  function clearLabels(): void {
+    labelLayer.selectAll('text').remove()
+  }
+
+  function drawPath(geometry: GeoPermissibleObjects): void {
+    context.beginPath()
+    path(geometry)
+  }
 
   function isVisible(coordinates: [number, number]): boolean {
     const [rotationLongitude, rotationLatitude] = projection.rotate()
@@ -160,19 +342,52 @@ export async function createGlobe(
     return geoDistance(center, coordinates) < Math.PI / 2 - 0.05
   }
 
+  function centroidForCountry(countryId: string): [number, number] | null {
+    return (
+      settledAtlas.countryCentroidById.get(countryId) ??
+      interactionAtlas.countryCentroidById.get(countryId) ??
+      fallbackCentroidByCountryId.get(countryId) ??
+      null
+    )
+  }
+
+  function featureForCountry(countryId: string): AtlasFeature | null {
+    return (
+      activeAtlas().featureByCountryId.get(countryId) ??
+      settledAtlas.featureByCountryId.get(countryId) ??
+      fallbackFeatureByCountryId.get(countryId) ??
+      null
+    )
+  }
+
+  function angularRadiusForCountry(countryId: string): number | null {
+    return (
+      settledAtlas.countryAngularRadiusById.get(countryId) ??
+      interactionAtlas.countryAngularRadiusById.get(countryId) ??
+      fallbackAngularRadiusByCountryId.get(countryId) ??
+      null
+    )
+  }
+
+  function zoomForCountry(countryId: string): number {
+    const angularRadius = angularRadiusForCountry(countryId) ?? MIN_COUNTRY_ANGULAR_RADIUS
+    const baseScale = Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO
+    const targetZoom = FOCUS_COUNTRY_RADIUS_PX / Math.max(baseScale * angularRadius, 0.0001)
+    return clampZoom(targetZoom)
+  }
+
   function renderLabels(): void {
-    const visibleLabels = countries
-      .filter((country) => answeredIds.has(country.id))
-      .map((country) => {
-        const countryFeature = featureByCountryId.get(country.id)
+    if (interactionActive) {
+      clearLabels()
+      return
+    }
 
-        if (!countryFeature) {
-          return null
-        }
+    const visibleLabels = [...answeredIds]
+      .map((countryId) => {
+        const country = countryById.get(countryId)
+        const centroid = centroidForCountry(countryId)
 
-        const centroid = geoCentroid(countryFeature)
-
-        if (!isVisible(centroid)) {
+        if (!country || !centroid || !isVisible(centroid)) {
           return null
         }
 
@@ -209,75 +424,237 @@ export async function createGlobe(
       .attr('y', (label: GlobeLabel) => label.y)
   }
 
-  function render(): void {
-    projection.scale(currentScale)
+  function renderNow(): void {
+    const atlas = activeAtlas()
 
-    defs.select<SVGPathElement>('path.globe__clip').attr('d', path(sphere))
-    spherePath.attr('d', path(sphere))
-    glowPath.attr('d', path(sphere))
-    graticulePath.attr('d', path(graticule))
-    landPath.attr('d', path(landFeature))
-    bordersPath.attr('d', path(borderMesh))
+    projection.scale(currentScale())
+    writeRenderState()
+    context.clearRect(0, 0, cssWidth, cssHeight)
 
-    countriesSelection
-      .attr('d', (countryFeature: AtlasFeature) => path(countryFeature))
-      .attr('data-country-name', (countryFeature: AtlasFeature) => countryByFeature.get(countryFeature)?.name ?? '')
-      .classed('globe__country--answered', (countryFeature: AtlasFeature) => {
-        const country = countryByFeature.get(countryFeature)
-        return Boolean(country && answeredIds.has(country.id))
-      })
-      .attr('fill', (countryFeature: AtlasFeature) => {
-        const country = countryByFeature.get(countryFeature)
+    drawPath(sphere)
+    context.fillStyle = '#0a4270'
+    context.fill()
 
-        if (!country || !answeredIds.has(country.id)) {
-          return '#1a4466'
-        }
+    context.save()
+    drawPath(sphere)
+    context.clip()
 
-        return appearanceFill(country.appearance)
-      })
+    if (!interactionActive) {
+      drawPath(graticule)
+      context.strokeStyle = 'rgba(168, 212, 244, 0.2)'
+      context.lineWidth = 0.7
+      context.stroke()
+    }
+
+    drawPath(atlas.landFeature)
+    context.fillStyle = UNSOLVED_LAND_FILL
+    context.fill()
+
+    for (const [countryId, fallbackFeature] of fallbackFeatureByCountryId) {
+      if (answeredIds.has(countryId)) {
+        continue
+      }
+
+      drawPath(fallbackFeature)
+      context.fillStyle = UNSOLVED_LAND_FILL
+      context.fill()
+    }
+
+    for (const countryId of answeredIds) {
+      const country = countryById.get(countryId)
+      const countryFeature = featureForCountry(countryId)
+
+      if (!country || !countryFeature) {
+        continue
+      }
+
+      drawPath(countryFeature)
+      context.fillStyle = appearanceFill(country.appearance)
+      context.fill()
+      context.strokeStyle = 'rgba(125, 80, 0, 0.9)'
+      context.lineWidth = 0.85
+      context.stroke()
+    }
+
+    drawPath(atlas.landFeature)
+    context.strokeStyle = interactionActive ? 'rgba(229, 243, 252, 0.45)' : 'rgba(229, 243, 252, 0.7)'
+    context.lineWidth = interactionActive ? 1 : 1.15
+    context.stroke()
+
+    if (!interactionActive) {
+      drawPath(atlas.borderMesh)
+      context.strokeStyle = 'rgba(227, 238, 247, 0.38)'
+      context.lineWidth = 0.62
+      context.stroke()
+    }
+
+    for (const [countryId, fallbackFeature] of fallbackFeatureByCountryId) {
+      const country = countryById.get(countryId)
+      const answered = Boolean(country && answeredIds.has(countryId))
+
+      drawPath(fallbackFeature)
+      context.strokeStyle = answered
+        ? 'rgba(125, 80, 0, 0.9)'
+        : interactionActive
+          ? 'rgba(229, 243, 252, 0.4)'
+          : 'rgba(227, 238, 247, 0.7)'
+      context.lineWidth = answered ? 0.85 : interactionActive ? 0.7 : 0.95
+      context.stroke()
+    }
+
+    context.restore()
+
+    drawPath(sphere)
+    context.strokeStyle = 'rgba(180, 225, 255, 0.55)'
+    context.lineWidth = 2.2
+    context.stroke()
 
     renderLabels()
   }
 
-  function applyScale(nextScale: number): void {
-    currentScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, nextScale))
-    render()
+  function scheduleRender(): void {
+    if (framePending) {
+      return
+    }
+
+    framePending = true
+    window.requestAnimationFrame(() => {
+      framePending = false
+      renderNow()
+    })
   }
 
-  svg.call(
-    drag<SVGSVGElement, unknown>().on('drag', (event: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
-        const [rotationLongitude, rotationLatitude, rotationGamma] = projection.rotate()
-        const sensitivity = 72 / currentScale
-        const nextLatitude = Math.max(-75, Math.min(75, rotationLatitude - event.dy * sensitivity))
+  function cancelFlyAnimation(): void {
+    if (flyFrame !== null) {
+      window.cancelAnimationFrame(flyFrame)
+      flyFrame = null
+    }
+  }
 
-        projection.rotate([
-          rotationLongitude + event.dx * sensitivity,
-          nextLatitude,
-          rotationGamma,
-        ])
-        render()
-      }),
-  )
+  function enterInteractionMode(): void {
+    if (interactionTimeout !== null) {
+      window.clearTimeout(interactionTimeout)
+      interactionTimeout = null
+    }
 
-  svg.node()?.addEventListener(
+    if (!interactionActive) {
+      interactionActive = true
+      syncCanvasSize(true)
+      clearLabels()
+    }
+  }
+
+  function scheduleInteractionSettle(): void {
+    if (interactionTimeout !== null) {
+      window.clearTimeout(interactionTimeout)
+    }
+
+    interactionTimeout = window.setTimeout(() => {
+      interactionActive = false
+      interactionTimeout = null
+      syncCanvasSize(true)
+      scheduleRender()
+    }, INTERACTION_SETTLE_DELAY_MS)
+  }
+
+  function applyZoom(nextZoom: number): void {
+    currentZoom = clampZoom(nextZoom)
+    scheduleRender()
+  }
+
+  function focusCountry(countryId: string): void {
+    const centroid = centroidForCountry(countryId)
+
+    if (!centroid) {
+      return
+    }
+
+    cancelFlyAnimation()
+    enterInteractionMode()
+
+    const [startLongitude, startLatitude, startGamma] = projection.rotate()
+    const targetLongitude = shortestLongitudeTarget(startLongitude, -centroid[0])
+    const targetLatitude = -centroid[1]
+    const startZoom = currentZoom
+    const targetZoom = zoomForCountry(countryId)
+    const startTime = performance.now()
+
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - startTime) / FLY_DURATION_MS)
+      const eased = easeInOutCubic(progress)
+
+      projection.rotate([
+        interpolateNumber(startLongitude, targetLongitude, eased),
+        interpolateNumber(startLatitude, targetLatitude, eased),
+        startGamma,
+      ])
+      currentZoom = clampZoom(interpolateNumber(startZoom, targetZoom, eased))
+      renderNow()
+
+      if (progress < 1) {
+        flyFrame = window.requestAnimationFrame(tick)
+        return
+      }
+
+      flyFrame = null
+      scheduleInteractionSettle()
+    }
+
+    flyFrame = window.requestAnimationFrame(tick)
+  }
+
+  const resizeObserver = new ResizeObserver(() => {
+    syncCanvasSize()
+  })
+  resizeObserver.observe(container)
+  syncCanvasSize(true)
+
+  const dragBehavior = drag<HTMLCanvasElement, unknown>()
+    .on('start', () => {
+      cancelFlyAnimation()
+      enterInteractionMode()
+    })
+    .on('drag', (event: D3DragEvent<HTMLCanvasElement, unknown, unknown>) => {
+      const [rotationLongitude, rotationLatitude, rotationGamma] = projection.rotate()
+      const sensitivity = 72 / currentScale()
+      const nextLatitude = Math.max(-75, Math.min(75, rotationLatitude - event.dy * sensitivity))
+
+      projection.rotate([
+        rotationLongitude + event.dx * sensitivity,
+        nextLatitude,
+        rotationGamma,
+      ])
+      scheduleRender()
+    })
+    .on('end', () => {
+      scheduleInteractionSettle()
+    })
+
+  select(canvas).call(dragBehavior)
+
+  canvas.addEventListener(
     'wheel',
     (event: WheelEvent) => {
       event.preventDefault()
-      const factor = event.deltaY < 0 ? 1.08 : 0.92
-      applyScale(currentScale * factor)
+      cancelFlyAnimation()
+      enterInteractionMode()
+      applyZoom(currentZoom * (event.deltaY < 0 ? 1.18 : 0.84))
+      scheduleInteractionSettle()
     },
     { passive: false },
   )
 
-  render()
-
   return {
+    focusCountry,
     setAnswered(nextAnsweredIds: Set<string>) {
       answeredIds = new Set(nextAnsweredIds)
-      render()
+      scheduleRender()
     },
     zoomBy(factor: number) {
-      applyScale(currentScale * factor)
+      cancelFlyAnimation()
+      enterInteractionMode()
+      applyZoom(currentZoom * factor)
+      scheduleInteractionSettle()
     },
   }
 }

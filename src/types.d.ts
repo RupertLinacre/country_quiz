@@ -3,7 +3,7 @@ declare module 'world-countries' {
   export default countries
 }
 
-declare module 'world-atlas/countries-10m.json?url' {
+declare module '*.json?url' {
   const assetUrl: string
   export default assetUrl
 }

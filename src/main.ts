@@ -193,6 +193,7 @@ function solveCountry(countryId: string): void {
   answeredIds.add(countryId)
   answerInput.value = ''
   globe?.setAnswered(answeredIds)
+  globe?.focusCountry(countryId)
   renderScore()
   renderTracker()
 
@@ -241,8 +242,8 @@ answerInput.addEventListener('input', () => {
   solveCountry(matchedCountryId)
 })
 
-zoomInButton.addEventListener('click', () => globe?.zoomBy(1.14))
-zoomOutButton.addEventListener('click', () => globe?.zoomBy(0.88))
+zoomInButton.addEventListener('click', () => globe?.zoomBy(1.28))
+zoomOutButton.addEventListener('click', () => globe?.zoomBy(0.8))
 
 renderScore()
 renderTracker()
