@@ -152,6 +152,10 @@ function formatMiles(miles: number): string {
   return `${new Intl.NumberFormat('en-GB').format(miles)} miles`
 }
 
+function remainingMilliseconds(): number {
+  return Math.max(0, deadline - Date.now())
+}
+
 function solvedCountByContinent(continent: string): number {
   return countriesByContinent
     .find((entry) => entry.continent === continent)
@@ -219,7 +223,12 @@ function renderFlightStatus(status: GlobeFlightStatus | null): void {
   flightTotalElement.textContent = `Total distance flown: ${formatMiles(status.totalMiles)}`
 }
 
-function finishQuiz(message: string): void {
+function finishQuiz(
+  message: string,
+  options?: {
+    timerText?: string
+  },
+): void {
   if (quizFinished) {
     return
   }
@@ -229,7 +238,7 @@ function finishQuiz(message: string): void {
   answerInput.disabled = true
   statusTone = 'muted'
   renderStatus(message)
-  timerElement.textContent = '00:00'
+  timerElement.textContent = options?.timerText ?? '00:00'
 }
 
 function solveCountry(countryId: string): void {
@@ -248,7 +257,9 @@ function solveCountry(countryId: string): void {
   renderTracker()
 
   if (answeredIds.size === totalCountryCount) {
-    finishQuiz('All 197 countries found. The globe is complete.')
+    finishQuiz('All 197 countries found. The globe is complete.', {
+      timerText: formatTime(remainingMilliseconds()),
+    })
     return
   }
 
@@ -303,10 +314,10 @@ function tick(): void {
     return
   }
 
-  const remainingMilliseconds = deadline - Date.now()
-  timerElement.textContent = formatTime(remainingMilliseconds)
+  const millisecondsLeft = remainingMilliseconds()
+  timerElement.textContent = formatTime(millisecondsLeft)
 
-  if (remainingMilliseconds <= 0) {
+  if (millisecondsLeft <= 0) {
     finishQuiz(`Time is up. You found ${answeredIds.size} of ${totalCountryCount} countries.`)
   }
 }
