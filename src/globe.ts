@@ -267,6 +267,7 @@ export async function createGlobe(
   const interactionAtlas = buildAtlasBundle(interactionTopology, countries)
   const settledAtlas = buildAtlasBundle(settledTopology, countries)
   const fallbackFeatureByCountryId = new Map<string, AtlasFeature>()
+  const fallbackLabelFeatureByCountryId = new Map<string, GeoPermissibleObjects>()
   const fallbackCentroidByCountryId = new Map<string, [number, number]>()
   const fallbackAngularRadiusByCountryId = new Map<string, number>()
   const countryById = new Map(countries.map((country) => [country.id, country]))
@@ -282,9 +283,11 @@ export async function createGlobe(
     }
 
     fallbackFeatureByCountryId.set(country.id, rawFeature)
-    const centroid = geoCentroid(rawFeature) as [number, number]
+    const labelFeature = primaryLabelFeature(rawFeature)
+    fallbackLabelFeatureByCountryId.set(country.id, labelFeature)
+    const centroid = geoCentroid(labelFeature) as [number, number]
     fallbackCentroidByCountryId.set(country.id, centroid)
-    fallbackAngularRadiusByCountryId.set(country.id, featureAngularRadius(rawFeature, centroid))
+    fallbackAngularRadiusByCountryId.set(country.id, featureAngularRadius(labelFeature, centroid))
   }
 
   container.replaceChildren()
@@ -397,24 +400,25 @@ export async function createGlobe(
 
   function centroidForCountry(countryId: string): [number, number] | null {
     return (
+      fallbackCentroidByCountryId.get(countryId) ??
       settledAtlas.countryCentroidById.get(countryId) ??
       interactionAtlas.countryCentroidById.get(countryId) ??
-      fallbackCentroidByCountryId.get(countryId) ??
       null
     )
   }
 
   function featureForCountry(countryId: string): AtlasFeature | null {
     return (
+      fallbackFeatureByCountryId.get(countryId) ??
       activeAtlas().featureByCountryId.get(countryId) ??
       settledAtlas.featureByCountryId.get(countryId) ??
-      fallbackFeatureByCountryId.get(countryId) ??
       null
     )
   }
 
   function labelFeatureForCountry(countryId: string): GeoPermissibleObjects | null {
     return (
+      fallbackLabelFeatureByCountryId.get(countryId) ??
       settledAtlas.labelFeatureByCountryId.get(countryId) ??
       interactionAtlas.labelFeatureByCountryId.get(countryId) ??
       featureForCountry(countryId)
@@ -423,9 +427,9 @@ export async function createGlobe(
 
   function angularRadiusForCountry(countryId: string): number | null {
     return (
+      fallbackAngularRadiusByCountryId.get(countryId) ??
       settledAtlas.countryAngularRadiusById.get(countryId) ??
       interactionAtlas.countryAngularRadiusById.get(countryId) ??
-      fallbackAngularRadiusByCountryId.get(countryId) ??
       null
     )
   }

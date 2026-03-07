@@ -11,6 +11,7 @@ import {
 import { createGlobe } from './globe'
 
 const QUIZ_DURATION_MS = 15 * 60 * 1000
+const PREFIX_CONFLICT_ACCEPT_DELAY_MS = 700
 
 function requireElement<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector)
@@ -106,11 +107,18 @@ const globeContainer = requireElement<HTMLElement>('#globe')
 
 const answeredIds = new Set<string>()
 const deadline = Date.now() + QUIZ_DURATION_MS
+const allAliases = [...new Set(quizCountries.flatMap((country) => country.aliases))]
+const prefixConflictAliases = new Set(
+  allAliases.filter((alias) => {
+    return allAliases.some((candidate) => candidate.length > alias.length && candidate.startsWith(alias))
+  }),
+)
 
 let statusTone: 'neutral' | 'success' | 'muted' = 'neutral'
 let intervalHandle = window.setInterval(tick, 250)
 let quizFinished = false
 let globe: Awaited<ReturnType<typeof createGlobe>> | null = null
+let pendingAcceptHandle: number | null = null
 
 function escapeHtml(value: string): string {
   return value
@@ -204,6 +212,13 @@ function renderStatus(message: string): void {
   statusElement.dataset.tone = statusTone
 }
 
+function clearPendingAcceptance(): void {
+  if (pendingAcceptHandle !== null) {
+    window.clearTimeout(pendingAcceptHandle)
+    pendingAcceptHandle = null
+  }
+}
+
 function finishQuiz(message: string): void {
   if (quizFinished) {
     return
@@ -240,6 +255,48 @@ function solveCountry(countryId: string): void {
   renderStatus(`${country.name} accepted.`)
 }
 
+function resolveMatchedCountry(matchedCountryId: string): void {
+  if (answeredIds.has(matchedCountryId)) {
+    answerInput.value = ''
+    statusTone = 'muted'
+    renderStatus(`${countriesById.get(matchedCountryId)?.name ?? 'That country'} is already solved.`)
+    return
+  }
+
+  solveCountry(matchedCountryId)
+}
+
+function maybeAcceptGuess(immediate = false): void {
+  clearPendingAcceptance()
+
+  const normalizedGuess = normalizeAnswer(answerInput.value)
+
+  if (!normalizedGuess || quizFinished) {
+    return
+  }
+
+  const matchedCountryId = aliasToCountryId.get(normalizedGuess)
+
+  if (!matchedCountryId) {
+    return
+  }
+
+  if (immediate || !prefixConflictAliases.has(normalizedGuess)) {
+    resolveMatchedCountry(matchedCountryId)
+    return
+  }
+
+  pendingAcceptHandle = window.setTimeout(() => {
+    pendingAcceptHandle = null
+
+    if (normalizeAnswer(answerInput.value) !== normalizedGuess) {
+      return
+    }
+
+    resolveMatchedCountry(matchedCountryId)
+  }, PREFIX_CONFLICT_ACCEPT_DELAY_MS)
+}
+
 function tick(): void {
   if (quizFinished) {
     return
@@ -254,26 +311,16 @@ function tick(): void {
 }
 
 answerInput.addEventListener('input', () => {
-  const normalizedGuess = normalizeAnswer(answerInput.value)
+  maybeAcceptGuess()
+})
 
-  if (!normalizedGuess || quizFinished) {
+answerInput.addEventListener('keydown', (event: KeyboardEvent) => {
+  if (event.key !== 'Enter') {
     return
   }
 
-  const matchedCountryId = aliasToCountryId.get(normalizedGuess)
-
-  if (!matchedCountryId) {
-    return
-  }
-
-  if (answeredIds.has(matchedCountryId)) {
-    answerInput.value = ''
-    statusTone = 'muted'
-    renderStatus(`${countriesById.get(matchedCountryId)?.name ?? 'That country'} is already solved.`)
-    return
-  }
-
-  solveCountry(matchedCountryId)
+  event.preventDefault()
+  maybeAcceptGuess(true)
 })
 
 zoomInButton.addEventListener('click', () => globe?.zoomBy(1.28))
