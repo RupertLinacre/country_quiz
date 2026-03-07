@@ -57,7 +57,6 @@ type GlobeLabel = {
 
 const BASE_SCALE_RATIO = 0.318
 const FLY_DURATION_MS = 850
-const INTERACTION_SETTLE_DELAY_MS = 120
 const MIN_ZOOM = 0.78
 const MAX_ZOOM = 18
 const FOCUS_COUNTRY_RADIUS_PX = 84
@@ -68,11 +67,22 @@ const MAP_LABEL_NAME_OFFSET_PX = -4
 const MAP_LABEL_FLAG_OFFSET_PX = 17
 const SEA_FILL = '#126aa6'
 const UNSOLVED_LAND_FILL = '#34393f'
+const LATEST_SOLVED_FILL = '#ffe45c'
 const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
 const SOLVED_COUNTRY_OUTLINE_COLOR = 'rgba(8, 18, 28, 0.95)'
 
 function appearanceFill(appearance: SolvedAppearance): string {
   return appearance.kind === 'flag' ? appearance.fallbackFill : appearance.fill
+}
+
+function latestAnsweredId(answeredIds: Set<string>): string | null {
+  let latestId: string | null = null
+
+  for (const answeredId of answeredIds) {
+    latestId = answeredId
+  }
+
+  return latestId
 }
 
 function easeInOutCubic(t: number): number {
@@ -320,8 +330,6 @@ export async function createGlobe(
   let cssHeight = 760
   let flyFrame: number | null = null
   let framePending = false
-  let interactionActive = false
-  let interactionTimeout: number | null = null
 
   function currentScale(): number {
     return Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO * currentZoom
@@ -333,7 +341,7 @@ export async function createGlobe(
 
   function writeRenderState(): void {
     const [rotationLongitude, rotationLatitude] = projection.rotate()
-    container.dataset.detailMode = interactionActive ? 'interaction' : 'settled'
+    container.dataset.detailMode = 'settled'
     container.dataset.rotationLon = rotationLongitude.toFixed(2)
     container.dataset.rotationLat = rotationLatitude.toFixed(2)
     container.dataset.zoom = currentZoom.toFixed(3)
@@ -348,10 +356,6 @@ export async function createGlobe(
     mapSvg.attr('viewBox', `0 0 ${cssWidth} ${cssHeight}`)
     labelsSvg.attr('viewBox', `0 0 ${cssWidth} ${cssHeight}`)
     scheduleRender()
-  }
-
-  function clearLabels(): void {
-    labelLayer.selectAll('.globe__label').remove()
   }
 
   function projectedPathData(geometry: GeoPermissibleObjects): string {
@@ -404,11 +408,6 @@ export async function createGlobe(
   }
 
   function renderLabels(): void {
-    if (interactionActive) {
-      clearLabels()
-      return
-    }
-
     const visibleLabels = [...answeredIds]
       .map((countryId) => {
         const country = countryById.get(countryId)
@@ -474,6 +473,7 @@ export async function createGlobe(
   function renderNow(): void {
     projection.scale(currentScale())
     writeRenderState()
+    const mostRecentAnsweredId = latestAnsweredId(answeredIds)
 
     spherePath
       .attr('d', projectedPathData(sphere))
@@ -482,7 +482,7 @@ export async function createGlobe(
       .attr('stroke-width', 2.2)
 
     graticulePath
-      .attr('d', interactionActive ? '' : projectedPathData(graticule))
+      .attr('d', projectedPathData(graticule))
       .attr('fill', 'none')
       .attr('stroke', 'rgba(168, 212, 244, 0.2)')
       .attr('stroke-width', 0.7)
@@ -518,7 +518,10 @@ export async function createGlobe(
         }
 
         return {
-          appearanceFill: appearanceFill(country.appearance),
+          appearanceFill:
+            countryId === mostRecentAnsweredId
+              ? LATEST_SOLVED_FILL
+              : appearanceFill(country.appearance),
           feature: countryFeature,
           id: countryId,
         }
@@ -539,13 +542,13 @@ export async function createGlobe(
     coastlinePath
       .attr('d', projectedPathData(atlas.landFeature))
       .attr('fill', 'none')
-      .attr('stroke', interactionActive ? 'rgba(231, 241, 250, 0.62)' : 'rgba(239, 247, 255, 0.76)')
-      .attr('stroke-width', interactionActive ? 1.05 : 1.3)
+      .attr('stroke', 'rgba(239, 247, 255, 0.76)')
+      .attr('stroke-width', 1.3)
       .attr('stroke-linejoin', 'round')
       .attr('stroke-linecap', 'round')
 
     borderPath
-      .attr('d', interactionActive ? '' : projectedPathData(atlas.borderMesh))
+      .attr('d', projectedPathData(atlas.borderMesh))
       .attr('fill', 'none')
       .attr('stroke', 'rgba(227, 238, 247, 0.38)')
       .attr('stroke-width', 0.62)
@@ -569,11 +572,9 @@ export async function createGlobe(
       .attr('stroke', (entry) =>
         entry.answered
           ? 'rgba(125, 80, 0, 0.9)'
-          : interactionActive
-            ? 'rgba(229, 243, 252, 0.4)'
-            : 'rgba(227, 238, 247, 0.7)',
+          : 'rgba(227, 238, 247, 0.7)',
       )
-      .attr('stroke-width', (entry) => (entry.answered ? 0.85 : interactionActive ? 0.7 : 0.95))
+      .attr('stroke-width', (entry) => (entry.answered ? 0.85 : 0.95))
 
     renderLabels()
   }
@@ -597,32 +598,6 @@ export async function createGlobe(
     }
   }
 
-  function enterInteractionMode(): void {
-    if (interactionTimeout !== null) {
-      window.clearTimeout(interactionTimeout)
-      interactionTimeout = null
-    }
-
-    if (!interactionActive) {
-      interactionActive = true
-      syncCanvasSize()
-      clearLabels()
-    }
-  }
-
-  function scheduleInteractionSettle(): void {
-    if (interactionTimeout !== null) {
-      window.clearTimeout(interactionTimeout)
-    }
-
-    interactionTimeout = window.setTimeout(() => {
-      interactionActive = false
-      interactionTimeout = null
-      syncCanvasSize()
-      scheduleRender()
-    }, INTERACTION_SETTLE_DELAY_MS)
-  }
-
   function applyZoom(nextZoom: number): void {
     currentZoom = clampZoom(nextZoom)
     scheduleRender()
@@ -642,7 +617,6 @@ export async function createGlobe(
     }
 
     cancelFlyAnimation()
-    enterInteractionMode()
 
     const [startLongitude, startLatitude, startGamma] = projection.rotate()
     const targetLongitude = shortestLongitudeTarget(startLongitude, -centroid[0])
@@ -669,7 +643,6 @@ export async function createGlobe(
       }
 
       flyFrame = null
-      scheduleInteractionSettle()
     }
 
     flyFrame = window.requestAnimationFrame(tick)
@@ -684,7 +657,6 @@ export async function createGlobe(
   const dragBehavior = drag<SVGSVGElement, unknown>()
     .on('start', () => {
       cancelFlyAnimation()
-      enterInteractionMode()
     })
     .on('drag', (event: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
       const [rotationLongitude, rotationLatitude, rotationGamma] = projection.rotate()
@@ -697,9 +669,6 @@ export async function createGlobe(
         rotationGamma,
       ])
       scheduleRender()
-    })
-    .on('end', () => {
-      scheduleInteractionSettle()
     })
 
   mapSvg.call(dragBehavior)
@@ -715,9 +684,7 @@ export async function createGlobe(
     (event: WheelEvent) => {
       event.preventDefault()
       cancelFlyAnimation()
-      enterInteractionMode()
       applyZoom(currentZoom * wheelZoomFactor(event))
-      scheduleInteractionSettle()
     },
     { passive: false },
   )
@@ -730,9 +697,7 @@ export async function createGlobe(
     },
     zoomBy(factor: number) {
       cancelFlyAnimation()
-      enterInteractionMode()
       applyZoom(currentZoom * factor)
-      scheduleInteractionSettle()
     },
   }
 }
