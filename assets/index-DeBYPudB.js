@@ -16,14 +16,18 @@
           </article>
         </div>
         <div class="answer-panel">
-          <label class="answer-panel__label" for="country-input">Enter a country</label>
+          <label class="answer-panel__label" for="guess-input">Enter a country</label>
           <input
-            id="country-input"
+            id="guess-input"
+            name="guess"
             class="answer-panel__input"
-            type="text"
+            type="search"
             autocomplete="off"
+            autocorrect="off"
             autocapitalize="words"
             spellcheck="false"
+            inputmode="search"
+            enterkeyhint="done"
             placeholder="Start typing a country name..."
           />
           <p id="status" class="status" aria-live="polite"></p>
@@ -46,7 +50,7 @@
       <div id="continent-board" class="continent-board"></div>
     </section>
   </main>
-`;var il=nl(`#score`),al=nl(`#timer`),ol=nl(`#remaining`),sl=nl(`#status`),cl=nl(`#country-input`),ll=nl(`#continent-board`),ul=nl(`#zoom-in`),dl=nl(`#zoom-out`),fl=nl(`#globe`),$=new Set,pl=Date.now()+tl,ml=`neutral`,hl=window.setInterval(kl,250),gl=!1,_l=null;function vl(e){return e.replaceAll(`&`,`&amp;`).replaceAll(`<`,`&lt;`).replaceAll(`>`,`&gt;`).replaceAll(`"`,`&quot;`).replaceAll(`'`,`&#39;`)}function yl(e){let t=a.get(e);if(!t||t.appearance.kind!==`flag`)return``;let n=vl(t.name),r=vl(t.appearance.assetUrl);return`
+`;var il=nl(`#score`),al=nl(`#timer`),ol=nl(`#remaining`),sl=nl(`#status`),cl=nl(`#guess-input`),ll=nl(`#continent-board`),ul=nl(`#zoom-in`),dl=nl(`#zoom-out`),fl=nl(`#globe`),$=new Set,pl=Date.now()+tl,ml=`neutral`,hl=window.setInterval(kl,250),gl=!1,_l=null;function vl(e){return e.replaceAll(`&`,`&amp;`).replaceAll(`<`,`&lt;`).replaceAll(`>`,`&gt;`).replaceAll(`"`,`&quot;`).replaceAll(`'`,`&#39;`)}function yl(e){let t=a.get(e);if(!t||t.appearance.kind!==`flag`)return``;let n=vl(t.name),r=vl(t.appearance.assetUrl);return`
     <span class="country-slot__flag-anchor" aria-hidden="true">
       <img class="country-slot__flag-icon" src="${r}" alt="" loading="lazy" />
       <span class="country-slot__flag-preview">
