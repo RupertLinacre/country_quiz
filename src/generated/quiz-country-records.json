@@ -3,6 +3,7 @@
     "id": "DZA",
     "ccn3": "012",
     "name": "Algeria",
+    "flagEmoji": "🇩🇿",
     "atlasName": "Algeria",
     "continent": "Africa",
     "aliases": [
@@ -12,14 +13,16 @@
       "algerie"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/DZ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "AGO",
     "ccn3": "024",
     "name": "Angola",
+    "flagEmoji": "🇦🇴",
     "atlasName": "Angola",
     "continent": "Africa",
     "aliases": [
@@ -29,14 +32,16 @@
       "publika de an la"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AO.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BEN",
     "ccn3": "204",
     "name": "Benin",
+    "flagEmoji": "🇧🇯",
     "atlasName": "Benin",
     "continent": "Africa",
     "aliases": [
@@ -45,14 +50,16 @@
       "republique du benin"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BJ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BWA",
     "ccn3": "072",
     "name": "Botswana",
+    "flagEmoji": "🇧🇼",
     "atlasName": "Botswana",
     "continent": "Africa",
     "aliases": [
@@ -61,28 +68,32 @@
       "lefatshe la botswana"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BW.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BFA",
     "ccn3": "854",
     "name": "Burkina Faso",
+    "flagEmoji": "🇧🇫",
     "atlasName": "Burkina Faso",
     "continent": "Africa",
     "aliases": [
       "burkina faso"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BF.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BDI",
     "ccn3": "108",
     "name": "Burundi",
+    "flagEmoji": "🇧🇮",
     "atlasName": "Burundi",
     "continent": "Africa",
     "aliases": [
@@ -92,14 +103,16 @@
       "republique du burundi"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BI.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CMR",
     "ccn3": "120",
     "name": "Cameroon",
+    "flagEmoji": "🇨🇲",
     "atlasName": "Cameroon",
     "continent": "Africa",
     "aliases": [
@@ -108,14 +121,16 @@
       "republique du cameroun"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CPV",
     "ccn3": "132",
     "name": "Cape Verde",
+    "flagEmoji": "🇨🇻",
     "atlasName": "Cape Verde",
     "continent": "Africa",
     "aliases": [
@@ -124,14 +139,16 @@
       "republica de cabo verde"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CV.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CAF",
     "ccn3": "140",
     "name": "Central African Republic",
+    "flagEmoji": "🇨🇫",
     "atlasName": "Central African Republic",
     "continent": "Africa",
     "aliases": [
@@ -139,14 +156,16 @@
       "republique centrafricaine"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CF.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TCD",
     "ccn3": "148",
     "name": "Chad",
+    "flagEmoji": "🇹🇩",
     "atlasName": "Chad",
     "continent": "Africa",
     "aliases": [
@@ -156,14 +175,16 @@
       "republique du tchad"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TD.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "COM",
     "ccn3": "174",
     "name": "Comoros",
+    "flagEmoji": "🇰🇲",
     "atlasName": "Comoros",
     "continent": "Africa",
     "aliases": [
@@ -174,14 +195,16 @@
       "al ittihad al qumuri"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/KM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "DJI",
     "ccn3": "262",
     "name": "Djibouti",
+    "flagEmoji": "🇩🇯",
     "atlasName": "Djibouti",
     "continent": "Africa",
     "aliases": [
@@ -194,14 +217,16 @@
       "jamhuuriyadda jabuuti"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/DJ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "COD",
     "ccn3": "180",
     "name": "DR Congo",
+    "flagEmoji": "🇨🇩",
     "atlasName": "DR Congo",
     "continent": "Africa",
     "aliases": [
@@ -213,14 +238,16 @@
       "drc"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CD.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "EGY",
     "ccn3": "818",
     "name": "Egypt",
+    "flagEmoji": "🇪🇬",
     "atlasName": "Egypt",
     "continent": "Africa",
     "aliases": [
@@ -228,14 +255,16 @@
       "arab republic of egypt"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/EG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GNQ",
     "ccn3": "226",
     "name": "Equatorial Guinea",
+    "flagEmoji": "🇬🇶",
     "atlasName": "Equatorial Guinea",
     "continent": "Africa",
     "aliases": [
@@ -246,14 +275,16 @@
       "republica da guine equatorial"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GQ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ERI",
     "ccn3": "232",
     "name": "Eritrea",
+    "flagEmoji": "🇪🇷",
     "atlasName": "Eritrea",
     "continent": "Africa",
     "aliases": [
@@ -264,14 +295,16 @@
       "iritriya"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/ER.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SWZ",
     "ccn3": "748",
     "name": "Eswatini",
+    "flagEmoji": "🇸🇿",
     "atlasName": "Eswatini",
     "continent": "Africa",
     "aliases": [
@@ -284,14 +317,16 @@
       "umbuso weswatini"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SZ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ETH",
     "ccn3": "231",
     "name": "Ethiopia",
+    "flagEmoji": "🇪🇹",
     "atlasName": "Ethiopia",
     "continent": "Africa",
     "aliases": [
@@ -300,14 +335,16 @@
       "ityoppya"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/ET.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GAB",
     "ccn3": "266",
     "name": "Gabon",
+    "flagEmoji": "🇬🇦",
     "atlasName": "Gabon",
     "continent": "Africa",
     "aliases": [
@@ -316,14 +353,16 @@
       "republique gabonaise"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GMB",
     "ccn3": "270",
     "name": "Gambia",
+    "flagEmoji": "🇬🇲",
     "atlasName": "Gambia",
     "continent": "Africa",
     "aliases": [
@@ -331,14 +370,16 @@
       "republic of the gambia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GHA",
     "ccn3": "288",
     "name": "Ghana",
+    "flagEmoji": "🇬🇭",
     "atlasName": "Ghana",
     "continent": "Africa",
     "aliases": [
@@ -346,14 +387,16 @@
       "republic of ghana"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GH.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GIN",
     "ccn3": "324",
     "name": "Guinea",
+    "flagEmoji": "🇬🇳",
     "atlasName": "Guinea",
     "continent": "Africa",
     "aliases": [
@@ -362,14 +405,16 @@
       "republique de guinee"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GN.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GNB",
     "ccn3": "624",
     "name": "Guinea-Bissau",
+    "flagEmoji": "🇬🇼",
     "atlasName": "Guinea-Bissau",
     "continent": "Africa",
     "aliases": [
@@ -378,14 +423,16 @@
       "republica da guine bissau"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GW.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CIV",
     "ccn3": "384",
     "name": "Ivory Coast",
+    "flagEmoji": "🇨🇮",
     "atlasName": "Ivory Coast",
     "continent": "Africa",
     "aliases": [
@@ -395,14 +442,16 @@
       "republique de cote d ivoire"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CI.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "KEN",
     "ccn3": "404",
     "name": "Kenya",
+    "flagEmoji": "🇰🇪",
     "atlasName": "Kenya",
     "continent": "Africa",
     "aliases": [
@@ -411,14 +460,16 @@
       "jamhuri ya kenya"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/KE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LSO",
     "ccn3": "426",
     "name": "Lesotho",
+    "flagEmoji": "🇱🇸",
     "atlasName": "Lesotho",
     "continent": "Africa",
     "aliases": [
@@ -427,14 +478,16 @@
       "muso oa lesotho"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LS.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LBR",
     "ccn3": "430",
     "name": "Liberia",
+    "flagEmoji": "🇱🇷",
     "atlasName": "Liberia",
     "continent": "Africa",
     "aliases": [
@@ -442,14 +495,16 @@
       "republic of liberia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LBY",
     "ccn3": "434",
     "name": "Libya",
+    "flagEmoji": "🇱🇾",
     "atlasName": "Libya",
     "continent": "Africa",
     "aliases": [
@@ -458,14 +513,16 @@
       "dawlat libya"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LY.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MDG",
     "ccn3": "450",
     "name": "Madagascar",
+    "flagEmoji": "🇲🇬",
     "atlasName": "Madagascar",
     "continent": "Africa",
     "aliases": [
@@ -475,14 +532,16 @@
       "republique de madagascar"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MWI",
     "ccn3": "454",
     "name": "Malawi",
+    "flagEmoji": "🇲🇼",
     "atlasName": "Malawi",
     "continent": "Africa",
     "aliases": [
@@ -490,14 +549,16 @@
       "republic of malawi"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MW.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MLI",
     "ccn3": "466",
     "name": "Mali",
+    "flagEmoji": "🇲🇱",
     "atlasName": "Mali",
     "continent": "Africa",
     "aliases": [
@@ -506,14 +567,16 @@
       "republique du mali"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/ML.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MRT",
     "ccn3": "478",
     "name": "Mauritania",
+    "flagEmoji": "🇲🇷",
     "atlasName": "Mauritania",
     "continent": "Africa",
     "aliases": [
@@ -522,14 +585,16 @@
       "al jumhuriyyah al islamiyyah al muritaniyyah"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MUS",
     "ccn3": "480",
     "name": "Mauritius",
+    "flagEmoji": "🇲🇺",
     "atlasName": "Mauritius",
     "continent": "Africa",
     "aliases": [
@@ -538,14 +603,16 @@
       "republique de maurice"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MU.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MAR",
     "ccn3": "504",
     "name": "Morocco",
+    "flagEmoji": "🇲🇦",
     "atlasName": "Morocco",
     "continent": "Africa",
     "aliases": [
@@ -554,14 +621,16 @@
       "al mamlakah al magribiyah"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MOZ",
     "ccn3": "508",
     "name": "Mozambique",
+    "flagEmoji": "🇲🇿",
     "atlasName": "Mozambique",
     "continent": "Africa",
     "aliases": [
@@ -570,14 +639,16 @@
       "republica de mocambique"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MZ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "NAM",
     "ccn3": "516",
     "name": "Namibia",
+    "flagEmoji": "🇳🇦",
     "atlasName": "Namibia",
     "continent": "Africa",
     "aliases": [
@@ -586,14 +657,16 @@
       "namibie"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/NA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "NER",
     "ccn3": "562",
     "name": "Niger",
+    "flagEmoji": "🇳🇪",
     "atlasName": "Niger",
     "continent": "Africa",
     "aliases": [
@@ -602,14 +675,16 @@
       "nijar"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/NE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "NGA",
     "ccn3": "566",
     "name": "Nigeria",
+    "flagEmoji": "🇳🇬",
     "atlasName": "Nigeria",
     "continent": "Africa",
     "aliases": [
@@ -619,14 +694,16 @@
       "naijiria"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/NG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "COG",
     "ccn3": "178",
     "name": "Republic of the Congo",
+    "flagEmoji": "🇨🇬",
     "atlasName": "Republic of the Congo",
     "continent": "Africa",
     "aliases": [
@@ -635,14 +712,16 @@
       "congo brazzaville"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "RWA",
     "ccn3": "646",
     "name": "Rwanda",
+    "flagEmoji": "🇷🇼",
     "atlasName": "Rwanda",
     "continent": "Africa",
     "aliases": [
@@ -652,14 +731,16 @@
       "republique du rwanda"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/RW.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "STP",
     "ccn3": "678",
     "name": "São Tomé and Príncipe",
+    "flagEmoji": "🇸🇹",
     "atlasName": "São Tomé and Príncipe",
     "continent": "Africa",
     "aliases": [
@@ -669,14 +750,16 @@
       "sao tome"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/ST.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SEN",
     "ccn3": "686",
     "name": "Senegal",
+    "flagEmoji": "🇸🇳",
     "atlasName": "Senegal",
     "continent": "Africa",
     "aliases": [
@@ -685,14 +768,16 @@
       "republique du senegal"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SN.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SYC",
     "ccn3": "690",
     "name": "Seychelles",
+    "flagEmoji": "🇸🇨",
     "atlasName": "Seychelles",
     "continent": "Africa",
     "aliases": [
@@ -702,14 +787,16 @@
       "republique des seychelles"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SC.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SLE",
     "ccn3": "694",
     "name": "Sierra Leone",
+    "flagEmoji": "🇸🇱",
     "atlasName": "Sierra Leone",
     "continent": "Africa",
     "aliases": [
@@ -717,14 +804,16 @@
       "republic of sierra leone"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SL.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SOM",
     "ccn3": "706",
     "name": "Somalia",
+    "flagEmoji": "🇸🇴",
     "atlasName": "Somalia",
     "continent": "Africa",
     "aliases": [
@@ -735,14 +824,16 @@
       "jumhuriyyat as sumal al fideraliyya"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SO.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ZAF",
     "ccn3": "710",
     "name": "South Africa",
+    "flagEmoji": "🇿🇦",
     "atlasName": "South Africa",
     "continent": "Africa",
     "aliases": [
@@ -751,14 +842,16 @@
       "suid afrika"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/ZA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SSD",
     "ccn3": "728",
     "name": "South Sudan",
+    "flagEmoji": "🇸🇸",
     "atlasName": "South Sudan",
     "continent": "Africa",
     "aliases": [
@@ -766,14 +859,16 @@
       "republic of south sudan"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SS.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SDN",
     "ccn3": "729",
     "name": "Sudan",
+    "flagEmoji": "🇸🇩",
     "atlasName": "Sudan",
     "continent": "Africa",
     "aliases": [
@@ -782,14 +877,16 @@
       "jumhuriyat as sudan"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SD.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TZA",
     "ccn3": "834",
     "name": "Tanzania",
+    "flagEmoji": "🇹🇿",
     "atlasName": "Tanzania",
     "continent": "Africa",
     "aliases": [
@@ -799,14 +896,16 @@
       "jamhuri ya muungano wa tanzania"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TZ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TGO",
     "ccn3": "768",
     "name": "Togo",
+    "flagEmoji": "🇹🇬",
     "atlasName": "Togo",
     "continent": "Africa",
     "aliases": [
@@ -816,14 +915,16 @@
       "republique togolaise"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TUN",
     "ccn3": "788",
     "name": "Tunisia",
+    "flagEmoji": "🇹🇳",
     "atlasName": "Tunisia",
     "continent": "Africa",
     "aliases": [
@@ -833,14 +934,16 @@
       "al jumhuriyyah at tunisiyyah"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TN.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "UGA",
     "ccn3": "800",
     "name": "Uganda",
+    "flagEmoji": "🇺🇬",
     "atlasName": "Uganda",
     "continent": "Africa",
     "aliases": [
@@ -849,14 +952,16 @@
       "jamhuri ya uganda"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/UG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ZMB",
     "ccn3": "894",
     "name": "Zambia",
+    "flagEmoji": "🇿🇲",
     "atlasName": "Zambia",
     "continent": "Africa",
     "aliases": [
@@ -864,14 +969,16 @@
       "republic of zambia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/ZM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ZWE",
     "ccn3": "716",
     "name": "Zimbabwe",
+    "flagEmoji": "🇿🇼",
     "atlasName": "Zimbabwe",
     "continent": "Africa",
     "aliases": [
@@ -879,14 +986,16 @@
       "republic of zimbabwe"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/ZW.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "AFG",
     "ccn3": "004",
     "name": "Afghanistan",
+    "flagEmoji": "🇦🇫",
     "atlasName": "Afghanistan",
     "continent": "Asia",
     "aliases": [
@@ -895,14 +1004,16 @@
       "afganistan"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AF.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ARM",
     "ccn3": "051",
     "name": "Armenia",
+    "flagEmoji": "🇦🇲",
     "atlasName": "Armenia",
     "continent": "Asia",
     "aliases": [
@@ -911,14 +1022,16 @@
       "hayastan"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "AZE",
     "ccn3": "031",
     "name": "Azerbaijan",
+    "flagEmoji": "🇦🇿",
     "atlasName": "Azerbaijan",
     "continent": "Asia",
     "aliases": [
@@ -927,14 +1040,16 @@
       "az rbaycan respublikas"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AZ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BHR",
     "ccn3": "048",
     "name": "Bahrain",
+    "flagEmoji": "🇧🇭",
     "atlasName": "Bahrain",
     "continent": "Asia",
     "aliases": [
@@ -943,14 +1058,16 @@
       "mamlakat al bahrayn"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BH.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BGD",
     "ccn3": "050",
     "name": "Bangladesh",
+    "flagEmoji": "🇧🇩",
     "atlasName": "Bangladesh",
     "continent": "Asia",
     "aliases": [
@@ -959,14 +1076,16 @@
       "gonoprojatontri bangladesh"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BD.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BTN",
     "ccn3": "064",
     "name": "Bhutan",
+    "flagEmoji": "🇧🇹",
     "atlasName": "Bhutan",
     "continent": "Asia",
     "aliases": [
@@ -974,14 +1093,16 @@
       "kingdom of bhutan"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BT.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BRN",
     "ccn3": "096",
     "name": "Brunei",
+    "flagEmoji": "🇧🇳",
     "atlasName": "Brunei",
     "continent": "Asia",
     "aliases": [
@@ -992,14 +1113,16 @@
       "abode of peace"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BN.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "KHM",
     "ccn3": "116",
     "name": "Cambodia",
+    "flagEmoji": "🇰🇭",
     "atlasName": "Cambodia",
     "continent": "Asia",
     "aliases": [
@@ -1007,14 +1130,16 @@
       "kingdom of cambodia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/KH.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CHN",
     "ccn3": "156",
     "name": "China",
+    "flagEmoji": "🇨🇳",
     "atlasName": "China",
     "continent": "Asia",
     "aliases": [
@@ -1025,14 +1150,16 @@
       "zhonghua renmin gongheguo"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CN.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GEO",
     "ccn3": "268",
     "name": "Georgia",
+    "flagEmoji": "🇬🇪",
     "atlasName": "Georgia",
     "continent": "Asia",
     "aliases": [
@@ -1040,14 +1167,16 @@
       "sakartvelo"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "IND",
     "ccn3": "356",
     "name": "India",
+    "flagEmoji": "🇮🇳",
     "atlasName": "India",
     "continent": "Asia",
     "aliases": [
@@ -1057,14 +1186,16 @@
       "bharat ganrajya"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/IN.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "IDN",
     "ccn3": "360",
     "name": "Indonesia",
+    "flagEmoji": "🇮🇩",
     "atlasName": "Indonesia",
     "continent": "Asia",
     "aliases": [
@@ -1073,14 +1204,16 @@
       "republik indonesia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/ID.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "IRN",
     "ccn3": "364",
     "name": "Iran",
+    "flagEmoji": "🇮🇷",
     "atlasName": "Iran",
     "continent": "Asia",
     "aliases": [
@@ -1090,14 +1223,16 @@
       "jomhuri ye eslami ye iran"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/IR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "IRQ",
     "ccn3": "368",
     "name": "Iraq",
+    "flagEmoji": "🇮🇶",
     "atlasName": "Iraq",
     "continent": "Asia",
     "aliases": [
@@ -1106,14 +1241,16 @@
       "jumhuriyyat al iraq"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/IQ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ISR",
     "ccn3": "376",
     "name": "Israel",
+    "flagEmoji": "🇮🇱",
     "atlasName": "Israel",
     "continent": "Asia",
     "aliases": [
@@ -1122,14 +1259,16 @@
       "medinat yisra el"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/IL.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "JPN",
     "ccn3": "392",
     "name": "Japan",
+    "flagEmoji": "🇯🇵",
     "atlasName": "Japan",
     "continent": "Asia",
     "aliases": [
@@ -1138,14 +1277,16 @@
       "nihon"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/JP.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "JOR",
     "ccn3": "400",
     "name": "Jordan",
+    "flagEmoji": "🇯🇴",
     "atlasName": "Jordan",
     "continent": "Asia",
     "aliases": [
@@ -1154,14 +1295,16 @@
       "al mamlakah al urduniyah al hashimiyah"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/JO.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "KAZ",
     "ccn3": "398",
     "name": "Kazakhstan",
+    "flagEmoji": "🇰🇿",
     "atlasName": "Kazakhstan",
     "continent": "Asia",
     "aliases": [
@@ -1172,14 +1315,16 @@
       "respublika kazakhstan"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/KZ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "KWT",
     "ccn3": "414",
     "name": "Kuwait",
+    "flagEmoji": "🇰🇼",
     "atlasName": "Kuwait",
     "continent": "Asia",
     "aliases": [
@@ -1188,14 +1333,16 @@
       "dawlat al kuwait"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/KW.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "KGZ",
     "ccn3": "417",
     "name": "Kyrgyzstan",
+    "flagEmoji": "🇰🇬",
     "atlasName": "Kyrgyzstan",
     "continent": "Asia",
     "aliases": [
@@ -1204,14 +1351,16 @@
       "kyrgyz respublikasy"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/KG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LAO",
     "ccn3": "418",
     "name": "Laos",
+    "flagEmoji": "🇱🇦",
     "atlasName": "Laos",
     "continent": "Asia",
     "aliases": [
@@ -1220,14 +1369,16 @@
       "sathalanalat paxathipatai paxaxon lao"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LBN",
     "ccn3": "422",
     "name": "Lebanon",
+    "flagEmoji": "🇱🇧",
     "atlasName": "Lebanon",
     "continent": "Asia",
     "aliases": [
@@ -1236,28 +1387,32 @@
       "al jumhuriyah al libnaniyah"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LB.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MYS",
     "ccn3": "458",
     "name": "Malaysia",
+    "flagEmoji": "🇲🇾",
     "atlasName": "Malaysia",
     "continent": "Asia",
     "aliases": [
       "malaysia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MY.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MDV",
     "ccn3": "462",
     "name": "Maldives",
+    "flagEmoji": "🇲🇻",
     "atlasName": "Maldives",
     "continent": "Asia",
     "aliases": [
@@ -1267,28 +1422,32 @@
       "dhivehi raajjeyge jumhooriyya"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MV.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MNG",
     "ccn3": "496",
     "name": "Mongolia",
+    "flagEmoji": "🇲🇳",
     "atlasName": "Mongolia",
     "continent": "Asia",
     "aliases": [
       "mongolia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MN.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MMR",
     "ccn3": "104",
     "name": "Myanmar",
+    "flagEmoji": "🇲🇲",
     "atlasName": "Myanmar",
     "continent": "Asia",
     "aliases": [
@@ -1298,14 +1457,16 @@
       "pyidaunzu thanmada myama nainngandaw"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "NPL",
     "ccn3": "524",
     "name": "Nepal",
+    "flagEmoji": "🇳🇵",
     "atlasName": "Nepal",
     "continent": "Asia",
     "aliases": [
@@ -1314,14 +1475,16 @@
       "loktantrik ganatantra nepal"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/NP.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "PRK",
     "ccn3": "408",
     "name": "North Korea",
+    "flagEmoji": "🇰🇵",
     "atlasName": "North Korea",
     "continent": "Asia",
     "aliases": [
@@ -1332,14 +1495,16 @@
       "korea democratic people s republic of"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/KP.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "OMN",
     "ccn3": "512",
     "name": "Oman",
+    "flagEmoji": "🇴🇲",
     "atlasName": "Oman",
     "continent": "Asia",
     "aliases": [
@@ -1348,14 +1513,16 @@
       "saltanat uman"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/OM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "PAK",
     "ccn3": "586",
     "name": "Pakistan",
+    "flagEmoji": "🇵🇰",
     "atlasName": "Pakistan",
     "continent": "Asia",
     "aliases": [
@@ -1364,14 +1531,16 @@
       "islami jumhuriya eh pakistan"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/PK.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "PSE",
     "ccn3": "275",
     "name": "Palestine",
+    "flagEmoji": "🇵🇸",
     "atlasName": "Palestine",
     "continent": "Asia",
     "aliases": [
@@ -1381,14 +1550,16 @@
       "dawlat filastin"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/PS.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "PHL",
     "ccn3": "608",
     "name": "Philippines",
+    "flagEmoji": "🇵🇭",
     "atlasName": "Philippines",
     "continent": "Asia",
     "aliases": [
@@ -1397,14 +1568,16 @@
       "republika ng pilipinas"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/PH.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "QAT",
     "ccn3": "634",
     "name": "Qatar",
+    "flagEmoji": "🇶🇦",
     "atlasName": "Qatar",
     "continent": "Asia",
     "aliases": [
@@ -1413,14 +1586,16 @@
       "dawlat qatar"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/QA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SAU",
     "ccn3": "682",
     "name": "Saudi Arabia",
+    "flagEmoji": "🇸🇦",
     "atlasName": "Saudi Arabia",
     "continent": "Asia",
     "aliases": [
@@ -1430,14 +1605,16 @@
       "al mamlakah al arabiyyah as su udiyyah"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SGP",
     "ccn3": "702",
     "name": "Singapore",
+    "flagEmoji": "🇸🇬",
     "atlasName": "Singapore",
     "continent": "Asia",
     "aliases": [
@@ -1447,14 +1624,16 @@
       "republik singapura"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "KOR",
     "ccn3": "410",
     "name": "South Korea",
+    "flagEmoji": "🇰🇷",
     "atlasName": "South Korea",
     "continent": "Asia",
     "aliases": [
@@ -1463,14 +1642,16 @@
       "korea republic of"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/KR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LKA",
     "ccn3": "144",
     "name": "Sri Lanka",
+    "flagEmoji": "🇱🇰",
     "atlasName": "Sri Lanka",
     "continent": "Asia",
     "aliases": [
@@ -1479,14 +1660,16 @@
       "ilankai"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LK.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SYR",
     "ccn3": "760",
     "name": "Syria",
+    "flagEmoji": "🇸🇾",
     "atlasName": "Syria",
     "continent": "Asia",
     "aliases": [
@@ -1495,14 +1678,16 @@
       "al jumhuriyah al arabiyah as suriyah"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SY.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TWN",
     "ccn3": "158",
     "name": "Taiwan",
+    "flagEmoji": "🇹🇼",
     "atlasName": "Taiwan",
     "continent": "Asia",
     "aliases": [
@@ -1513,14 +1698,16 @@
       "chinese taipei"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TW.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TJK",
     "ccn3": "762",
     "name": "Tajikistan",
+    "flagEmoji": "🇹🇯",
     "atlasName": "Tajikistan",
     "continent": "Asia",
     "aliases": [
@@ -1530,14 +1717,16 @@
       "cumhuriyi tocikiston"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TJ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "THA",
     "ccn3": "764",
     "name": "Thailand",
+    "flagEmoji": "🇹🇭",
     "atlasName": "Thailand",
     "continent": "Asia",
     "aliases": [
@@ -1548,14 +1737,16 @@
       "ratcha anachak thai"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TH.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TLS",
     "ccn3": "626",
     "name": "Timor-Leste",
+    "flagEmoji": "🇹🇱",
     "atlasName": "Timor-Leste",
     "continent": "Asia",
     "aliases": [
@@ -1569,14 +1760,16 @@
       "timor lorosae"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TL.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TUR",
     "ccn3": "792",
     "name": "Türkiye",
+    "flagEmoji": "🇹🇷",
     "atlasName": "Türkiye",
     "continent": "Asia",
     "aliases": [
@@ -1586,28 +1779,32 @@
       "turkiye cumhuriyeti"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TKM",
     "ccn3": "795",
     "name": "Turkmenistan",
+    "flagEmoji": "🇹🇲",
     "atlasName": "Turkmenistan",
     "continent": "Asia",
     "aliases": [
       "turkmenistan"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ARE",
     "ccn3": "784",
     "name": "United Arab Emirates",
+    "flagEmoji": "🇦🇪",
     "atlasName": "United Arab Emirates",
     "continent": "Asia",
     "aliases": [
@@ -1616,14 +1813,16 @@
       "uae"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "UZB",
     "ccn3": "860",
     "name": "Uzbekistan",
+    "flagEmoji": "🇺🇿",
     "atlasName": "Uzbekistan",
     "continent": "Asia",
     "aliases": [
@@ -1632,14 +1831,16 @@
       "o zbekiston respublikasi"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/UZ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "VNM",
     "ccn3": "704",
     "name": "Vietnam",
+    "flagEmoji": "🇻🇳",
     "atlasName": "Vietnam",
     "continent": "Asia",
     "aliases": [
@@ -1649,14 +1850,16 @@
       "viet nam"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/VN.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "YEM",
     "ccn3": "887",
     "name": "Yemen",
+    "flagEmoji": "🇾🇪",
     "atlasName": "Yemen",
     "continent": "Asia",
     "aliases": [
@@ -1666,14 +1869,16 @@
       "al jumhuriyyah al yamaniyyah"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/YE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ALB",
     "ccn3": "008",
     "name": "Albania",
+    "flagEmoji": "🇦🇱",
     "atlasName": "Albania",
     "continent": "Europe",
     "aliases": [
@@ -1684,14 +1889,16 @@
       "shqipnia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AL.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "AND",
     "ccn3": "020",
     "name": "Andorra",
+    "flagEmoji": "🇦🇩",
     "atlasName": "Andorra",
     "continent": "Europe",
     "aliases": [
@@ -1700,14 +1907,16 @@
       "principat d andorra"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AD.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "AUT",
     "ccn3": "040",
     "name": "Austria",
+    "flagEmoji": "🇦🇹",
     "atlasName": "Austria",
     "continent": "Europe",
     "aliases": [
@@ -1717,14 +1926,16 @@
       "oesterreich"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AT.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BLR",
     "ccn3": "112",
     "name": "Belarus",
+    "flagEmoji": "🇧🇾",
     "atlasName": "Belarus",
     "continent": "Europe",
     "aliases": [
@@ -1733,14 +1944,16 @@
       "bielarus"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BY.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BEL",
     "ccn3": "056",
     "name": "Belgium",
+    "flagEmoji": "🇧🇪",
     "atlasName": "Belgium",
     "continent": "Europe",
     "aliases": [
@@ -1754,14 +1967,16 @@
       "konigreich belgien"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BIH",
     "ccn3": "070",
     "name": "Bosnia and Herzegovina",
+    "flagEmoji": "🇧🇦",
     "atlasName": "Bosnia and Herzegovina",
     "continent": "Europe",
     "aliases": [
@@ -1769,14 +1984,16 @@
       "bosnia herzegovina"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BGR",
     "ccn3": "100",
     "name": "Bulgaria",
+    "flagEmoji": "🇧🇬",
     "atlasName": "Bulgaria",
     "continent": "Europe",
     "aliases": [
@@ -1784,14 +2001,16 @@
       "republic of bulgaria"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "HRV",
     "ccn3": "191",
     "name": "Croatia",
+    "flagEmoji": "🇭🇷",
     "atlasName": "Croatia",
     "continent": "Europe",
     "aliases": [
@@ -1801,14 +2020,16 @@
       "republika hrvatska"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/HR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CYP",
     "ccn3": "196",
     "name": "Cyprus",
+    "flagEmoji": "🇨🇾",
     "atlasName": "Cyprus",
     "continent": "Europe",
     "aliases": [
@@ -1819,14 +2040,16 @@
       "k br s cumhuriyeti"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CY.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CZE",
     "ccn3": "203",
     "name": "Czechia",
+    "flagEmoji": "🇨🇿",
     "atlasName": "Czechia",
     "continent": "Europe",
     "aliases": [
@@ -1836,14 +2059,16 @@
       "cesko"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CZ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "DNK",
     "ccn3": "208",
     "name": "Denmark",
+    "flagEmoji": "🇩🇰",
     "atlasName": "Denmark",
     "continent": "Europe",
     "aliases": [
@@ -1853,14 +2078,16 @@
       "kongeriget danmark"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/DK.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "EST",
     "ccn3": "233",
     "name": "Estonia",
+    "flagEmoji": "🇪🇪",
     "atlasName": "Estonia",
     "continent": "Europe",
     "aliases": [
@@ -1870,14 +2097,16 @@
       "eesti vabariik"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/EE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "FIN",
     "ccn3": "246",
     "name": "Finland",
+    "flagEmoji": "🇫🇮",
     "atlasName": "Finland",
     "continent": "Europe",
     "aliases": [
@@ -1888,14 +2117,16 @@
       "republiken finland"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/FI.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "FRA",
     "ccn3": "250",
     "name": "France",
+    "flagEmoji": "🇫🇷",
     "atlasName": "France",
     "continent": "Europe",
     "aliases": [
@@ -1904,14 +2135,16 @@
       "republique francaise"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/FR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "DEU",
     "ccn3": "276",
     "name": "Germany",
+    "flagEmoji": "🇩🇪",
     "atlasName": "Germany",
     "continent": "Europe",
     "aliases": [
@@ -1920,14 +2153,16 @@
       "bundesrepublik deutschland"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/DE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GRC",
     "ccn3": "300",
     "name": "Greece",
+    "flagEmoji": "🇬🇷",
     "atlasName": "Greece",
     "continent": "Europe",
     "aliases": [
@@ -1936,28 +2171,32 @@
       "ellada"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "HUN",
     "ccn3": "348",
     "name": "Hungary",
+    "flagEmoji": "🇭🇺",
     "atlasName": "Hungary",
     "continent": "Europe",
     "aliases": [
       "hungary"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/HU.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ISL",
     "ccn3": "352",
     "name": "Iceland",
+    "flagEmoji": "🇮🇸",
     "atlasName": "Iceland",
     "continent": "Europe",
     "aliases": [
@@ -1967,14 +2206,16 @@
       "ly veldi island"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/IS.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "IRL",
     "ccn3": "372",
     "name": "Ireland",
+    "flagEmoji": "🇮🇪",
     "atlasName": "Ireland",
     "continent": "Europe",
     "aliases": [
@@ -1984,14 +2225,16 @@
       "poblacht na heireann"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/IE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ITA",
     "ccn3": "380",
     "name": "Italy",
+    "flagEmoji": "🇮🇹",
     "atlasName": "Italy",
     "continent": "Europe",
     "aliases": [
@@ -2000,14 +2243,16 @@
       "repubblica italiana"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/IT.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "UNK",
     "ccn3": null,
     "name": "Kosovo",
+    "flagEmoji": "🇽🇰",
     "atlasName": "Kosovo",
     "continent": "Europe",
     "aliases": [
@@ -2015,14 +2260,16 @@
       "republic of kosovo"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/XK.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LVA",
     "ccn3": "428",
     "name": "Latvia",
+    "flagEmoji": "🇱🇻",
     "atlasName": "Latvia",
     "continent": "Europe",
     "aliases": [
@@ -2031,14 +2278,16 @@
       "latvijas republika"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LV.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LIE",
     "ccn3": "438",
     "name": "Liechtenstein",
+    "flagEmoji": "🇱🇮",
     "atlasName": "Liechtenstein",
     "continent": "Europe",
     "aliases": [
@@ -2047,14 +2296,16 @@
       "furstentum liechtenstein"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LI.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LTU",
     "ccn3": "440",
     "name": "Lithuania",
+    "flagEmoji": "🇱🇹",
     "atlasName": "Lithuania",
     "continent": "Europe",
     "aliases": [
@@ -2063,14 +2314,16 @@
       "lietuvos respublika"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LT.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LUX",
     "ccn3": "442",
     "name": "Luxembourg",
+    "flagEmoji": "🇱🇺",
     "atlasName": "Luxembourg",
     "continent": "Europe",
     "aliases": [
@@ -2081,14 +2334,16 @@
       "groussherzogtum letzebuerg"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LU.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MLT",
     "ccn3": "470",
     "name": "Malta",
+    "flagEmoji": "🇲🇹",
     "atlasName": "Malta",
     "continent": "Europe",
     "aliases": [
@@ -2097,14 +2352,16 @@
       "repubblika ta malta"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MT.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MDA",
     "ccn3": "498",
     "name": "Moldova",
+    "flagEmoji": "🇲🇩",
     "atlasName": "Moldova",
     "continent": "Europe",
     "aliases": [
@@ -2114,14 +2371,16 @@
       "republica moldova"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MD.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MCO",
     "ccn3": "492",
     "name": "Monaco",
+    "flagEmoji": "🇲🇨",
     "atlasName": "Monaco",
     "continent": "Europe",
     "aliases": [
@@ -2130,14 +2389,16 @@
       "principaute de monaco"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MC.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MNE",
     "ccn3": "499",
     "name": "Montenegro",
+    "flagEmoji": "🇲🇪",
     "atlasName": "Montenegro",
     "continent": "Europe",
     "aliases": [
@@ -2145,14 +2406,16 @@
       "crna gora"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/ME.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "NLD",
     "ccn3": "528",
     "name": "Netherlands",
+    "flagEmoji": "🇳🇱",
     "atlasName": "Netherlands",
     "continent": "Europe",
     "aliases": [
@@ -2162,14 +2425,16 @@
       "nederland"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/NL.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MKD",
     "ccn3": "807",
     "name": "North Macedonia",
+    "flagEmoji": "🇲🇰",
     "atlasName": "North Macedonia",
     "continent": "Europe",
     "aliases": [
@@ -2180,14 +2445,16 @@
       "macedonia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MK.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "NOR",
     "ccn3": "578",
     "name": "Norway",
+    "flagEmoji": "🇳🇴",
     "atlasName": "Norway",
     "continent": "Europe",
     "aliases": [
@@ -2199,14 +2466,16 @@
       "kongeriket noreg"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/NO.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "POL",
     "ccn3": "616",
     "name": "Poland",
+    "flagEmoji": "🇵🇱",
     "atlasName": "Poland",
     "continent": "Europe",
     "aliases": [
@@ -2215,14 +2484,16 @@
       "rzeczpospolita polska"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/PL.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "PRT",
     "ccn3": "620",
     "name": "Portugal",
+    "flagEmoji": "🇵🇹",
     "atlasName": "Portugal",
     "continent": "Europe",
     "aliases": [
@@ -2232,14 +2503,16 @@
       "republica portuguesa"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/PT.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ROU",
     "ccn3": "642",
     "name": "Romania",
+    "flagEmoji": "🇷🇴",
     "atlasName": "Romania",
     "continent": "Europe",
     "aliases": [
@@ -2248,14 +2521,16 @@
       "roumania"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/RO.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "RUS",
     "ccn3": "643",
     "name": "Russia",
+    "flagEmoji": "🇷🇺",
     "atlasName": "Russia",
     "continent": "Europe",
     "aliases": [
@@ -2263,14 +2538,16 @@
       "russian federation"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/RU.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SMR",
     "ccn3": "674",
     "name": "San Marino",
+    "flagEmoji": "🇸🇲",
     "atlasName": "San Marino",
     "continent": "Europe",
     "aliases": [
@@ -2280,14 +2557,16 @@
       "repubblica di san marino"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SRB",
     "ccn3": "688",
     "name": "Serbia",
+    "flagEmoji": "🇷🇸",
     "atlasName": "Serbia",
     "continent": "Europe",
     "aliases": [
@@ -2297,14 +2576,16 @@
       "republika srbija"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/RS.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SVK",
     "ccn3": "703",
     "name": "Slovakia",
+    "flagEmoji": "🇸🇰",
     "atlasName": "Slovakia",
     "continent": "Europe",
     "aliases": [
@@ -2313,14 +2594,16 @@
       "slovenska republika"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SK.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SVN",
     "ccn3": "705",
     "name": "Slovenia",
+    "flagEmoji": "🇸🇮",
     "atlasName": "Slovenia",
     "continent": "Europe",
     "aliases": [
@@ -2329,14 +2612,16 @@
       "republika slovenija"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SI.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ESP",
     "ccn3": "724",
     "name": "Spain",
+    "flagEmoji": "🇪🇸",
     "atlasName": "Spain",
     "continent": "Europe",
     "aliases": [
@@ -2345,14 +2630,16 @@
       "reino de espana"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/ES.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SWE",
     "ccn3": "752",
     "name": "Sweden",
+    "flagEmoji": "🇸🇪",
     "atlasName": "Sweden",
     "continent": "Europe",
     "aliases": [
@@ -2361,14 +2648,16 @@
       "konungariket sverige"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CHE",
     "ccn3": "756",
     "name": "Switzerland",
+    "flagEmoji": "🇨🇭",
     "atlasName": "Switzerland",
     "continent": "Europe",
     "aliases": [
@@ -2380,14 +2669,16 @@
       "svizra"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CH.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "UKR",
     "ccn3": "804",
     "name": "Ukraine",
+    "flagEmoji": "🇺🇦",
     "atlasName": "Ukraine",
     "continent": "Europe",
     "aliases": [
@@ -2395,14 +2686,16 @@
       "ukrayina"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/UA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GBR",
     "ccn3": "826",
     "name": "United Kingdom",
+    "flagEmoji": "🇬🇧",
     "atlasName": "United Kingdom",
     "continent": "Europe",
     "aliases": [
@@ -2413,14 +2706,16 @@
       "britain"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GB.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "VAT",
     "ccn3": "336",
     "name": "Vatican City",
+    "flagEmoji": "🇻🇦",
     "atlasName": "Vatican",
     "continent": "Europe",
     "aliases": [
@@ -2432,28 +2727,32 @@
       "holy see"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/VA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ATG",
     "ccn3": "028",
     "name": "Antigua and Barbuda",
+    "flagEmoji": "🇦🇬",
     "atlasName": "Antigua and Barbuda",
     "continent": "North America",
     "aliases": [
       "antigua and barbuda"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BHS",
     "ccn3": "044",
     "name": "Bahamas",
+    "flagEmoji": "🇧🇸",
     "atlasName": "Bahamas",
     "continent": "North America",
     "aliases": [
@@ -2461,56 +2760,64 @@
       "commonwealth of the bahamas"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BS.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BRB",
     "ccn3": "052",
     "name": "Barbados",
+    "flagEmoji": "🇧🇧",
     "atlasName": "Barbados",
     "continent": "North America",
     "aliases": [
       "barbados"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BB.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BLZ",
     "ccn3": "084",
     "name": "Belize",
+    "flagEmoji": "🇧🇿",
     "atlasName": "Belize",
     "continent": "North America",
     "aliases": [
       "belize"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BZ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CAN",
     "ccn3": "124",
     "name": "Canada",
+    "flagEmoji": "🇨🇦",
     "atlasName": "Canada",
     "continent": "North America",
     "aliases": [
       "canada"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CRI",
     "ccn3": "188",
     "name": "Costa Rica",
+    "flagEmoji": "🇨🇷",
     "atlasName": "Costa Rica",
     "continent": "North America",
     "aliases": [
@@ -2519,14 +2826,16 @@
       "republica de costa rica"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CUB",
     "ccn3": "192",
     "name": "Cuba",
+    "flagEmoji": "🇨🇺",
     "atlasName": "Cuba",
     "continent": "North America",
     "aliases": [
@@ -2535,14 +2844,16 @@
       "republica de cuba"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CU.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "DMA",
     "ccn3": "212",
     "name": "Dominica",
+    "flagEmoji": "🇩🇲",
     "atlasName": "Dominica",
     "continent": "North America",
     "aliases": [
@@ -2552,28 +2863,32 @@
       "wai tu kubuli"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/DM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "DOM",
     "ccn3": "214",
     "name": "Dominican Republic",
+    "flagEmoji": "🇩🇴",
     "atlasName": "Dominican Republic",
     "continent": "North America",
     "aliases": [
       "dominican republic"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/DO.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SLV",
     "ccn3": "222",
     "name": "El Salvador",
+    "flagEmoji": "🇸🇻",
     "atlasName": "El Salvador",
     "continent": "North America",
     "aliases": [
@@ -2582,28 +2897,32 @@
       "republica de el salvador"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SV.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GRD",
     "ccn3": "308",
     "name": "Grenada",
+    "flagEmoji": "🇬🇩",
     "atlasName": "Grenada",
     "continent": "North America",
     "aliases": [
       "grenada"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GD.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GTM",
     "ccn3": "320",
     "name": "Guatemala",
+    "flagEmoji": "🇬🇹",
     "atlasName": "Guatemala",
     "continent": "North America",
     "aliases": [
@@ -2611,14 +2930,16 @@
       "republic of guatemala"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GT.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "HTI",
     "ccn3": "332",
     "name": "Haiti",
+    "flagEmoji": "🇭🇹",
     "atlasName": "Haiti",
     "continent": "North America",
     "aliases": [
@@ -2628,14 +2949,16 @@
       "repiblik ayiti"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/HT.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "HND",
     "ccn3": "340",
     "name": "Honduras",
+    "flagEmoji": "🇭🇳",
     "atlasName": "Honduras",
     "continent": "North America",
     "aliases": [
@@ -2644,28 +2967,32 @@
       "republica de honduras"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/HN.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "JAM",
     "ccn3": "388",
     "name": "Jamaica",
+    "flagEmoji": "🇯🇲",
     "atlasName": "Jamaica",
     "continent": "North America",
     "aliases": [
       "jamaica"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/JM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MEX",
     "ccn3": "484",
     "name": "Mexico",
+    "flagEmoji": "🇲🇽",
     "atlasName": "Mexico",
     "continent": "North America",
     "aliases": [
@@ -2675,14 +3002,16 @@
       "estados unidos mexicanos"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MX.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "NIC",
     "ccn3": "558",
     "name": "Nicaragua",
+    "flagEmoji": "🇳🇮",
     "atlasName": "Nicaragua",
     "continent": "North America",
     "aliases": [
@@ -2691,14 +3020,16 @@
       "republica de nicaragua"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/NI.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "PAN",
     "ccn3": "591",
     "name": "Panama",
+    "flagEmoji": "🇵🇦",
     "atlasName": "Panama",
     "continent": "North America",
     "aliases": [
@@ -2707,14 +3038,16 @@
       "republica de panama"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/PA.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "KNA",
     "ccn3": "659",
     "name": "Saint Kitts and Nevis",
+    "flagEmoji": "🇰🇳",
     "atlasName": "Saint Kitts and Nevis",
     "continent": "North America",
     "aliases": [
@@ -2723,28 +3056,32 @@
       "saint kitts"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/KN.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "LCA",
     "ccn3": "662",
     "name": "Saint Lucia",
+    "flagEmoji": "🇱🇨",
     "atlasName": "Saint Lucia",
     "continent": "North America",
     "aliases": [
       "saint lucia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/LC.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "VCT",
     "ccn3": "670",
     "name": "Saint Vincent and the Grenadines",
+    "flagEmoji": "🇻🇨",
     "atlasName": "Saint Vincent and the Grenadines",
     "continent": "North America",
     "aliases": [
@@ -2752,14 +3089,16 @@
       "saint vincent"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/VC.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TTO",
     "ccn3": "780",
     "name": "Trinidad and Tobago",
+    "flagEmoji": "🇹🇹",
     "atlasName": "Trinidad and Tobago",
     "continent": "North America",
     "aliases": [
@@ -2767,14 +3106,16 @@
       "republic of trinidad and tobago"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TT.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "USA",
     "ccn3": "840",
     "name": "United States",
+    "flagEmoji": "🇺🇸",
     "atlasName": "United States",
     "continent": "North America",
     "aliases": [
@@ -2785,14 +3126,16 @@
       "america"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/US.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ARG",
     "ccn3": "032",
     "name": "Argentina",
+    "flagEmoji": "🇦🇷",
     "atlasName": "Argentina",
     "continent": "South America",
     "aliases": [
@@ -2801,14 +3144,16 @@
       "republica argentina"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BOL",
     "ccn3": "068",
     "name": "Bolivia",
+    "flagEmoji": "🇧🇴",
     "atlasName": "Bolivia",
     "continent": "South America",
     "aliases": [
@@ -2823,14 +3168,16 @@
       "teta volivia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BO.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "BRA",
     "ccn3": "076",
     "name": "Brazil",
+    "flagEmoji": "🇧🇷",
     "atlasName": "Brazil",
     "continent": "South America",
     "aliases": [
@@ -2840,14 +3187,16 @@
       "republica federativa do brasil"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/BR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "CHL",
     "ccn3": "152",
     "name": "Chile",
+    "flagEmoji": "🇨🇱",
     "atlasName": "Chile",
     "continent": "South America",
     "aliases": [
@@ -2856,14 +3205,16 @@
       "republica de chile"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CL.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "COL",
     "ccn3": "170",
     "name": "Colombia",
+    "flagEmoji": "🇨🇴",
     "atlasName": "Colombia",
     "continent": "South America",
     "aliases": [
@@ -2872,14 +3223,16 @@
       "republica de colombia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/CO.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "ECU",
     "ccn3": "218",
     "name": "Ecuador",
+    "flagEmoji": "🇪🇨",
     "atlasName": "Ecuador",
     "continent": "South America",
     "aliases": [
@@ -2888,14 +3241,16 @@
       "republica del ecuador"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/EC.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "GUY",
     "ccn3": "328",
     "name": "Guyana",
+    "flagEmoji": "🇬🇾",
     "atlasName": "Guyana",
     "continent": "South America",
     "aliases": [
@@ -2903,14 +3258,16 @@
       "co operative republic of guyana"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/GY.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "PRY",
     "ccn3": "600",
     "name": "Paraguay",
+    "flagEmoji": "🇵🇾",
     "atlasName": "Paraguay",
     "continent": "South America",
     "aliases": [
@@ -2920,14 +3277,16 @@
       "teta paraguai"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/PY.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "PER",
     "ccn3": "604",
     "name": "Peru",
+    "flagEmoji": "🇵🇪",
     "atlasName": "Peru",
     "continent": "South America",
     "aliases": [
@@ -2936,14 +3295,16 @@
       "republica del peru"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/PE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SUR",
     "ccn3": "740",
     "name": "Suriname",
+    "flagEmoji": "🇸🇷",
     "atlasName": "Suriname",
     "continent": "South America",
     "aliases": [
@@ -2954,14 +3315,16 @@
       "republiek suriname"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "URY",
     "ccn3": "858",
     "name": "Uruguay",
+    "flagEmoji": "🇺🇾",
     "atlasName": "Uruguay",
     "continent": "South America",
     "aliases": [
@@ -2970,14 +3333,16 @@
       "republica oriental del uruguay"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/UY.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "VEN",
     "ccn3": "862",
     "name": "Venezuela",
+    "flagEmoji": "🇻🇪",
     "atlasName": "Venezuela",
     "continent": "South America",
     "aliases": [
@@ -2987,14 +3352,16 @@
       "republica bolivariana de venezuela"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/VE.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "AUS",
     "ccn3": "036",
     "name": "Australia",
+    "flagEmoji": "🇦🇺",
     "atlasName": "Australia",
     "continent": "Oceania",
     "aliases": [
@@ -3002,14 +3369,16 @@
       "commonwealth of australia"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/AU.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "FJI",
     "ccn3": "242",
     "name": "Fiji",
+    "flagEmoji": "🇫🇯",
     "atlasName": "Fiji",
     "continent": "Oceania",
     "aliases": [
@@ -3020,14 +3389,16 @@
       "fiji ganarajya"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/FJ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "KIR",
     "ccn3": "296",
     "name": "Kiribati",
+    "flagEmoji": "🇰🇮",
     "atlasName": "Kiribati",
     "continent": "Oceania",
     "aliases": [
@@ -3037,14 +3408,16 @@
       "ribaberiki kiribati"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/KI.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "MHL",
     "ccn3": "584",
     "name": "Marshall Islands",
+    "flagEmoji": "🇲🇭",
     "atlasName": "Marshall Islands",
     "continent": "Oceania",
     "aliases": [
@@ -3053,14 +3426,16 @@
       "aolepan aorokin majel"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/MH.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "FSM",
     "ccn3": "583",
     "name": "Micronesia",
+    "flagEmoji": "🇫🇲",
     "atlasName": "Micronesia",
     "continent": "Oceania",
     "aliases": [
@@ -3069,14 +3444,16 @@
       "micronesia federated states of"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/FM.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "NRU",
     "ccn3": "520",
     "name": "Nauru",
+    "flagEmoji": "🇳🇷",
     "atlasName": "Nauru",
     "continent": "Oceania",
     "aliases": [
@@ -3087,14 +3464,16 @@
       "ripublik naoero"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/NR.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "NZL",
     "ccn3": "554",
     "name": "New Zealand",
+    "flagEmoji": "🇳🇿",
     "atlasName": "New Zealand",
     "continent": "Oceania",
     "aliases": [
@@ -3102,14 +3481,16 @@
       "aotearoa"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/NZ.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "PLW",
     "ccn3": "585",
     "name": "Palau",
+    "flagEmoji": "🇵🇼",
     "atlasName": "Palau",
     "continent": "Oceania",
     "aliases": [
@@ -3118,14 +3499,16 @@
       "beluu er a belau"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/PW.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "PNG",
     "ccn3": "598",
     "name": "Papua New Guinea",
+    "flagEmoji": "🇵🇬",
     "atlasName": "Papua New Guinea",
     "continent": "Oceania",
     "aliases": [
@@ -3134,14 +3517,16 @@
       "independen stet bilong papua niugini"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/PG.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "WSM",
     "ccn3": "882",
     "name": "Samoa",
+    "flagEmoji": "🇼🇸",
     "atlasName": "Samoa",
     "continent": "Oceania",
     "aliases": [
@@ -3150,28 +3535,32 @@
       "malo saoloto tutoatasi o samoa"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/WS.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "SLB",
     "ccn3": "090",
     "name": "Solomon Islands",
+    "flagEmoji": "🇸🇧",
     "atlasName": "Solomon Islands",
     "continent": "Oceania",
     "aliases": [
       "solomon islands"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/SB.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TON",
     "ccn3": "776",
     "name": "Tonga",
+    "flagEmoji": "🇹🇴",
     "atlasName": "Tonga",
     "continent": "Oceania",
     "aliases": [
@@ -3179,28 +3568,32 @@
       "kingdom of tonga"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TO.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "TUV",
     "ccn3": "798",
     "name": "Tuvalu",
+    "flagEmoji": "🇹🇻",
     "atlasName": "Tuvalu",
     "continent": "Oceania",
     "aliases": [
       "tuvalu"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/TV.svg",
+      "fallbackFill": "#f6c64d"
     }
   },
   {
     "id": "VUT",
     "ccn3": "548",
     "name": "Vanuatu",
+    "flagEmoji": "🇻🇺",
     "atlasName": "Vanuatu",
     "continent": "Oceania",
     "aliases": [
@@ -3210,8 +3603,9 @@
       "republique de vanuatu"
     ],
     "appearance": {
-      "kind": "color",
-      "fill": "#f6c64d"
+      "kind": "flag",
+      "assetUrl": "https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/VU.svg",
+      "fallbackFill": "#f6c64d"
     }
   }
 ]

@@ -25,6 +25,7 @@ export type QuizCountry = {
   id: string
   ccn3: string | null
   name: string
+  flagEmoji: string
   atlasName: string
   continent: Continent
   aliases: string[]

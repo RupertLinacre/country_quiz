@@ -57,6 +57,10 @@ const CONTINENT_ORDER = [
   'Oceania',
 ]
 
+function flagAssetUrlFor(country) {
+  return `https://cdn.jsdelivr.net/npm/country-flag-icons@1.5.19/3x2/${country.cca2}.svg`
+}
+
 function normalizeAnswer(value) {
   return value
     .toLowerCase()
@@ -124,12 +128,14 @@ const records = rawCountries
       id: country.cca3,
       ccn3: country.ccn3 || null,
       name,
+      flagEmoji: country.flag,
       atlasName: atlasNameFor(country),
       continent: toContinent(country.region, country.subregion),
       aliases: collectAliases(country, name),
       appearance: {
-        kind: 'color',
-        fill: '#f6c64d',
+        kind: 'flag',
+        assetUrl: flagAssetUrlFor(country),
+        fallbackFill: '#f6c64d',
       },
     }
   })

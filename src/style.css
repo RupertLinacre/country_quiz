@@ -293,13 +293,23 @@ h1 {
 
 .globe__label {
   fill: #fff4c8;
-  font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
+  font-family: "Avenir Next Condensed", "Arial Narrow", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
   font-size: 13px;
   font-weight: 700;
   paint-order: stroke;
   stroke: rgba(6, 15, 24, 0.92);
   stroke-width: 3px;
   letter-spacing: 0.04em;
+}
+
+.globe__label-name,
+.globe__label-flag {
+  text-anchor: middle;
+}
+
+.globe__label-flag {
+  font-size: 2em;
+  letter-spacing: 0;
 }
 
 .tracker {
@@ -368,6 +378,7 @@ h2 {
 }
 
 .country-slot {
+  position: relative;
   min-inline-size: calc(var(--chars) * 0.58ch + 1.1rem);
   min-height: 2rem;
   padding: 0.38rem 0.58rem;
@@ -375,6 +386,7 @@ h2 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 0.45rem;
   font-size: 0.87rem;
 }
 
@@ -390,9 +402,87 @@ h2 {
 }
 
 .country-slot--solved {
-  background: linear-gradient(180deg, rgba(246, 198, 77, 0.94), rgba(240, 177, 38, 0.92));
-  color: #12243a;
+  background: rgba(11, 31, 47, 0.8);
+  border: 1px solid rgba(246, 198, 77, 0.34);
+  color: #f8f3e4;
   font-weight: 700;
+  justify-content: flex-start;
+  padding-inline: 0.45rem 0.75rem;
+}
+
+.country-slot__name {
+  white-space: nowrap;
+}
+
+.country-slot__flag-anchor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.country-slot__flag-icon,
+.country-slot__flag-preview-image {
+  display: block;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+}
+
+.country-slot__flag-icon {
+  width: 1.2rem;
+  height: 0.9rem;
+}
+
+.country-slot__flag-preview {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.65rem);
+  transform: translate(-50%, 0.4rem);
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.55rem;
+  border-radius: 14px;
+  background: rgba(5, 19, 31, 0.96);
+  border: 1px solid rgba(244, 240, 226, 0.14);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+  z-index: 3;
+}
+
+.country-slot__flag-preview::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 0.7rem;
+  height: 0.7rem;
+  background: rgba(5, 19, 31, 0.96);
+  border-right: 1px solid rgba(244, 240, 226, 0.14);
+  border-bottom: 1px solid rgba(244, 240, 226, 0.14);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.country-slot__flag-preview-image {
+  width: 5.4rem;
+  aspect-ratio: 3 / 2;
+}
+
+.country-slot__flag-preview-label {
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+
+.country-slot--solved:hover .country-slot__flag-preview,
+.country-slot--solved:focus-within .country-slot__flag-preview {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 @media (max-width: 1120px) {

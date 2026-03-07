@@ -68,8 +68,8 @@ app.innerHTML = `
       <div class="globe-card">
         <div class="globe-card__toolbar">
           <div>
-            <p class="globe-card__title">Solved countries appear in gold</p>
-            <p class="globe-card__subtitle">Labels only show on the visible side of the globe.</p>
+            <p class="globe-card__title">Solved countries fill in gold</p>
+            <p class="globe-card__subtitle">Hover tracker flags for a larger preview.</p>
           </div>
           <div class="zoom-controls" aria-label="Globe zoom controls">
             <button id="zoom-out" class="zoom-controls__button" type="button" aria-label="Zoom out">−</button>
@@ -86,7 +86,7 @@ app.innerHTML = `
           <h2>Every answer fills its slot immediately.</h2>
         </div>
         <p class="tracker__summary">
-          The accepted-answer list is separate from the geometry, so future solved-state styles can switch from color fills to flag fills without reworking the quiz logic.
+          Tracker flags and map-label flags both come from the quiz data, while the globe fill stays simple and readable.
         </p>
       </div>
       <div id="continent-board" class="continent-board"></div>
@@ -111,6 +111,36 @@ let statusTone: 'neutral' | 'success' | 'muted' = 'neutral'
 let intervalHandle = window.setInterval(tick, 250)
 let quizFinished = false
 let globe: Awaited<ReturnType<typeof createGlobe>> | null = null
+
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+}
+
+function solvedFlagMarkup(countryId: string): string {
+  const country = countriesById.get(countryId)
+
+  if (!country || country.appearance.kind !== 'flag') {
+    return ''
+  }
+
+  const safeName = escapeHtml(country.name)
+  const safeAssetUrl = escapeHtml(country.appearance.assetUrl)
+
+  return `
+    <span class="country-slot__flag-anchor" aria-hidden="true">
+      <img class="country-slot__flag-icon" src="${safeAssetUrl}" alt="" loading="lazy" />
+      <span class="country-slot__flag-preview">
+        <img class="country-slot__flag-preview-image" src="${safeAssetUrl}" alt="" loading="lazy" />
+        <span class="country-slot__flag-preview-label">${safeName}</span>
+      </span>
+    </span>
+  `
+}
 
 function formatTime(milliseconds: number): string {
   const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000))
@@ -139,7 +169,11 @@ function renderTracker(): void {
               class="country-slot ${solved ? 'country-slot--solved' : 'country-slot--empty'}"
               style="--chars:${Math.max(6, country.name.length)}"
             >
-              ${solved ? `<span>${country.name}</span>` : ''}
+              ${
+                solved
+                  ? `${solvedFlagMarkup(country.id)}<span class="country-slot__name">${escapeHtml(country.name)}</span>`
+                  : ''
+              }
             </li>
           `
         })

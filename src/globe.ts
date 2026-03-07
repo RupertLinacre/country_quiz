@@ -49,6 +49,7 @@ type GlobeController = {
 type GlobeLabel = {
   id: string
   name: string
+  flagEmoji: string
   x: number
   y: number
 }
@@ -62,6 +63,10 @@ const MAX_ZOOM = 18
 const FOCUS_COUNTRY_RADIUS_PX = 84
 const MIN_COUNTRY_ANGULAR_RADIUS = 0.0025
 const UNSOLVED_LAND_FILL = '#34393f'
+const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
+const SOLVED_COUNTRY_OUTLINE_COLOR = 'rgba(8, 18, 28, 0.95)'
+const SOLVED_COUNTRY_INLINE_WIDTH = 1.15
+const SOLVED_COUNTRY_INLINE_COLOR = 'rgba(255, 232, 173, 0.92)'
 
 function appearanceFill(appearance: SolvedAppearance): string {
   return appearance.kind === 'flag' ? appearance.fallbackFill : appearance.fill
@@ -376,6 +381,24 @@ export async function createGlobe(
     return clampZoom(targetZoom)
   }
 
+  function strokeSolvedCountry(feature: AtlasFeature): void {
+    context.save()
+    context.lineJoin = 'round'
+    context.lineCap = 'round'
+
+    drawPath(feature)
+    context.strokeStyle = SOLVED_COUNTRY_OUTLINE_COLOR
+    context.lineWidth = SOLVED_COUNTRY_OUTLINE_WIDTH
+    context.stroke()
+
+    drawPath(feature)
+    context.strokeStyle = SOLVED_COUNTRY_INLINE_COLOR
+    context.lineWidth = SOLVED_COUNTRY_INLINE_WIDTH
+    context.stroke()
+
+    context.restore()
+  }
+
   function renderLabels(): void {
     if (interactionActive) {
       clearLabels()
@@ -400,6 +423,7 @@ export async function createGlobe(
         return {
           id: country.id,
           name: country.name,
+          flagEmoji: country.flagEmoji,
           x: projected[0],
           y: projected[1],
         }
@@ -411,17 +435,30 @@ export async function createGlobe(
       .data(visibleLabels, (label: GlobeLabel) => label.id)
       .join(
         (enter: Selection<EnterElement, GlobeLabel, SVGGElement, unknown>) =>
-          enter
-            .append('text')
+          enter.append('text')
             .attr('class', 'globe__label')
             .attr('text-anchor', 'middle')
-            .attr('dy', '0.35em')
-            .text((label: GlobeLabel) => label.name),
+            .call((textSelection) => {
+              textSelection.append('tspan').attr('class', 'globe__label-name')
+              textSelection
+                .append('tspan')
+                .attr('class', 'globe__label-flag')
+                .attr('x', 0)
+                .attr('dy', '1.25em')
+            }),
         (update: Selection<SVGTextElement, GlobeLabel, SVGGElement, unknown>) => update,
         (exit: Selection<SVGTextElement, GlobeLabel, SVGGElement, unknown>) => exit.remove(),
       )
       .attr('x', (label: GlobeLabel) => label.x)
       .attr('y', (label: GlobeLabel) => label.y)
+      .each(function (label: GlobeLabel) {
+        const textSelection = select(this)
+        textSelection.select<SVGTSpanElement>('.globe__label-name').text(label.name).attr('x', label.x)
+        textSelection
+          .select<SVGTSpanElement>('.globe__label-flag')
+          .text(label.flagEmoji)
+          .attr('x', label.x)
+      })
   }
 
   function renderNow(): void {
@@ -471,9 +508,8 @@ export async function createGlobe(
       drawPath(countryFeature)
       context.fillStyle = appearanceFill(country.appearance)
       context.fill()
-      context.strokeStyle = 'rgba(125, 80, 0, 0.9)'
-      context.lineWidth = 0.85
-      context.stroke()
+
+      strokeSolvedCountry(countryFeature)
     }
 
     drawPath(atlas.landFeature)
