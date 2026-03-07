@@ -4,6 +4,7 @@ import {
   type GeoPermissibleObjects,
   type Selection,
   drag,
+  geoArea,
   geoCentroid,
   geoDistance,
   geoGraticule10,
@@ -37,6 +38,7 @@ type AtlasBundle = {
   countryCentroidById: Map<string, [number, number]>
   countryAngularRadiusById: Map<string, number>
   featureByCountryId: Map<string, AtlasFeature>
+  labelFeatureByCountryId: Map<string, GeoPermissibleObjects>
   landFeature: GeoPermissibleObjects
 }
 
@@ -139,7 +141,7 @@ function visitCoordinates(
   }
 }
 
-function featureAngularRadius(feature: AtlasFeature, centroid: [number, number]): number {
+function featureAngularRadius(feature: GeoPermissibleObjects, centroid: [number, number]): number {
   let maxDistance = 0
 
   visitCoordinates(feature, (coordinates) => {
@@ -147,6 +149,47 @@ function featureAngularRadius(feature: AtlasFeature, centroid: [number, number])
   })
 
   return Math.max(maxDistance, MIN_COUNTRY_ANGULAR_RADIUS)
+}
+
+function primaryLabelFeature(feature: AtlasFeature): GeoPermissibleObjects {
+  const geometry =
+    'geometry' in feature && feature.geometry
+      ? (feature.geometry as AtlasFeature)
+      : feature
+
+  if (geometry.type === 'Polygon') {
+    return geometry
+  }
+
+  if (geometry.type !== 'MultiPolygon') {
+    return geometry
+  }
+
+  const multiPolygonGeometry = geometry as {
+    type: 'MultiPolygon'
+    coordinates: number[][][][]
+  }
+
+  let largestPolygon = multiPolygonGeometry.coordinates[0]
+  let largestArea = 0
+
+  for (const polygonCoordinates of multiPolygonGeometry.coordinates) {
+    const polygon = {
+      type: 'Polygon',
+      coordinates: polygonCoordinates,
+    } as GeoPermissibleObjects
+    const area = geoArea(polygon)
+
+    if (area > largestArea) {
+      largestArea = area
+      largestPolygon = polygonCoordinates
+    }
+  }
+
+  return {
+    type: 'Polygon',
+    coordinates: largestPolygon,
+  } as GeoPermissibleObjects
 }
 
 function buildAtlasBundle(topology: Topology, countries: QuizCountry[]): AtlasBundle {
@@ -181,22 +224,25 @@ function buildAtlasBundle(topology: Topology, countries: QuizCountry[]): AtlasBu
   }
 
   const featureByCountryId = new Map<string, AtlasFeature>()
+  const labelFeatureByCountryId = new Map<string, GeoPermissibleObjects>()
   const countryCentroidById = new Map<string, [number, number]>()
   const countryAngularRadiusById = new Map<string, number>()
 
   for (const country of countries) {
     const matchedFeature =
-      (country.ccn3 ? byCcn3.get(country.ccn3.padStart(3, '0')) : undefined) ??
-      byName.get(country.atlasName)
+      byName.get(country.atlasName) ??
+      (country.ccn3 ? byCcn3.get(country.ccn3.padStart(3, '0')) : undefined)
 
     if (!matchedFeature) {
       continue
     }
 
     featureByCountryId.set(country.id, matchedFeature)
-    const centroid = geoCentroid(matchedFeature) as [number, number]
+    const labelFeature = primaryLabelFeature(matchedFeature)
+    labelFeatureByCountryId.set(country.id, labelFeature)
+    const centroid = geoCentroid(labelFeature) as [number, number]
     countryCentroidById.set(country.id, centroid)
-    countryAngularRadiusById.set(country.id, featureAngularRadius(matchedFeature, centroid))
+    countryAngularRadiusById.set(country.id, featureAngularRadius(labelFeature, centroid))
   }
 
   return {
@@ -204,6 +250,7 @@ function buildAtlasBundle(topology: Topology, countries: QuizCountry[]): AtlasBu
     countryCentroidById,
     countryAngularRadiusById,
     featureByCountryId,
+    labelFeatureByCountryId,
     landFeature,
   }
 }
@@ -263,6 +310,7 @@ export async function createGlobe(
   const context = renderingContext
   const projection = geoOrthographic().clipAngle(90).precision(0.3).rotate([-12, -18])
   const path = geoPath(projection, context)
+  const measurementPath = geoPath(projection)
   const sphere = { type: 'Sphere' } as GeoPermissibleObjects
   const graticule = geoGraticule10()
 
@@ -365,6 +413,14 @@ export async function createGlobe(
     )
   }
 
+  function labelFeatureForCountry(countryId: string): GeoPermissibleObjects | null {
+    return (
+      settledAtlas.labelFeatureByCountryId.get(countryId) ??
+      interactionAtlas.labelFeatureByCountryId.get(countryId) ??
+      featureForCountry(countryId)
+    )
+  }
+
   function angularRadiusForCountry(countryId: string): number | null {
     return (
       settledAtlas.countryAngularRadiusById.get(countryId) ??
@@ -409,14 +465,15 @@ export async function createGlobe(
       .map((countryId) => {
         const country = countryById.get(countryId)
         const centroid = centroidForCountry(countryId)
+        const labelFeature = labelFeatureForCountry(countryId)
 
-        if (!country || !centroid || !isVisible(centroid)) {
+        if (!country || !centroid || !labelFeature || !isVisible(centroid)) {
           return null
         }
 
-        const projected = projection(centroid)
+        const projected = measurementPath.centroid(labelFeature)
 
-        if (!projected) {
+        if (!projected || Number.isNaN(projected[0]) || Number.isNaN(projected[1])) {
           return null
         }
 
