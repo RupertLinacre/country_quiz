@@ -4,6 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>countries_quiz</title>
+    <script>
+      const analyticsMeasurementId = 'G-94373ZKHEE'
+      const analyticsDisabledHosts = new Set(['localhost', '127.0.0.1'])
+
+      if (!analyticsDisabledHosts.has(window.location.hostname)) {
+        window.dataLayer = window.dataLayer || []
+        window.gtag = function gtag() {
+          window.dataLayer.push(arguments)
+        }
+
+        window.gtag('js', new Date())
+        window.gtag('config', analyticsMeasurementId)
+
+        const analyticsScript = document.createElement('script')
+        analyticsScript.async = true
+        analyticsScript.src = `https://www.googletagmanager.com/gtag/js?id=${analyticsMeasurementId}`
+        document.head.append(analyticsScript)
+      }
+    </script>
   </head>
   <body>
     <div id="app"></div>
