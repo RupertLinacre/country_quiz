@@ -7,8 +7,7 @@ import { presimplify, quantile, simplify } from 'topojson-simplify'
 import atlas50 from 'world-atlas/countries-50m.json' with { type: 'json' }
 
 const QUANTIZATION = 1e4
-const SETTLED_QUANTILE = 0.32
-const INTERACTION_QUANTILE = 0.1
+const MAP_SIMPLIFY_QUANTILE = 0.2
 
 function buildAtlas(sourceTopology, simplifyQuantile) {
   const topology = presimplify(structuredClone(sourceTopology))
@@ -16,17 +15,9 @@ function buildAtlas(sourceTopology, simplifyQuantile) {
   return quantize(simplified, QUANTIZATION)
 }
 
-const settledAtlas = buildAtlas(atlas50, SETTLED_QUANTILE)
-const interactionAtlas = buildAtlas(atlas50, INTERACTION_QUANTILE)
+const atlas = buildAtlas(atlas50, MAP_SIMPLIFY_QUANTILE)
+const outputPath = path.resolve('src/generated/globe-atlas.json')
+const serialized = `${JSON.stringify(atlas)}\n`
 
-const outputs = [
-  ['src/generated/globe-atlas-settled.json', settledAtlas],
-  ['src/generated/globe-atlas-interaction.json', interactionAtlas],
-]
-
-for (const [relativePath, topology] of outputs) {
-  const outputPath = path.resolve(relativePath)
-  const serialized = `${JSON.stringify(topology)}\n`
-  await fs.writeFile(outputPath, serialized)
-  console.log(`Wrote ${relativePath} (${serialized.length} bytes)`)
-}
+await fs.writeFile(outputPath, serialized)
+console.log(`Wrote src/generated/globe-atlas.json (${serialized.length} bytes)`)

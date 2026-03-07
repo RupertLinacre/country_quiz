@@ -13,10 +13,8 @@ import {
   select,
 } from 'd3'
 import { feature, mesh } from 'topojson-client'
-import land50 from 'world-atlas/land-50m.json' with { type: 'json' }
 
-import interactionAtlasUrl from './generated/globe-atlas-interaction.json?url'
-import settledAtlasUrl from './generated/globe-atlas-settled.json?url'
+import atlasUrl from './generated/globe-atlas.json?url'
 import fallbackFeatures from './generated/country-geometry-fallbacks.json'
 import type { QuizCountry, SolvedAppearance } from './quiz-data'
 
@@ -30,17 +28,17 @@ type AtlasFeature = GeoPermissibleObjects & {
 type Topology = {
   objects: {
     countries: object
-    land?: object
+    land: object
   }
 }
 
 type AtlasBundle = {
   borderMesh: GeoPermissibleObjects
-  countryFeatures: AtlasFeature[]
   countryCentroidById: Map<string, [number, number]>
   countryAngularRadiusById: Map<string, number>
   featureByCountryId: Map<string, AtlasFeature>
   labelFeatureByCountryId: Map<string, GeoPermissibleObjects>
+  landFeature: GeoPermissibleObjects
 }
 
 type GlobeController = {
@@ -199,6 +197,10 @@ function buildAtlasBundle(topology: Topology, countries: QuizCountry[]): AtlasBu
   const countryFeatures = (feature(topology as never, topology.objects.countries as never) as unknown as {
     features: AtlasFeature[]
   }).features
+  const landFeature = feature(
+    topology as never,
+    topology.objects.land as never,
+  ) as unknown as GeoPermissibleObjects
   const borderMesh = mesh(
     topology as never,
     topology.objects.countries as never,
@@ -246,11 +248,11 @@ function buildAtlasBundle(topology: Topology, countries: QuizCountry[]): AtlasBu
 
   return {
     borderMesh,
-    countryFeatures,
     countryCentroidById,
     countryAngularRadiusById,
     featureByCountryId,
     labelFeatureByCountryId,
+    landFeature,
   }
 }
 
@@ -258,13 +260,8 @@ export async function createGlobe(
   container: HTMLElement,
   countries: QuizCountry[],
 ): Promise<GlobeController> {
-  const [interactionTopology, settledTopology] = (await Promise.all([
-    fetch(interactionAtlasUrl).then((response) => response.json()),
-    fetch(settledAtlasUrl).then((response) => response.json()),
-  ])) as [Topology, Topology]
-
-  const interactionAtlas = buildAtlasBundle(interactionTopology, countries)
-  const settledAtlas = buildAtlasBundle(settledTopology, countries)
+  const topology = (await fetch(atlasUrl).then((response) => response.json())) as Topology
+  const atlas = buildAtlasBundle(topology, countries)
   const fallbackFeatureByCountryId = new Map<string, AtlasFeature>()
   const fallbackLabelFeatureByCountryId = new Map<string, GeoPermissibleObjects>()
   const fallbackCentroidByCountryId = new Map<string, [number, number]>()
@@ -312,14 +309,10 @@ export async function createGlobe(
   const borderPath = mapLayer.append('path').attr('class', 'globe__borders')
   const fallbackOutlineLayer = mapLayer.append('g').attr('class', 'globe__fallback-outlines')
   const labelLayer = labelsSvg.append('g').attr('class', 'globe__labels')
-  const projection = geoOrthographic().clipAngle(90).precision(0.3).rotate([-12, -18])
+  const projection = geoOrthographic().clipAngle(90).precision(0.6).rotate([-12, -18])
   const measurementPath = geoPath(projection)
   const sphere = { type: 'Sphere' } as GeoPermissibleObjects
   const graticule = geoGraticule10()
-  const landFeature = feature(
-    land50 as never,
-    (land50 as { objects: { land: object } }).objects.land as never,
-  ) as unknown as GeoPermissibleObjects
 
   let answeredIds = new Set<string>()
   let currentZoom = 1
@@ -329,10 +322,6 @@ export async function createGlobe(
   let framePending = false
   let interactionActive = false
   let interactionTimeout: number | null = null
-
-  function activeAtlas(): AtlasBundle {
-    return interactionActive ? interactionAtlas : settledAtlas
-  }
 
   function currentScale(): number {
     return Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO * currentZoom
@@ -378,8 +367,7 @@ export async function createGlobe(
   function centroidForCountry(countryId: string): [number, number] | null {
     return (
       fallbackCentroidByCountryId.get(countryId) ??
-      settledAtlas.countryCentroidById.get(countryId) ??
-      interactionAtlas.countryCentroidById.get(countryId) ??
+      atlas.countryCentroidById.get(countryId) ??
       null
     )
   }
@@ -387,8 +375,7 @@ export async function createGlobe(
   function featureForCountry(countryId: string): AtlasFeature | null {
     return (
       fallbackFeatureByCountryId.get(countryId) ??
-      activeAtlas().featureByCountryId.get(countryId) ??
-      settledAtlas.featureByCountryId.get(countryId) ??
+      atlas.featureByCountryId.get(countryId) ??
       null
     )
   }
@@ -396,8 +383,7 @@ export async function createGlobe(
   function labelFeatureForCountry(countryId: string): GeoPermissibleObjects | null {
     return (
       fallbackLabelFeatureByCountryId.get(countryId) ??
-      settledAtlas.labelFeatureByCountryId.get(countryId) ??
-      interactionAtlas.labelFeatureByCountryId.get(countryId) ??
+      atlas.labelFeatureByCountryId.get(countryId) ??
       featureForCountry(countryId)
     )
   }
@@ -405,8 +391,7 @@ export async function createGlobe(
   function angularRadiusForCountry(countryId: string): number | null {
     return (
       fallbackAngularRadiusByCountryId.get(countryId) ??
-      settledAtlas.countryAngularRadiusById.get(countryId) ??
-      interactionAtlas.countryAngularRadiusById.get(countryId) ??
+      atlas.countryAngularRadiusById.get(countryId) ??
       null
     )
   }
@@ -487,8 +472,6 @@ export async function createGlobe(
   }
 
   function renderNow(): void {
-    const atlas = activeAtlas()
-
     projection.scale(currentScale())
     writeRenderState()
 
@@ -506,7 +489,7 @@ export async function createGlobe(
 
     countriesLayer
       .selectAll<SVGPathElement, GeoPermissibleObjects>('path')
-      .data([landFeature])
+      .data([atlas.landFeature])
       .join('path')
       .attr('d', (featureEntry) => projectedPathData(featureEntry))
       .attr('fill', UNSOLVED_LAND_FILL)
@@ -554,7 +537,7 @@ export async function createGlobe(
       .attr('stroke-linecap', 'round')
 
     coastlinePath
-      .attr('d', projectedPathData(landFeature))
+      .attr('d', projectedPathData(atlas.landFeature))
       .attr('fill', 'none')
       .attr('stroke', interactionActive ? 'rgba(231, 241, 250, 0.62)' : 'rgba(239, 247, 255, 0.76)')
       .attr('stroke-width', interactionActive ? 1.05 : 1.3)
