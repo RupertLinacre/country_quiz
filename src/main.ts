@@ -64,6 +64,12 @@ app.innerHTML = `
           <p id="status" class="status" aria-live="polite"></p>
         </div>
       </div>
+      <section class="flight-panel hero__flight-panel" aria-live="polite">
+        <p class="flight-panel__eyebrow">Flight Path</p>
+        <strong id="flight-route" class="flight-panel__route">Plane standing by in the United Kingdom</strong>
+        <span id="flight-distance" class="flight-panel__meta">Leg distance: 0 miles</span>
+        <span id="flight-total" class="flight-panel__meta">Total distance flown: 0 miles</span>
+      </section>
       <div class="globe-card">
         <div class="globe-card__toolbar">
           <div class="zoom-controls" aria-label="Globe zoom controls">
@@ -72,12 +78,6 @@ app.innerHTML = `
           </div>
         </div>
         <div id="globe" class="globe-frame"></div>
-        <section class="flight-panel" aria-live="polite">
-          <p class="flight-panel__eyebrow">Flight Path</p>
-          <strong id="flight-route" class="flight-panel__route">Plane standing by in the United Kingdom</strong>
-          <span id="flight-distance" class="flight-panel__meta">Leg distance: 0 miles</span>
-          <span id="flight-total" class="flight-panel__meta">Total distance flown: 0 miles</span>
-        </section>
       </div>
     </section>
     <section class="tracker">
@@ -109,35 +109,64 @@ let statusTone: 'neutral' | 'success' | 'muted' = 'neutral'
 let intervalHandle = window.setInterval(tick, 250)
 let quizFinished = false
 let globe: Awaited<ReturnType<typeof createGlobe>> | null = null
+const trackerSlotByCountryId = new Map<string, HTMLLIElement>()
+const trackerSolvedCountByContinent = new Map<string, HTMLElement>()
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;')
-}
-
-function solvedFlagMarkup(countryId: string): string {
+function createSolvedFlagNode(countryId: string): HTMLElement | null {
   const country = countriesById.get(countryId)
 
   if (!country || country.appearance.kind !== 'flag') {
-    return ''
+    return null
   }
 
-  const safeName = escapeHtml(country.name)
-  const safeAssetUrl = escapeHtml(country.appearance.assetUrl)
+  const anchor = document.createElement('span')
+  anchor.className = 'country-slot__flag-anchor'
+  anchor.setAttribute('aria-hidden', 'true')
 
-  return `
-    <span class="country-slot__flag-anchor" aria-hidden="true">
-      <img class="country-slot__flag-icon" src="${safeAssetUrl}" alt="" loading="lazy" />
-      <span class="country-slot__flag-preview">
-        <img class="country-slot__flag-preview-image" src="${safeAssetUrl}" alt="" loading="lazy" />
-        <span class="country-slot__flag-preview-label">${safeName}</span>
-      </span>
-    </span>
-  `
+  const icon = document.createElement('img')
+  icon.className = 'country-slot__flag-icon'
+  icon.src = country.appearance.assetUrl
+  icon.alt = ''
+  icon.loading = 'lazy'
+
+  const preview = document.createElement('span')
+  preview.className = 'country-slot__flag-preview'
+
+  const previewImage = document.createElement('img')
+  previewImage.className = 'country-slot__flag-preview-image'
+  previewImage.src = country.appearance.assetUrl
+  previewImage.alt = ''
+  previewImage.loading = 'lazy'
+
+  const previewLabel = document.createElement('span')
+  previewLabel.className = 'country-slot__flag-preview-label'
+  previewLabel.textContent = country.name
+
+  preview.append(previewImage, previewLabel)
+  anchor.append(icon, preview)
+  return anchor
+}
+
+function applySolvedCountrySlot(slot: HTMLLIElement, countryId: string): void {
+  const country = countriesById.get(countryId)
+
+  if (!country) {
+    return
+  }
+
+  slot.className = 'country-slot country-slot--solved'
+  slot.replaceChildren()
+
+  const flagNode = createSolvedFlagNode(countryId)
+  const name = document.createElement('span')
+  name.className = 'country-slot__name'
+  name.textContent = country.name
+
+  if (flagNode) {
+    slot.append(flagNode)
+  }
+
+  slot.append(name)
 }
 
 function formatTime(milliseconds: number): string {
@@ -163,41 +192,66 @@ function solvedCountByContinent(continent: string): number {
 }
 
 function renderTracker(): void {
-  continentBoard.innerHTML = countriesByContinent
-    .map(({ continent, countries }) => {
-      const solvedCount = solvedCountByContinent(continent)
-      const slots = countries
-        .map((country) => {
-          const solved = answeredIds.has(country.id)
+  continentBoard.replaceChildren()
+  trackerSlotByCountryId.clear()
+  trackerSolvedCountByContinent.clear()
 
-          return `
-            <li
-              class="country-slot ${solved ? 'country-slot--solved' : 'country-slot--empty'}"
-              style="--chars:${Math.max(6, country.name.length)}"
-            >
-              ${
-                solved
-                  ? `${solvedFlagMarkup(country.id)}<span class="country-slot__name">${escapeHtml(country.name)}</span>`
-                  : ''
-              }
-            </li>
-          `
-        })
-        .join('')
+  for (const { continent, countries } of countriesByContinent) {
+    const section = document.createElement('section')
+    section.className = 'continent-section'
 
-      return `
-        <section class="continent-section">
-          <div class="continent-section__header">
-            <h3>${continent}</h3>
-            <span>${solvedCount}/${countries.length}</span>
-          </div>
-          <ul class="continent-section__list">
-            ${slots}
-          </ul>
-        </section>
-      `
-    })
-    .join('')
+    const header = document.createElement('div')
+    header.className = 'continent-section__header'
+
+    const title = document.createElement('h3')
+    title.textContent = continent
+
+    const count = document.createElement('span')
+    count.textContent = `${solvedCountByContinent(continent)}/${countries.length}`
+    trackerSolvedCountByContinent.set(continent, count)
+
+    header.append(title, count)
+
+    const list = document.createElement('ul')
+    list.className = 'continent-section__list'
+
+    for (const country of countries) {
+      const slot = document.createElement('li')
+      slot.className = 'country-slot country-slot--empty'
+      slot.style.setProperty('--chars', String(Math.max(6, country.name.length)))
+      trackerSlotByCountryId.set(country.id, slot)
+
+      if (answeredIds.has(country.id)) {
+        applySolvedCountrySlot(slot, country.id)
+      }
+
+      list.append(slot)
+    }
+
+    section.append(header, list)
+    continentBoard.append(section)
+  }
+}
+
+function updateTracker(countryId: string): void {
+  const slot = trackerSlotByCountryId.get(countryId)
+  const country = countriesById.get(countryId)
+
+  if (!slot || !country || !answeredIds.has(countryId)) {
+    return
+  }
+
+  if (!slot.classList.contains('country-slot--solved')) {
+    applySolvedCountrySlot(slot, countryId)
+  }
+
+  const count = trackerSolvedCountByContinent.get(country.continent)
+
+  if (count) {
+    const totalForContinent =
+      countriesByContinent.find((entry) => entry.continent === country.continent)?.countries.length ?? 0
+    count.textContent = `${solvedCountByContinent(country.continent)}/${totalForContinent}`
+  }
 }
 
 function renderScore(): void {
@@ -254,7 +308,7 @@ function solveCountry(countryId: string): void {
   globe?.setAnswered(answeredIds)
   renderFlightStatus(globe?.syncFlightPath(answerOrder, { animate: true }) ?? null)
   renderScore()
-  renderTracker()
+  updateTracker(countryId)
 
   if (answeredIds.size === totalCountryCount) {
     finishQuiz('All 197 countries found. The globe is complete.', {
