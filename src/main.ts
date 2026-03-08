@@ -13,7 +13,6 @@ import { createGlobe, type GlobeFlightStatus } from './globe'
 
 registerSW({ immediate: true })
 
-const QUIZ_DURATION_MS = 30 * 60 * 1000
 const STARTING_COUNTRY_ID = 'GBR'
 
 function requireElement<T extends Element>(selector: string): T {
@@ -44,8 +43,8 @@ app.innerHTML = `
             <span class="stat-card__meta">countries found</span>
           </article>
           <article class="stat-card stat-card--timer">
-            <span class="stat-card__label">Time Left</span>
-            <strong id="timer" class="stat-card__value">30:00</strong>
+            <span class="stat-card__label">Time</span>
+            <strong id="timer" class="stat-card__value">00:00</strong>
             <span id="remaining" class="stat-card__meta">${totalCountryCount} left</span>
           </article>
         </div>
@@ -55,7 +54,7 @@ app.innerHTML = `
             <div class="answer-panel__summary" aria-live="polite">
               <span id="score-compact" class="answer-panel__summary-text">0/${totalCountryCount}</span>
               <span class="answer-panel__summary-separator" aria-hidden="true">·</span>
-              <span id="timer-compact" class="answer-panel__summary-text">30:00 left</span>
+              <span id="timer-compact" class="answer-panel__summary-text">00:00</span>
             </div>
           </div>
           <input
@@ -117,7 +116,7 @@ const globeContainer = requireElement<HTMLElement>('#globe')
 const answeredIds = new Set<string>([STARTING_COUNTRY_ID])
 const cheatedIds = new Set<string>()
 const answerOrder: string[] = []
-const deadline = Date.now() + QUIZ_DURATION_MS
+let quizStartedAt: number | null = null
 let statusTone: 'neutral' | 'success' | 'muted' = 'neutral'
 let intervalHandle = window.setInterval(tick, 250)
 let quizFinished = false
@@ -197,8 +196,12 @@ function formatMiles(miles: number): string {
   return `${new Intl.NumberFormat('en-GB').format(miles)} miles`
 }
 
-function remainingMilliseconds(): number {
-  return Math.max(0, deadline - Date.now())
+function elapsedMilliseconds(): number {
+  if (quizStartedAt === null) {
+    return 0
+  }
+
+  return Math.max(0, Date.now() - quizStartedAt)
 }
 
 function solvedCountByContinent(continent: string): number {
@@ -318,7 +321,7 @@ function finishQuiz(
   renderStatus(message)
   const finalTimerText = options?.timerText ?? '00:00'
   timerElement.textContent = finalTimerText
-  compactTimerElement.textContent = `${finalTimerText} left`
+  compactTimerElement.textContent = finalTimerText
 }
 
 function solveCountry(
@@ -332,6 +335,10 @@ function solveCountry(
   }
 
   answeredIds.add(countryId)
+  if (quizStartedAt === null) {
+    quizStartedAt = Date.now()
+  }
+
   if (source === 'cheat') {
     cheatedIds.add(countryId)
   } else {
@@ -345,8 +352,9 @@ function solveCountry(
   updateTracker(countryId)
 
   if (answeredIds.size === totalCountryCount) {
-    finishQuiz('All 197 countries solved. The globe is complete.', {
-      timerText: formatTime(remainingMilliseconds()),
+    const elapsedTimeText = formatTime(elapsedMilliseconds())
+    finishQuiz(`All 197 countries solved in ${elapsedTimeText}.`, {
+      timerText: elapsedTimeText,
     })
     return
   }
@@ -406,14 +414,9 @@ function tick(): void {
     return
   }
 
-  const millisecondsLeft = remainingMilliseconds()
-  const timerText = formatTime(millisecondsLeft)
+  const timerText = formatTime(elapsedMilliseconds())
   timerElement.textContent = timerText
-  compactTimerElement.textContent = `${timerText} left`
-
-  if (millisecondsLeft <= 0) {
-    finishQuiz(`Time is up. You found ${answeredIds.size} of ${totalCountryCount} countries.`)
-  }
+  compactTimerElement.textContent = timerText
 }
 
 answerInput.addEventListener('input', () => {
