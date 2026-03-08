@@ -1216,13 +1216,13 @@ export async function createGlobe(
         zoom: currentZoom,
       }
     },
-    { passive: false },
+    { capture: true, passive: false },
   )
 
   mapSvgNode.addEventListener(
     'touchmove',
     (event: TouchEvent) => {
-      if (event.touches.length !== 2 || !pinchZoomState) {
+      if (event.touches.length !== 2) {
         return
       }
 
@@ -1233,18 +1233,26 @@ export async function createGlobe(
         return
       }
 
+      if (!pinchZoomState) {
+        pinchZoomState = {
+          distance,
+          zoom: currentZoom,
+        }
+      }
+
       event.preventDefault()
+      event.stopImmediatePropagation()
       applyZoom(pinchZoomState.zoom * (distance / pinchZoomState.distance))
     },
-    { passive: false },
+    { capture: true, passive: false },
   )
 
   const clearPinchZoomState = (): void => {
     pinchZoomState = null
   }
 
-  mapSvgNode.addEventListener('touchend', clearPinchZoomState)
-  mapSvgNode.addEventListener('touchcancel', clearPinchZoomState)
+  mapSvgNode.addEventListener('touchend', clearPinchZoomState, { capture: true })
+  mapSvgNode.addEventListener('touchcancel', clearPinchZoomState, { capture: true })
 
   return {
     setAnswered(nextAnsweredIds: Set<string>, options) {
