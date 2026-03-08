@@ -46,6 +46,7 @@ type GlobeController = {
   setAnswered: (
     answeredIds: Set<string>,
     options?: {
+      cheatedIds?: Set<string>
       focusLatest?: boolean
     },
   ) => void
@@ -112,6 +113,7 @@ const PLANE_EMOJI = '✈️'
 const SEA_FILL = '#126aa6'
 const UNSOLVED_LAND_FILL = '#34393f'
 const LATEST_SOLVED_FILL = '#ffe45c'
+const CHEATED_SOLVED_FILL = '#8f59ff'
 const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
 const SOLVED_COUNTRY_OUTLINE_COLOR = 'rgba(8, 18, 28, 0.95)'
 const MAX_COUNTRY_POLYGON_AREA = Math.PI * 2
@@ -403,6 +405,9 @@ function buildAtlasBundle(topology: Topology, countries: QuizCountry[]): AtlasBu
 export async function createGlobe(
   container: HTMLElement,
   countries: QuizCountry[],
+  options?: {
+    onCountryShiftClick?: (countryId: string) => void
+  },
 ): Promise<GlobeController> {
   const topology = (await fetch(atlasUrl).then((response) => response.json())) as Topology
   const atlas = buildAtlasBundle(topology, countries)
@@ -456,6 +461,7 @@ export async function createGlobe(
   const coastlinePath = mapLayer.append('path').attr('class', 'globe__coastlines')
   const borderPath = mapLayer.append('path').attr('class', 'globe__borders')
   const fallbackOutlineLayer = mapLayer.append('g').attr('class', 'globe__fallback-outlines')
+  const hitTargetLayer = mapLayer.append('g').attr('class', 'globe__hit-targets')
   const labelLayer = labelsSvg.append('g').attr('class', 'globe__labels')
   const planeLayer = labelsSvg.append('g').attr('class', 'globe__plane-layer').attr('aria-hidden', 'true')
   const planeMarker = planeLayer.append('g').attr('class', 'globe__plane')
@@ -468,6 +474,7 @@ export async function createGlobe(
   const desktopFlightTrailsMediaQuery = window.matchMedia(DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY)
 
   let answeredIds = new Set<string>()
+  let cheatedIds = new Set<string>()
   let flightSegments: FlightSegment[] = []
   let activeFlightSegmentId: string | null = null
   let activeFlightProgress = 1
@@ -924,7 +931,9 @@ export async function createGlobe(
 
         return {
           appearanceFill:
-            countryId === mostRecentAnsweredId
+            cheatedIds.has(countryId)
+              ? CHEATED_SOLVED_FILL
+              : countryId === mostRecentAnsweredId
               ? LATEST_SOLVED_FILL
               : appearanceFill(country.appearance),
           feature: countryFeature,
@@ -982,6 +991,39 @@ export async function createGlobe(
           : 'rgba(227, 238, 247, 0.7)',
       )
       .attr('stroke-width', (entry) => (entry.answered ? 0.85 : 0.95))
+
+    const hitTargetData = countries
+      .map((country) => {
+        const feature = featureForCountry(country.id)
+
+        if (!feature) {
+          return null
+        }
+
+        return {
+          feature,
+          id: country.id,
+        }
+      })
+      .filter((entry): entry is { feature: AtlasFeature; id: string } => Boolean(entry))
+
+    hitTargetLayer
+      .selectAll<SVGPathElement, { feature: AtlasFeature; id: string }>('path')
+      .data(hitTargetData, (entry) => entry.id)
+      .join('path')
+      .attr('class', 'globe__hit-target')
+      .attr('data-country-id', (entry) => entry.id)
+      .attr('d', (entry) => projectedPathData(entry.feature))
+      .attr('fill', 'rgba(0, 0, 0, 0.001)')
+      .attr('stroke', 'none')
+      .on('click', function (event: MouseEvent, entry) {
+        if (!event.shiftKey) {
+          return
+        }
+
+        event.preventDefault()
+        options?.onCountryShiftClick?.(entry.id)
+      })
 
     renderLabels()
     renderPlane(mostRecentAnsweredId)
@@ -1207,6 +1249,7 @@ export async function createGlobe(
   return {
     setAnswered(nextAnsweredIds: Set<string>, options) {
       answeredIds = new Set(nextAnsweredIds)
+      cheatedIds = new Set(options?.cheatedIds ?? [])
 
       if (options?.focusLatest) {
         const mostRecentAnsweredId = latestAnsweredId(answeredIds)

@@ -112,6 +112,7 @@ const zoomOutButton = requireElement<HTMLButtonElement>('#zoom-out')
 const globeContainer = requireElement<HTMLElement>('#globe')
 
 const answeredIds = new Set<string>([STARTING_COUNTRY_ID])
+const cheatedIds = new Set<string>()
 const answerOrder: string[] = []
 const deadline = Date.now() + QUIZ_DURATION_MS
 let statusTone: 'neutral' | 'success' | 'muted' = 'neutral'
@@ -163,7 +164,10 @@ function applySolvedCountrySlot(slot: HTMLLIElement, countryId: string): void {
     return
   }
 
-  slot.className = 'country-slot country-slot--solved'
+  const cheated = cheatedIds.has(countryId)
+  slot.className = cheated
+    ? 'country-slot country-slot--solved country-slot--cheated'
+    : 'country-slot country-slot--solved'
   slot.replaceChildren()
 
   const flagNode = createSolvedFlagNode(countryId)
@@ -287,6 +291,13 @@ function renderFlightStatus(status: GlobeFlightStatus | null): void {
   flightTotalElement.textContent = `Total distance flown: ${formatMiles(status.totalMiles)}`
 }
 
+function syncSolvedCountries(options?: { focusLatest?: boolean }): void {
+  globe?.setAnswered(answeredIds, {
+    cheatedIds,
+    focusLatest: options?.focusLatest,
+  })
+}
+
 function finishQuiz(
   message: string,
   options?: {
@@ -307,7 +318,10 @@ function finishQuiz(
   compactTimerElement.textContent = `${finalTimerText} left`
 }
 
-function solveCountry(countryId: string): void {
+function solveCountry(
+  countryId: string,
+  source: 'answer' | 'cheat' = 'answer',
+): void {
   const country = countriesById.get(countryId)
 
   if (!country || answeredIds.has(countryId) || quizFinished) {
@@ -315,22 +329,31 @@ function solveCountry(countryId: string): void {
   }
 
   answeredIds.add(countryId)
+  if (source === 'cheat') {
+    cheatedIds.add(countryId)
+  } else {
+    cheatedIds.delete(countryId)
+  }
   answerOrder.push(countryId)
   answerInput.value = ''
-  globe?.setAnswered(answeredIds)
+  syncSolvedCountries()
   renderFlightStatus(globe?.syncFlightPath(answerOrder, { animate: true }) ?? null)
   renderScore()
   updateTracker(countryId)
 
   if (answeredIds.size === totalCountryCount) {
-    finishQuiz('All 197 countries found. The globe is complete.', {
+    finishQuiz('All 197 countries solved. The globe is complete.', {
       timerText: formatTime(remainingMilliseconds()),
     })
     return
   }
 
-  statusTone = 'success'
-  renderStatus(`${country.name} accepted.`)
+  statusTone = source === 'cheat' ? 'neutral' : 'success'
+  renderStatus(
+    source === 'cheat'
+      ? `${country.name} revealed via cheat.`
+      : `${country.name} accepted.`,
+  )
 }
 
 function maybeAcceptGuess(): void {
@@ -412,6 +435,10 @@ renderFlightStatus(null)
 tick()
 answerInput.focus()
 
-globe = await createGlobe(globeContainer, quizCountries)
-globe.setAnswered(answeredIds, { focusLatest: true })
+globe = await createGlobe(globeContainer, quizCountries, {
+  onCountryShiftClick(countryId) {
+    solveCountry(countryId, 'cheat')
+  },
+})
+syncSolvedCountries({ focusLatest: true })
 renderFlightStatus(globe.syncFlightPath(answerOrder, { animate: false }))

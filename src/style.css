@@ -488,6 +488,16 @@ h1 {
   padding-inline: 0.45rem 0.75rem;
 }
 
+.country-slot--cheated {
+  background: rgba(63, 22, 103, 0.82);
+  border-color: rgba(174, 121, 255, 0.58);
+  color: #f5ebff;
+}
+
+.country-slot--cheated .country-slot__flag-icon {
+  box-shadow: 0 4px 14px rgba(74, 27, 126, 0.36);
+}
+
 .country-slot__name {
   white-space: nowrap;
 }
