@@ -349,10 +349,9 @@ h1 {
   pointer-events: none;
 }
 
-.globe__label-name,
-.globe__label-flag {
+.globe__label-name {
   fill: #fff4c8;
-  font-family: "Avenir Next Condensed", "Arial Narrow", "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+  font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
   font-weight: 700;
   paint-order: stroke;
   stroke: rgba(6, 15, 24, 0.92);
@@ -366,19 +365,12 @@ h1 {
   letter-spacing: 0.04em;
 }
 
-.globe__label-flag {
+.globe__label-flag-image {
   pointer-events: auto;
-  font-size: 2em;
-  letter-spacing: 0;
   cursor: default;
-  transform-box: fill-box;
+  transform-box: view-box;
   transform-origin: center;
-  transition: transform 180ms ease;
-  will-change: transform;
-}
-
-.globe__label-flag:hover {
-  transform: scale(3);
+  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.38));
 }
 
 .globe__flight-trail,

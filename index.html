@@ -1,31 +1,40 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>countries_quiz</title>
-    <script>
-      const analyticsMeasurementId = 'G-94373ZKHEE'
-      const analyticsDisabledHosts = new Set(['localhost', '127.0.0.1'])
 
-      if (!analyticsDisabledHosts.has(window.location.hostname)) {
-        window.dataLayer = window.dataLayer || []
-        window.gtag = function gtag() {
-          window.dataLayer.push(arguments)
-        }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#04131f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Countries Quiz" />
+  <link rel="manifest" href="%BASE_URL%manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="%BASE_URL%apple-touch-icon.png" />
+  <title>Countries Quiz</title>
+  <script>
+    const analyticsMeasurementId = 'G-94373ZKHEE'
+    const analyticsDisabledHosts = new Set(['localhost', '127.0.0.1'])
 
-        window.gtag('js', new Date())
-        window.gtag('config', analyticsMeasurementId)
-
-        const analyticsScript = document.createElement('script')
-        analyticsScript.async = true
-        analyticsScript.src = `https://www.googletagmanager.com/gtag/js?id=${analyticsMeasurementId}`
-        document.head.append(analyticsScript)
+    if (!analyticsDisabledHosts.has(window.location.hostname)) {
+      window.dataLayer = window.dataLayer || []
+      window.gtag = function gtag() {
+        window.dataLayer.push(arguments)
       }
-    </script>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+
+      window.gtag('js', new Date())
+      window.gtag('config', analyticsMeasurementId)
+
+      const analyticsScript = document.createElement('script')
+      analyticsScript.async = true
+      analyticsScript.src = `https://www.googletagmanager.com/gtag/js?id=${analyticsMeasurementId}`
+      document.head.append(analyticsScript)
+    }
+  </script>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

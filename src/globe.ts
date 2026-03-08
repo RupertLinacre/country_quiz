@@ -67,9 +67,9 @@ export type GlobeFlightStatus = {
 }
 
 type GlobeLabel = {
+  flagAssetUrl: string | null
   id: string
   name: string
-  flagEmoji: string
   x: number
   y: number
 }
@@ -108,6 +108,8 @@ const MAX_WHEEL_DELTA = 80
 const MIN_PINCH_DISTANCE_PX = 24
 const MAP_LABEL_NAME_OFFSET_PX = -4
 const MAP_LABEL_FLAG_OFFSET_PX = 17
+const MAP_LABEL_FLAG_WIDTH_PX = 26
+const MAP_LABEL_FLAG_HEIGHT_PX = 18
 const PLANE_LABEL_OFFSET_PX = -MAP_LABEL_FLAG_OFFSET_PX
 const PLANE_EMOJI = '✈️'
 const SEA_FILL = '#126aa6'
@@ -793,9 +795,9 @@ export async function createGlobe(
         }
 
         return {
+          flagAssetUrl: country.appearance.kind === 'flag' ? country.appearance.assetUrl : null,
           id: country.id,
           name: country.name,
-          flagEmoji: country.flagEmoji,
           x: projected[0],
           y: projected[1],
         }
@@ -815,9 +817,8 @@ export async function createGlobe(
                 .attr('class', 'globe__label-name')
                 .attr('text-anchor', 'middle')
               groupSelection
-                .append('text')
-                .attr('class', 'globe__label-flag')
-                .attr('text-anchor', 'middle')
+                .append('image')
+                .attr('class', 'globe__label-flag-image')
             }),
         (update: Selection<SVGGElement, GlobeLabel, SVGGElement, unknown>) => update,
         (exit: Selection<SVGGElement, GlobeLabel, SVGGElement, unknown>) => exit.remove(),
@@ -831,10 +832,14 @@ export async function createGlobe(
           .attr('x', 0)
           .attr('y', MAP_LABEL_NAME_OFFSET_PX)
         groupSelection
-          .select<SVGTextElement>('.globe__label-flag')
-          .text(label.flagEmoji)
-          .attr('x', 0)
-          .attr('y', MAP_LABEL_FLAG_OFFSET_PX)
+          .select<SVGImageElement>('.globe__label-flag-image')
+          .attr('href', label.flagAssetUrl ?? '')
+          .attr('x', -MAP_LABEL_FLAG_WIDTH_PX / 2)
+          .attr('y', MAP_LABEL_FLAG_OFFSET_PX - MAP_LABEL_FLAG_HEIGHT_PX / 2)
+          .attr('width', MAP_LABEL_FLAG_WIDTH_PX)
+          .attr('height', MAP_LABEL_FLAG_HEIGHT_PX)
+          .attr('preserveAspectRatio', 'xMidYMid meet')
+          .attr('display', label.flagAssetUrl ? null : 'none')
       })
   }
 

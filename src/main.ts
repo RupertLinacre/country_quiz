@@ -1,4 +1,5 @@
 import './style.css'
+import { registerSW } from 'virtual:pwa-register'
 
 import { normalizeAnswer } from './normalize'
 import {
@@ -9,6 +10,8 @@ import {
   totalCountryCount,
 } from './quiz-data'
 import { createGlobe, type GlobeFlightStatus } from './globe'
+
+registerSW({ immediate: true })
 
 const QUIZ_DURATION_MS = 30 * 60 * 1000
 const STARTING_COUNTRY_ID = 'GBR'
@@ -59,13 +62,13 @@ app.innerHTML = `
             id="guess-input"
             name="guess"
             class="answer-panel__input"
-            type="text"
+            type="search"
             autocomplete="off"
             autocorrect="off"
             autocapitalize="words"
             spellcheck="false"
-            inputmode="text"
-            enterkeyhint="done"
+            inputmode="search"
+            enterkeyhint="search"
             placeholder="Start typing a country name..."
           />
           <p id="status" class="status" aria-live="polite"></p>
