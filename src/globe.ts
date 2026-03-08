@@ -17,7 +17,7 @@ import { feature, mesh } from 'topojson-client'
 
 import atlasUrl from './generated/globe-atlas.json?url'
 import fallbackFeatures from './generated/country-geometry-fallbacks.json'
-import type { QuizCountry, SolvedAppearance } from './quiz-data'
+import type { QuizCountry } from './quiz-data'
 
 type AtlasFeature = GeoPermissibleObjects & {
   id?: string | number
@@ -56,6 +56,7 @@ type GlobeController = {
       animate?: boolean
     },
   ) => GlobeFlightStatus | null
+  resetView: () => void
   zoomBy: (factor: number) => void
 }
 
@@ -122,15 +123,10 @@ const PLANE_LABEL_OFFSET_PX = -MAP_LABEL_FLAG_OFFSET_PX
 const PLANE_EMOJI = '✈️'
 const SEA_FILL = '#126aa6'
 const UNSOLVED_LAND_FILL = '#34393f'
-const LATEST_SOLVED_FILL = '#ffe45c'
-const CHEATED_SOLVED_FILL = '#8f59ff'
+const REVEALED_SOLVED_FILL = '#8f59ff'
 const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
 const SOLVED_COUNTRY_OUTLINE_COLOR = 'rgba(8, 18, 28, 0.95)'
 const MAX_COUNTRY_POLYGON_AREA = Math.PI * 2
-
-function appearanceFill(appearance: SolvedAppearance): string {
-  return appearance.kind === 'flag' ? appearance.fallbackFill : appearance.fill
-}
 
 function latestAnsweredId(answeredIds: Set<string>): string | null {
   let latestId: string | null = null
@@ -484,7 +480,6 @@ export async function createGlobe(
   const desktopFlightTrailsMediaQuery = window.matchMedia(DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY)
 
   let answeredIds = new Set<string>()
-  let cheatedIds = new Set<string>()
   let flightSegments: FlightSegment[] = []
   let activeFlightSegmentId: string | null = null
   let activeFlightProgress = 1
@@ -944,12 +939,7 @@ export async function createGlobe(
         }
 
         return {
-          appearanceFill:
-            cheatedIds.has(countryId)
-              ? CHEATED_SOLVED_FILL
-              : countryId === mostRecentAnsweredId
-              ? LATEST_SOLVED_FILL
-              : appearanceFill(country.appearance),
+          appearanceFill: REVEALED_SOLVED_FILL,
           feature: countryFeature,
           id: countryId,
         }
@@ -1001,7 +991,7 @@ export async function createGlobe(
       .attr('fill', 'none')
       .attr('stroke', (entry) =>
         entry.answered
-          ? 'rgba(125, 80, 0, 0.9)'
+          ? 'rgba(174, 121, 255, 0.88)'
           : 'rgba(227, 238, 247, 0.7)',
       )
       .attr('stroke-width', (entry) => (entry.answered ? 0.85 : 0.95))
@@ -1143,6 +1133,24 @@ export async function createGlobe(
       gamma,
     ])
     currentZoom = zoomForCountry(countryId)
+  }
+
+  function resetGlobeView(): void {
+    const centroid = centroidForCountry(FLIGHT_START_COUNTRY_ID)
+
+    cancelFlyAnimation()
+
+    if (centroid) {
+      const [, , gamma] = projection.rotate()
+      projection.rotate([
+        shortestLongitudeTarget(projection.rotate()[0], -centroid[0]),
+        -centroid[1],
+        gamma,
+      ])
+    }
+
+    currentZoom = 1
+    scheduleRender()
   }
 
   function animateFlight(segment: FlightSegment): void {
@@ -1356,7 +1364,6 @@ export async function createGlobe(
   return {
     setAnswered(nextAnsweredIds: Set<string>, options) {
       answeredIds = new Set(nextAnsweredIds)
-      cheatedIds = new Set(options?.cheatedIds ?? [])
 
       if (options?.focusLatest) {
         const mostRecentAnsweredId = latestAnsweredId(answeredIds)
@@ -1392,6 +1399,11 @@ export async function createGlobe(
       snapToCountry(lastSegment.toCountryId)
       scheduleRender()
       return nextFlightState.status
+    },
+    resetView() {
+      flightSegments = []
+      planeCoordinates = centroidForCountry(FLIGHT_START_COUNTRY_ID)
+      resetGlobeView()
     },
     zoomBy(factor: number) {
       cancelFlyAnimation()

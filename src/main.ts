@@ -44,7 +44,10 @@ app.innerHTML = `
             <span class="stat-card__meta">countries found</span>
           </article>
           <article class="stat-card stat-card--timer">
-            <span class="stat-card__label">Time</span>
+            <div class="stat-card__header">
+              <span class="stat-card__label">Time</span>
+              <button id="give-up-button" class="give-up-button" type="button">Give up</button>
+            </div>
             <strong id="timer" class="stat-card__value">00:00</strong>
             <span id="remaining" class="stat-card__meta">${totalCountryCount} left</span>
           </article>
@@ -56,6 +59,13 @@ app.innerHTML = `
               <span id="score-compact" class="answer-panel__summary-text">0/${totalCountryCount}</span>
               <span class="answer-panel__summary-separator" aria-hidden="true">·</span>
               <span id="timer-compact" class="answer-panel__summary-text">00:00</span>
+              <button
+                id="give-up-button-compact"
+                class="give-up-button give-up-button--compact"
+                type="button"
+              >
+                Give up
+              </button>
             </div>
           </div>
           <input
@@ -113,6 +123,8 @@ const continentBoard = requireElement<HTMLElement>('#continent-board')
 const zoomInButton = requireElement<HTMLButtonElement>('#zoom-in')
 const zoomOutButton = requireElement<HTMLButtonElement>('#zoom-out')
 const globeContainer = requireElement<HTMLElement>('#globe')
+const giveUpButton = requireElement<HTMLButtonElement>('#give-up-button')
+const compactGiveUpButton = requireElement<HTMLButtonElement>('#give-up-button-compact')
 
 const answeredIds = new Set<string>([STARTING_COUNTRY_ID])
 const cheatedIds = new Set<string>()
@@ -388,11 +400,51 @@ function finishQuiz(
   quizFinished = true
   window.clearInterval(intervalHandle)
   answerInput.disabled = true
+  giveUpButton.disabled = true
+  compactGiveUpButton.disabled = true
   statusTone = 'muted'
   renderStatus(message)
   const finalTimerText = options?.timerText ?? '00:00'
   timerElement.textContent = finalTimerText
   compactTimerElement.textContent = finalTimerText
+}
+
+function giveUp(): void {
+  if (quizFinished) {
+    return
+  }
+
+  const solvedBeforeGiveUp = answeredIds.size
+  const remainingCountryIds = quizCountries
+    .map((country) => country.id)
+    .filter((countryId) => !answeredIds.has(countryId))
+
+  if (remainingCountryIds.length === 0) {
+    return
+  }
+
+  for (const countryId of remainingCountryIds) {
+    answeredIds.add(countryId)
+    cheatedIds.add(countryId)
+    answerOrder.push(countryId)
+  }
+
+  answerInput.value = ''
+  syncSolvedCountries()
+  globe?.syncFlightPath([], { animate: false })
+  globe?.resetView()
+  renderFlightStatus(null)
+  renderScore()
+  renderTracker()
+
+  const elapsedTimeText = formatTime(elapsedMilliseconds())
+  const countryNoun = remainingCountryIds.length === 1 ? 'country' : 'countries'
+  finishQuiz(
+    `Gave up at ${solvedBeforeGiveUp}/${totalCountryCount}. Revealed ${remainingCountryIds.length} remaining ${countryNoun}.`,
+    {
+      timerText: elapsedTimeText,
+    },
+  )
 }
 
 function solveCountry(
@@ -505,6 +557,8 @@ answerInput.addEventListener('keydown', (event: KeyboardEvent) => {
 
 zoomInButton.addEventListener('click', () => globe?.zoomBy(1.28))
 zoomOutButton.addEventListener('click', () => globe?.zoomBy(0.8))
+giveUpButton.addEventListener('click', giveUp)
+compactGiveUpButton.addEventListener('click', giveUp)
 
 renderScore()
 renderTracker()
