@@ -9,7 +9,7 @@ import {
   quizCountries,
   totalCountryCount,
 } from './quiz-data'
-import { createGlobe, type GlobeFlightStatus } from './globe'
+import { createGlobe, type GlobeFlightStatus, type ProjectionMode } from './globe'
 
 registerSW({ immediate: true })
 
@@ -82,6 +82,15 @@ app.innerHTML = `
       </section>
       <div class="globe-card">
         <div class="globe-card__toolbar">
+          <button
+            id="projection-toggle"
+            class="projection-toggle"
+            type="button"
+            aria-pressed="false"
+          >
+            <span class="projection-toggle__eyebrow">View</span>
+            <span id="projection-toggle-label" class="projection-toggle__label">Unfold to flat map</span>
+          </button>
           <div class="zoom-controls" aria-label="Globe zoom controls">
             <button id="zoom-out" class="zoom-controls__button" type="button" aria-label="Zoom out">−</button>
             <button id="zoom-in" class="zoom-controls__button" type="button" aria-label="Zoom in">+</button>
@@ -112,6 +121,8 @@ const flightTotalElement = requireElement<HTMLElement>('#flight-total')
 const continentBoard = requireElement<HTMLElement>('#continent-board')
 const zoomInButton = requireElement<HTMLButtonElement>('#zoom-in')
 const zoomOutButton = requireElement<HTMLButtonElement>('#zoom-out')
+const projectionToggleButton = requireElement<HTMLButtonElement>('#projection-toggle')
+const projectionToggleLabel = requireElement<HTMLElement>('#projection-toggle-label')
 const globeContainer = requireElement<HTMLElement>('#globe')
 
 const answeredIds = new Set<string>([STARTING_COUNTRY_ID])
@@ -122,8 +133,18 @@ let statusTone: 'neutral' | 'success' | 'muted' = 'neutral'
 let intervalHandle = window.setInterval(tick, 250)
 let quizFinished = false
 let globe: Awaited<ReturnType<typeof createGlobe>> | null = null
+let projectionMode: ProjectionMode = 'globe'
 const trackerSlotByCountryId = new Map<string, HTMLLIElement>()
 const trackerSolvedCountByContinent = new Map<string, HTMLElement>()
+
+function renderProjectionToggle(): void {
+  projectionToggleButton.setAttribute(
+    'aria-pressed',
+    projectionMode === 'map' ? 'true' : 'false',
+  )
+  projectionToggleLabel.textContent =
+    projectionMode === 'globe' ? 'Unfold to flat map' : 'Return to 3D globe'
+}
 
 function attachTrackerCheatInteractions(
   slot: HTMLLIElement,
@@ -505,10 +526,16 @@ answerInput.addEventListener('keydown', (event: KeyboardEvent) => {
 
 zoomInButton.addEventListener('click', () => globe?.zoomBy(1.28))
 zoomOutButton.addEventListener('click', () => globe?.zoomBy(0.8))
+projectionToggleButton.addEventListener('click', () => {
+  projectionMode = projectionMode === 'globe' ? 'map' : 'globe'
+  globe?.setProjectionMode(projectionMode)
+  renderProjectionToggle()
+})
 
 renderScore()
 renderTracker()
 renderFlightStatus(null)
+renderProjectionToggle()
 tick()
 answerInput.focus()
 
@@ -517,5 +544,6 @@ globe = await createGlobe(globeContainer, quizCountries, {
     solveCountry(countryId, 'cheat')
   },
 })
+globe.setProjectionMode(projectionMode)
 syncSolvedCountries({ focusLatest: true })
 renderFlightStatus(globe.syncFlightPath(answerOrder, { animate: false }))

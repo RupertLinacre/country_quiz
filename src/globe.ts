@@ -1,13 +1,17 @@
 import {
   type D3DragEvent,
   type EnterElement,
+  type GeoProjection,
   type GeoPermissibleObjects,
   type Selection,
   drag,
+  easeCubicInOut,
   geoArea,
   geoCentroid,
   geoDistance,
+  geoEqualEarth,
   geoInterpolate,
+  geoProjection,
   geoGraticule10,
   geoOrthographic,
   geoPath,
@@ -56,8 +60,11 @@ type GlobeController = {
       animate?: boolean
     },
   ) => GlobeFlightStatus | null
+  setProjectionMode: (mode: ProjectionMode) => void
   zoomBy: (factor: number) => void
 }
+
+export type ProjectionMode = 'globe' | 'map'
 
 export type GlobeFlightStatus = {
   fromName: string
@@ -98,6 +105,35 @@ type TouchCheatState = {
   timeoutId: number
 }
 
+type ProjectionView = {
+  mode: ProjectionMode
+  projection: GeoProjection
+  measurementPath: ReturnType<typeof geoPath>
+  clipOutlinePath: Selection<SVGPathElement, unknown, null, undefined>
+  mapRoot: Selection<SVGGElement, unknown, null, undefined>
+  labelsRoot: Selection<SVGGElement, unknown, null, undefined>
+  mapLayer: Selection<SVGGElement, unknown, null, undefined>
+  spherePath: Selection<SVGPathElement, unknown, null, undefined>
+  graticulePath: Selection<SVGPathElement, unknown, null, undefined>
+  countriesLayer: Selection<SVGGElement, unknown, null, undefined>
+  fallbackLayer: Selection<SVGGElement, unknown, null, undefined>
+  solvedLayer: Selection<SVGGElement, unknown, null, undefined>
+  flightTrailLayer: Selection<SVGGElement, unknown, null, undefined>
+  flightActiveLayer: Selection<SVGGElement, unknown, null, undefined>
+  coastlinePath: Selection<SVGPathElement, unknown, null, undefined>
+  borderPath: Selection<SVGPathElement, unknown, null, undefined>
+  fallbackOutlineLayer: Selection<SVGGElement, unknown, null, undefined>
+  hitTargetLayer: Selection<SVGGElement, unknown, null, undefined>
+  labelLayer: Selection<SVGGElement, unknown, null, undefined>
+  planeLayer: Selection<SVGGElement, unknown, null, undefined>
+  planeMarker: Selection<SVGGElement, unknown, null, undefined>
+  currentZoom: number
+  panOffsetX: number
+  panOffsetY: number
+  baseScale: number
+  baseTranslate: [number, number]
+}
+
 const BASE_SCALE_RATIO = 0.318
 const EARTH_RADIUS_MILES = 3958.7613
 const FLIGHT_PATH_SAMPLE_STEP_RADIANS = 0.045
@@ -118,8 +154,11 @@ const MAP_LABEL_NAME_OFFSET_PX = -4
 const MAP_LABEL_FLAG_OFFSET_PX = 17
 const MAP_LABEL_FLAG_WIDTH_PX = 26
 const MAP_LABEL_FLAG_HEIGHT_PX = 18
+const MAP_VIEW_PADDING_RATIO = 0.065
 const PLANE_LABEL_OFFSET_PX = -MAP_LABEL_FLAG_OFFSET_PX
 const PLANE_EMOJI = '✈️'
+const PROJECTION_TRANSITION_DURATION_MS = 3000
+const PROJECTION_TRANSITION_EDGE_FRACTION = 0.12
 const SEA_FILL = '#126aa6'
 const UNSOLVED_LAND_FILL = '#34393f'
 const LATEST_SOLVED_FILL = '#ffe45c'
@@ -148,6 +187,18 @@ function easeInOutCubic(t: number): number {
 
 function interpolateNumber(start: number, end: number, t: number): number {
   return start + (end - start) * t
+}
+
+function edgeFadeValue(progress: number, edgeFraction: number): number {
+  if (progress <= edgeFraction) {
+    return progress / edgeFraction
+  }
+
+  if (progress >= 1 - edgeFraction) {
+    return (1 - progress) / edgeFraction
+  }
+
+  return 1
 }
 
 function distanceBetweenTouches(firstTouch: Touch, secondTouch: Touch): number {
@@ -452,54 +503,167 @@ export async function createGlobe(
     .append('svg')
     .attr('class', 'globe__map-svg')
     .attr('aria-hidden', 'true')
+  const defs = mapSvg.append('defs')
 
   const labelsSvg = select(container)
     .append('svg')
     .attr('class', 'globe__labels-svg')
     .attr('role', 'img')
     .attr('aria-label', 'Interactive globe showing countries of the world')
-
-  const mapLayer = mapSvg.append('g').attr('class', 'globe__map')
-  const spherePath = mapLayer.append('path').attr('class', 'globe__sphere')
-  const graticulePath = mapLayer.append('path').attr('class', 'globe__graticule')
-  const countriesLayer = mapLayer.append('g').attr('class', 'globe__countries')
-  const fallbackLayer = mapLayer.append('g').attr('class', 'globe__fallbacks')
-  const solvedLayer = mapLayer.append('g').attr('class', 'globe__solved')
-  const flightLayer = mapLayer.append('g').attr('class', 'globe__flights')
-  const flightTrailLayer = flightLayer.append('g').attr('class', 'globe__flight-trails')
-  const flightActiveLayer = flightLayer.append('g').attr('class', 'globe__flight-active')
-  const coastlinePath = mapLayer.append('path').attr('class', 'globe__coastlines')
-  const borderPath = mapLayer.append('path').attr('class', 'globe__borders')
-  const fallbackOutlineLayer = mapLayer.append('g').attr('class', 'globe__fallback-outlines')
-  const hitTargetLayer = mapLayer.append('g').attr('class', 'globe__hit-targets')
-  const labelLayer = labelsSvg.append('g').attr('class', 'globe__labels')
-  const planeLayer = labelsSvg.append('g').attr('class', 'globe__plane-layer').attr('aria-hidden', 'true')
-  const planeMarker = planeLayer.append('g').attr('class', 'globe__plane')
-  planeMarker.append('circle').attr('class', 'globe__plane-halo')
-  planeMarker.append('text').attr('class', 'globe__plane-emoji').text(PLANE_EMOJI)
-  const projection = geoOrthographic().clipAngle(90).precision(0.6).rotate([-12, -18])
-  const measurementPath = geoPath(projection)
   const sphere = { type: 'Sphere' } as GeoPermissibleObjects
   const graticule = geoGraticule10()
   const desktopFlightTrailsMediaQuery = window.matchMedia(DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY)
+  let projectionViewIndex = 0
+
+  function createProjectionView(
+    mode: ProjectionMode,
+    projection: GeoProjection,
+  ): ProjectionView {
+    const clipPathId = `globe-clip-${projectionViewIndex}-${mode}`
+    projectionViewIndex += 1
+    const clipOutlinePath = defs.append('clipPath').attr('id', clipPathId).append('path')
+    const mapRoot = mapSvg.append('g').attr('class', `globe__view globe__view--${mode}`)
+    const labelsRoot = labelsSvg.append('g').attr('class', `globe__view globe__view--${mode}`)
+    const mapLayer = mapRoot.append('g').attr('class', 'globe__map')
+    const spherePath = mapLayer.append('path').attr('class', 'globe__sphere')
+    const graticulePath = mapLayer
+      .append('path')
+      .attr('class', 'globe__graticule')
+      .attr('clip-path', `url(#${clipPathId})`)
+    const countriesLayer = mapLayer
+      .append('g')
+      .attr('class', 'globe__countries')
+      .attr('clip-path', `url(#${clipPathId})`)
+    const fallbackLayer = mapLayer
+      .append('g')
+      .attr('class', 'globe__fallbacks')
+      .attr('clip-path', `url(#${clipPathId})`)
+    const solvedLayer = mapLayer
+      .append('g')
+      .attr('class', 'globe__solved')
+      .attr('clip-path', `url(#${clipPathId})`)
+    const flightLayer = mapLayer.append('g').attr('class', 'globe__flights')
+    const flightTrailLayer = flightLayer
+      .append('g')
+      .attr('class', 'globe__flight-trails')
+      .attr('clip-path', `url(#${clipPathId})`)
+    const flightActiveLayer = flightLayer
+      .append('g')
+      .attr('class', 'globe__flight-active')
+      .attr('clip-path', `url(#${clipPathId})`)
+    const coastlinePath = mapLayer
+      .append('path')
+      .attr('class', 'globe__coastlines')
+      .attr('clip-path', `url(#${clipPathId})`)
+    const borderPath = mapLayer
+      .append('path')
+      .attr('class', 'globe__borders')
+      .attr('clip-path', `url(#${clipPathId})`)
+    const fallbackOutlineLayer = mapLayer
+      .append('g')
+      .attr('class', 'globe__fallback-outlines')
+      .attr('clip-path', `url(#${clipPathId})`)
+    const hitTargetLayer = mapLayer
+      .append('g')
+      .attr('class', 'globe__hit-targets')
+      .attr('clip-path', `url(#${clipPathId})`)
+    const labelLayer = labelsRoot.append('g').attr('class', 'globe__labels')
+    const planeLayer = labelsRoot
+      .append('g')
+      .attr('class', 'globe__plane-layer')
+      .attr('aria-hidden', 'true')
+    const planeMarker = planeLayer.append('g').attr('class', 'globe__plane')
+    planeMarker.append('circle').attr('class', 'globe__plane-halo')
+    planeMarker.append('text').attr('class', 'globe__plane-emoji').text(PLANE_EMOJI)
+
+    return {
+      mode,
+      projection,
+      measurementPath: geoPath(projection),
+      clipOutlinePath,
+      mapRoot,
+      labelsRoot,
+      mapLayer,
+      spherePath,
+      graticulePath,
+      countriesLayer,
+      fallbackLayer,
+      solvedLayer,
+      flightTrailLayer,
+      flightActiveLayer,
+      coastlinePath,
+      borderPath,
+      fallbackOutlineLayer,
+      hitTargetLayer,
+      labelLayer,
+      planeLayer,
+      planeMarker,
+      currentZoom: 1,
+      panOffsetX: 0,
+      panOffsetY: 0,
+      baseScale: 1,
+      baseTranslate: [0, 0],
+    }
+  }
+
+  const globeView = createProjectionView(
+    'globe',
+    geoOrthographic().clipAngle(90).precision(0.6).rotate([-12, -18]),
+  )
+  const mapView = createProjectionView('map', geoEqualEarth().precision(0.6))
+  const transitionView = createProjectionView('map', geoEqualEarth().precision(0.6))
+  transitionView.mapRoot
+    .attr('class', 'globe__view globe__transition-view')
+    .attr('display', 'none')
+    .attr('aria-hidden', 'true')
+  transitionView.labelsRoot.attr('display', 'none').attr('aria-hidden', 'true')
+  transitionView.mapRoot.lower()
+  transitionView.labelsRoot.lower()
+  for (const layer of [
+    transitionView.graticulePath,
+    transitionView.countriesLayer,
+    transitionView.fallbackLayer,
+    transitionView.solvedLayer,
+    transitionView.flightTrailLayer,
+    transitionView.flightActiveLayer,
+    transitionView.coastlinePath,
+    transitionView.borderPath,
+    transitionView.fallbackOutlineLayer,
+    transitionView.hitTargetLayer,
+  ]) {
+    layer.attr('clip-path', null)
+  }
+  const projectionViews = [globeView, mapView] as const
+  const viewByMode: Record<ProjectionMode, ProjectionView> = {
+    globe: globeView,
+    map: mapView,
+  }
 
   let answeredIds = new Set<string>()
   let cheatedIds = new Set<string>()
   let flightSegments: FlightSegment[] = []
   let activeFlightSegmentId: string | null = null
   let activeFlightProgress = 1
-  let currentZoom = 1
+  let activeMode: ProjectionMode = 'globe'
   let cssWidth = 760
   let cssHeight = 760
   let flyFrame: number | null = null
   let framePending = false
   let planeCoordinates: [number, number] | null = null
   let pinchZoomState: PinchZoomState | null = null
+  let projectionTransitionActive = false
+  let projectionTransitionProgress = 1
+  let projectionTransitionSourceMode: ProjectionMode | null = null
+  let projectionTransitionTargetMode: ProjectionMode | null = null
   let showDesktopFlightTrails = desktopFlightTrailsMediaQuery.matches
   let touchCheatState: TouchCheatState | null = null
 
-  function currentScale(): number {
-    return Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO * currentZoom
+  function currentView(): ProjectionView {
+    return viewByMode[activeMode]
+  }
+
+  function currentScale(view: ProjectionView): number {
+    return view.baseScale * view.currentZoom
   }
 
   function clampZoom(nextZoom: number): number {
@@ -507,11 +671,146 @@ export async function createGlobe(
   }
 
   function writeRenderState(): void {
-    const [rotationLongitude, rotationLatitude] = projection.rotate()
+    const activeView = currentView()
+    const [rotationLongitude, rotationLatitude] = activeView.projection.rotate()
     container.dataset.detailMode = 'settled'
+    container.dataset.projectionMode =
+      projectionTransitionActive && projectionTransitionTargetMode
+        ? projectionTransitionTargetMode
+        : activeMode
+    container.dataset.transitionFrom = projectionTransitionSourceMode ?? ''
+    container.dataset.transitionTo = projectionTransitionTargetMode ?? ''
+    container.dataset.transitionProgress = projectionTransitionActive
+      ? projectionTransitionProgress.toFixed(3)
+      : '1.000'
     container.dataset.rotationLon = rotationLongitude.toFixed(2)
     container.dataset.rotationLat = rotationLatitude.toFixed(2)
-    container.dataset.zoom = currentZoom.toFixed(3)
+    container.dataset.zoom = activeView.currentZoom.toFixed(3)
+    container.dataset.panX = activeView.panOffsetX.toFixed(1)
+    container.dataset.panY = activeView.panOffsetY.toFixed(1)
+  }
+
+  function viewVisibility(view: ProjectionView): number {
+    if (
+      projectionTransitionActive &&
+      projectionTransitionSourceMode &&
+      projectionTransitionTargetMode
+    ) {
+      const sourceFadeOut = 1 - Math.min(1, projectionTransitionProgress / PROJECTION_TRANSITION_EDGE_FRACTION)
+      const targetFadeIn =
+        1 -
+        Math.min(
+          1,
+          (1 - projectionTransitionProgress) / PROJECTION_TRANSITION_EDGE_FRACTION,
+        )
+
+      if (view.mode === projectionTransitionSourceMode) {
+        return sourceFadeOut
+      }
+
+      if (view.mode === projectionTransitionTargetMode) {
+        return targetFadeIn
+      }
+    }
+
+    return view.mode === activeMode ? 1 : 0
+  }
+
+  function applyViewPresentation(view: ProjectionView): void {
+    const visibility = viewVisibility(view)
+    const displayValue = visibility > 0.001 ? null : 'none'
+    const pointerEvents =
+      !projectionTransitionActive && view.mode === activeMode ? 'auto' : 'none'
+
+    for (const root of [view.mapRoot, view.labelsRoot]) {
+      root
+        .attr('display', displayValue)
+        .attr('data-active', visibility > 0.5 ? 'true' : 'false')
+        .style('opacity', visibility.toFixed(3))
+        .style('pointer-events', pointerEvents)
+        .style('transform-origin', '50% 50%')
+        .style('transform-box', 'fill-box')
+        .style('transform', 'none')
+        .style('filter', 'none')
+    }
+  }
+
+  function updateViewVisibility(): void {
+    const presentedMode =
+      projectionTransitionActive && projectionTransitionTargetMode
+        ? projectionTransitionTargetMode
+        : activeMode
+    container.dataset.projectionMode = presentedMode
+    container.dataset.transitioning = projectionTransitionActive ? 'true' : 'false'
+    labelsSvg.attr(
+      'aria-label',
+      presentedMode === 'globe'
+        ? 'Interactive globe showing countries of the world'
+        : 'Interactive Equal Earth map showing countries of the world',
+    )
+
+    for (const view of projectionViews) {
+      applyViewPresentation(view)
+    }
+
+    const transitionOpacity = projectionTransitionActive
+      ? Math.min(
+        1,
+        edgeFadeValue(projectionTransitionProgress, PROJECTION_TRANSITION_EDGE_FRACTION),
+      )
+      : 0
+
+    transitionView.mapRoot
+      .attr('display', transitionOpacity > 0.001 ? null : 'none')
+      .style('opacity', transitionOpacity.toFixed(3))
+      .style('pointer-events', 'none')
+      .style('filter', transitionOpacity > 0.01 ? 'drop-shadow(0 10px 24px rgba(0, 0, 0, 0.12))' : 'none')
+  }
+
+  function seaVisibility(): number {
+    return projectionTransitionActive ? 0 : 1
+  }
+
+  function syncViewProjection(view: ProjectionView): void {
+    if (view.mode === 'globe') {
+      const baseScale = Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO
+      view.baseScale = baseScale
+      view.baseTranslate = [cssWidth / 2, cssHeight / 2]
+      view.projection.translate(view.baseTranslate).scale(currentScale(view))
+      return
+    }
+
+    const padding = Math.max(20, Math.min(cssWidth, cssHeight) * MAP_VIEW_PADDING_RATIO)
+    view.projection.fitExtent(
+      [
+        [padding, padding],
+        [cssWidth - padding, cssHeight - padding],
+      ],
+      sphere as never,
+    )
+    const [baseTranslateX, baseTranslateY] = view.projection.translate() as [number, number]
+    view.baseTranslate = [baseTranslateX, baseTranslateY]
+    view.baseScale = view.projection.scale()
+    view.projection
+      .scale(currentScale(view))
+      .translate([
+        view.baseTranslate[0] + view.panOffsetX,
+        view.baseTranslate[1] + view.panOffsetY,
+      ])
+  }
+
+  function cloneProjection(view: ProjectionView): GeoProjection {
+    const clonedProjection =
+      view.mode === 'globe'
+        ? geoOrthographic().clipAngle(90).precision(0.6)
+        : geoEqualEarth().precision(0.6)
+
+    clonedProjection
+      .scale(view.projection.scale())
+      .translate(view.projection.translate())
+      .rotate(view.projection.rotate())
+
+    return clonedProjection
   }
 
   function syncCanvasSize(): void {
@@ -519,18 +818,72 @@ export async function createGlobe(
     cssWidth = Math.max(1, bounds.width)
     cssHeight = Math.max(1, bounds.height)
 
-    projection.translate([cssWidth / 2, cssHeight / 2]).scale(currentScale())
     mapSvg.attr('viewBox', `0 0 ${cssWidth} ${cssHeight}`)
     labelsSvg.attr('viewBox', `0 0 ${cssWidth} ${cssHeight}`)
+
+    for (const view of projectionViews) {
+      syncViewProjection(view)
+    }
+
     scheduleRender()
   }
 
-  function projectedPathData(geometry: GeoPermissibleObjects): string {
-    return measurementPath(geometry) ?? ''
+  function projectedPathData(view: ProjectionView, geometry: GeoPermissibleObjects): string {
+    return view.measurementPath(geometry) ?? ''
   }
 
-  function isVisible(coordinates: [number, number]): boolean {
-    const [rotationLongitude, rotationLatitude] = projection.rotate()
+  function morphedProjectedPoint(
+    sourceProjection: GeoProjection,
+    targetProjection: GeoProjection,
+    coordinates: [number, number],
+    alpha: number,
+  ): [number, number] {
+    const sourcePoint = sourceProjection(coordinates)
+    const targetPoint = targetProjection(coordinates)
+    const sourceTranslate = sourceProjection.translate() as [number, number]
+    const targetTranslate = targetProjection.translate() as [number, number]
+    const sourceFallback = sourcePoint ?? sourceTranslate
+    const targetFallback = targetPoint ?? targetTranslate
+
+    return [
+      interpolateNumber(sourceFallback[0], targetFallback[0], alpha),
+      interpolateNumber(sourceFallback[1], targetFallback[1], alpha),
+    ]
+  }
+
+  function createProjectionTweenProjection(
+    sourceProjection: GeoProjection,
+    targetProjection: GeoProjection,
+    alpha: number,
+  ): GeoProjection {
+    const origin = morphedProjectedPoint(sourceProjection, targetProjection, [0, 0], alpha)
+    const tweenProjection = geoProjection((lambda, phi) => {
+      const point = morphedProjectedPoint(
+        sourceProjection,
+        targetProjection,
+        [(lambda * 180) / Math.PI, (phi * 180) / Math.PI],
+        alpha,
+      )
+
+      return [point[0] - origin[0], origin[1] - point[1]]
+    })
+
+    tweenProjection
+      .scale(1)
+      .translate(origin)
+      .center([0, 0])
+      .rotate([0, 0, 0])
+      .precision(0.6)
+
+    return tweenProjection
+  }
+
+  function isVisible(view: ProjectionView, coordinates: [number, number]): boolean {
+    if (view.mode === 'map') {
+      return true
+    }
+
+    const [rotationLongitude, rotationLatitude] = view.projection.rotate()
     const center: [number, number] = [-rotationLongitude, -rotationLatitude]
     return geoDistance(center, coordinates) < Math.PI / 2 - 0.05
   }
@@ -567,11 +920,93 @@ export async function createGlobe(
     )
   }
 
-  function zoomForCountry(countryId: string): number {
+  function zoomForCountry(countryId: string, view: ProjectionView): number {
     const angularRadius = angularRadiusForCountry(countryId) ?? MIN_COUNTRY_ANGULAR_RADIUS
-    const baseScale = Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO
+    const baseScale = Math.max(view.baseScale, 1)
     const targetZoom = FOCUS_COUNTRY_RADIUS_PX / Math.max(baseScale * angularRadius, 0.0001)
     return clampZoom(targetZoom)
+  }
+
+  function mapPanOffsetsForCoordinates(
+    coordinates: [number, number],
+    zoom: number,
+  ): [number, number] | null {
+    const previousZoom = mapView.currentZoom
+    const previousPanOffsetX = mapView.panOffsetX
+    const previousPanOffsetY = mapView.panOffsetY
+
+    mapView.currentZoom = zoom
+    mapView.panOffsetX = 0
+    mapView.panOffsetY = 0
+    syncViewProjection(mapView)
+    const projected = mapView.projection(coordinates)
+
+    mapView.currentZoom = previousZoom
+    mapView.panOffsetX = previousPanOffsetX
+    mapView.panOffsetY = previousPanOffsetY
+    syncViewProjection(mapView)
+
+    if (!projected) {
+      return null
+    }
+
+    return [cssWidth / 2 - projected[0], cssHeight / 2 - projected[1]]
+  }
+
+  function mapPanOffsetsForCountry(countryId: string, zoom: number): [number, number] | null {
+    const centroid = centroidForCountry(countryId)
+    return centroid ? mapPanOffsetsForCoordinates(centroid, zoom) : null
+  }
+
+  function centerCoordinatesForView(view: ProjectionView): [number, number] | null {
+    if (view.mode === 'globe') {
+      const [rotationLongitude, rotationLatitude] = view.projection.rotate()
+      return [-rotationLongitude, -rotationLatitude]
+    }
+
+    return (view.projection.invert?.([cssWidth / 2, cssHeight / 2]) as [number, number] | null) ?? null
+  }
+
+  function alignViewToCoordinates(
+    view: ProjectionView,
+    coordinates: [number, number],
+    zoom = view.currentZoom,
+  ): void {
+    view.currentZoom = clampZoom(zoom)
+
+    if (view.mode === 'globe') {
+      const [rotationLongitude, , rotationGamma] = view.projection.rotate()
+      const clampedLatitude = Math.max(-75, Math.min(75, coordinates[1]))
+      view.projection.rotate([
+        shortestLongitudeTarget(rotationLongitude, -coordinates[0]),
+        -clampedLatitude,
+        rotationGamma,
+      ])
+      return
+    }
+
+    const targetPanOffsets = mapPanOffsetsForCoordinates(coordinates, view.currentZoom)
+
+    if (targetPanOffsets) {
+      view.panOffsetX = targetPanOffsets[0]
+      view.panOffsetY = targetPanOffsets[1]
+    }
+  }
+
+  function focusCountry(view: ProjectionView, countryId: string): void {
+    const centroid = centroidForCountry(countryId)
+
+    if (!centroid) {
+      return
+    }
+
+    alignViewToCoordinates(view, centroid, zoomForCountry(countryId, view))
+  }
+
+  function focusCountryAllViews(countryId: string): void {
+    for (const view of projectionViews) {
+      focusCountry(view, countryId)
+    }
   }
 
   function flightPathGeometry(
@@ -663,15 +1098,15 @@ export async function createGlobe(
     }
   }
 
-  function renderFlights(): void {
+  function renderFlights(view: ProjectionView): void {
     const renderedSegments = showDesktopFlightTrails ? flightSegments : []
 
-    flightTrailLayer
+    view.flightTrailLayer
       .selectAll<SVGPathElement, FlightSegment>('path.globe__flight-trail')
       .data(renderedSegments, (segment) => segment.id)
       .join('path')
       .attr('class', 'globe__flight-trail')
-      .attr('d', (segment) => projectedPathData(flightPathGeometry(segment)))
+      .attr('d', (segment) => projectedPathData(view, flightPathGeometry(segment)))
       .attr('fill', 'none')
       .attr('stroke', (segment) =>
         segment.id === activeFlightSegmentId
@@ -689,12 +1124,12 @@ export async function createGlobe(
       ? flightSegments.find((segment) => segment.id === activeFlightSegmentId) ?? null
       : null
 
-    flightActiveLayer
+    view.flightActiveLayer
       .selectAll<SVGPathElement, FlightSegment>('path.globe__flight-progress')
       .data(activeSegment ? [activeSegment] : [], (segment) => segment.id)
       .join('path')
       .attr('class', 'globe__flight-progress')
-      .attr('d', (segment) => projectedPathData(flightPathGeometry(segment, activeFlightProgress)))
+      .attr('d', (segment) => projectedPathData(view, flightPathGeometry(segment, activeFlightProgress)))
       .attr('fill', 'none')
       .attr('stroke', 'rgba(255, 239, 187, 0.68)')
       .attr('stroke-width', 2)
@@ -702,15 +1137,15 @@ export async function createGlobe(
       .attr('stroke-linejoin', 'round')
   }
 
-  function projectedLabelPosition(countryId: string): [number, number] | null {
+  function projectedLabelPosition(view: ProjectionView, countryId: string): [number, number] | null {
     const centroid = centroidForCountry(countryId)
     const labelFeature = labelFeatureForCountry(countryId)
 
-    if (!centroid || !labelFeature || !isVisible(centroid)) {
+    if (!centroid || !labelFeature || !isVisible(view, centroid)) {
       return null
     }
 
-    const projected = measurementPath.centroid(labelFeature)
+    const projected = view.measurementPath.centroid(labelFeature)
 
     if (!projected || Number.isNaN(projected[0]) || Number.isNaN(projected[1])) {
       return null
@@ -719,8 +1154,11 @@ export async function createGlobe(
     return [projected[0], projected[1]]
   }
 
-  function projectedPlaneLabelAnchor(countryId: string): [number, number] | null {
-    const projectedLabel = projectedLabelPosition(countryId)
+  function projectedPlaneLabelAnchor(
+    view: ProjectionView,
+    countryId: string,
+  ): [number, number] | null {
+    const projectedLabel = projectedLabelPosition(view, countryId)
 
     if (!projectedLabel) {
       return null
@@ -730,10 +1168,11 @@ export async function createGlobe(
   }
 
   function correctedProjectedPlanePosition(
+    view: ProjectionView,
     segment: FlightSegment,
     progress: number,
   ): [number, number] | null {
-    const projectedFlightPoint = projection(
+    const projectedFlightPoint = view.projection(
       geoInterpolate(segment.fromCoordinates, segment.toCoordinates)(progress) as [number, number],
     )
 
@@ -741,10 +1180,10 @@ export async function createGlobe(
       return null
     }
 
-    const projectedStart = projection(segment.fromCoordinates)
-    const projectedEnd = projection(segment.toCoordinates)
-    const startAnchor = projectedPlaneLabelAnchor(segment.fromCountryId)
-    const endAnchor = projectedPlaneLabelAnchor(segment.toCountryId)
+    const projectedStart = view.projection(segment.fromCoordinates)
+    const projectedEnd = view.projection(segment.toCoordinates)
+    const startAnchor = projectedPlaneLabelAnchor(view, segment.fromCountryId)
+    const endAnchor = projectedPlaneLabelAnchor(view, segment.toCountryId)
 
     if (!projectedStart || !projectedEnd || !startAnchor || !endAnchor) {
       return [projectedFlightPoint[0], projectedFlightPoint[1]]
@@ -761,7 +1200,11 @@ export async function createGlobe(
     ]
   }
 
-  function planeHeadingDegrees(segment: FlightSegment, progress: number): number {
+  function planeHeadingDegrees(
+    view: ProjectionView,
+    segment: FlightSegment,
+    progress: number,
+  ): number {
     const startProgress = Math.max(0, Math.min(1, progress - PLANE_TANGENT_SAMPLE_STEP))
     const endProgress = Math.max(0, Math.min(1, progress + PLANE_TANGENT_SAMPLE_STEP))
 
@@ -773,8 +1216,8 @@ export async function createGlobe(
       segment.fromCoordinates,
       segment.toCoordinates,
     )
-    const startPoint = projection(interpolateCoordinates(startProgress) as [number, number])
-    const endPoint = projection(interpolateCoordinates(endProgress) as [number, number])
+    const startPoint = view.projection(interpolateCoordinates(startProgress) as [number, number])
+    const endPoint = view.projection(interpolateCoordinates(endProgress) as [number, number])
 
     if (!startPoint || !endPoint) {
       return 0
@@ -786,18 +1229,18 @@ export async function createGlobe(
     )
   }
 
-  function renderLabels(): void {
+  function renderLabels(view: ProjectionView): void {
     const visibleLabels = [...answeredIds]
       .map((countryId) => {
         const country = countryById.get(countryId)
         const centroid = centroidForCountry(countryId)
         const labelFeature = labelFeatureForCountry(countryId)
 
-        if (!country || !centroid || !labelFeature || !isVisible(centroid)) {
+        if (!country || !centroid || !labelFeature || !isVisible(view, centroid)) {
           return null
         }
 
-        const projected = measurementPath.centroid(labelFeature)
+        const projected = view.measurementPath.centroid(labelFeature)
 
         if (!projected || Number.isNaN(projected[0]) || Number.isNaN(projected[1])) {
           return null
@@ -813,7 +1256,7 @@ export async function createGlobe(
       })
       .filter((label): label is GlobeLabel => Boolean(label))
 
-    labelLayer
+    view.labelLayer
       .selectAll<SVGGElement, GlobeLabel>('g.globe__label')
       .data(visibleLabels, (label: GlobeLabel) => label.id)
       .join(
@@ -852,21 +1295,21 @@ export async function createGlobe(
       })
   }
 
-  function renderPlane(mostRecentAnsweredId: string | null): void {
+  function renderPlane(view: ProjectionView, mostRecentAnsweredId: string | null): void {
     const activeSegment = flightSegments.find((segment) => segment.id === activeFlightSegmentId) ?? null
     const latestSegment = flightSegments.at(-1) ?? null
 
     let anchorPoint: [number, number] | null = null
     let localOffsetY = 0
-    let headingDegrees = latestSegment ? planeHeadingDegrees(latestSegment, 1) : 0
+    let headingDegrees = latestSegment ? planeHeadingDegrees(view, latestSegment, 1) : 0
 
-    if (activeSegment && planeCoordinates && isVisible(planeCoordinates)) {
-      anchorPoint = correctedProjectedPlanePosition(activeSegment, activeFlightProgress)
-      headingDegrees = planeHeadingDegrees(activeSegment, activeFlightProgress)
+    if (activeSegment && planeCoordinates && isVisible(view, planeCoordinates)) {
+      anchorPoint = correctedProjectedPlanePosition(view, activeSegment, activeFlightProgress)
+      headingDegrees = planeHeadingDegrees(view, activeSegment, activeFlightProgress)
     } else if (mostRecentAnsweredId) {
-      anchorPoint = projectedPlaneLabelAnchor(mostRecentAnsweredId)
-    } else if (planeCoordinates && isVisible(planeCoordinates)) {
-      const projected = projection(planeCoordinates)
+      anchorPoint = projectedPlaneLabelAnchor(view, mostRecentAnsweredId)
+    } else if (planeCoordinates && isVisible(view, planeCoordinates)) {
+      const projected = view.projection(planeCoordinates)
 
       if (projected) {
         anchorPoint = [projected[0], projected[1]]
@@ -874,58 +1317,64 @@ export async function createGlobe(
     }
 
     if (!anchorPoint) {
-      planeLayer.attr('display', 'none')
+      view.planeLayer.attr('display', 'none')
       return
     }
 
-    planeLayer.attr('display', null)
-    planeMarker
+    view.planeLayer.attr('display', null)
+    view.planeMarker
       .attr('transform', `translate(${anchorPoint[0]} ${anchorPoint[1]})`)
       .attr('data-moving', activeFlightSegmentId && activeFlightProgress < 1 ? 'true' : 'false')
 
-    planeMarker
+    view.planeMarker
       .select<SVGCircleElement>('.globe__plane-halo')
       .attr('cx', 0)
       .attr('cy', localOffsetY)
       .attr('r', activeFlightSegmentId && activeFlightProgress < 1 ? 15 : 12)
 
-    planeMarker
+    view.planeMarker
       .select<SVGTextElement>('.globe__plane-emoji')
       .attr('x', 0)
       .attr('y', localOffsetY)
       .attr('transform', `rotate(${headingDegrees} 0 ${localOffsetY})`)
   }
 
-  function renderNow(): void {
-    projection.scale(currentScale())
-    writeRenderState()
+  function renderView(view: ProjectionView): void {
     const mostRecentAnsweredId = latestAnsweredId(answeredIds)
+    const spherePathData = projectedPathData(view, sphere)
+    const seaOpacity = seaVisibility()
 
-    spherePath
-      .attr('d', projectedPathData(sphere))
+    view.clipOutlinePath.attr('d', spherePathData)
+
+    view.spherePath
+      .attr('d', spherePathData)
       .attr('fill', SEA_FILL)
-      .attr('stroke', 'rgba(180, 225, 255, 0.55)')
-      .attr('stroke-width', 2.2)
+      .attr(
+        'stroke',
+        view.mode === 'globe' ? 'rgba(180, 225, 255, 0.55)' : 'rgba(180, 225, 255, 0.34)',
+      )
+      .attr('stroke-width', view.mode === 'globe' ? 2.2 : 1.35)
+      .style('opacity', seaOpacity.toFixed(3))
 
-    graticulePath
-      .attr('d', projectedPathData(graticule))
+    view.graticulePath
+      .attr('d', projectedPathData(view, graticule))
       .attr('fill', 'none')
       .attr('stroke', 'rgba(168, 212, 244, 0.2)')
       .attr('stroke-width', 0.7)
 
-    countriesLayer
+    view.countriesLayer
       .selectAll<SVGPathElement, GeoPermissibleObjects>('path')
       .data([atlas.landFeature])
       .join('path')
-      .attr('d', (featureEntry) => projectedPathData(featureEntry))
+      .attr('d', (featureEntry) => projectedPathData(view, featureEntry))
       .attr('fill', UNSOLVED_LAND_FILL)
       .attr('stroke', 'none')
 
-    fallbackLayer
+    view.fallbackLayer
       .selectAll<SVGPathElement, AtlasFeature>('path')
       .data([])
       .join('path')
-      .attr('d', (fallbackFeature) => projectedPathData(fallbackFeature))
+      .attr('d', (fallbackFeature) => projectedPathData(view, fallbackFeature))
       .attr('fill', UNSOLVED_LAND_FILL)
       .attr('stroke', 'none')
 
@@ -939,7 +1388,7 @@ export async function createGlobe(
           return null
         }
 
-        if (solvedCentroid && !isVisible(solvedCentroid)) {
+        if (solvedCentroid && !isVisible(view, solvedCentroid)) {
           return null
         }
 
@@ -948,37 +1397,37 @@ export async function createGlobe(
             cheatedIds.has(countryId)
               ? CHEATED_SOLVED_FILL
               : countryId === mostRecentAnsweredId
-              ? LATEST_SOLVED_FILL
-              : appearanceFill(country.appearance),
+                ? LATEST_SOLVED_FILL
+                : appearanceFill(country.appearance),
           feature: countryFeature,
           id: countryId,
         }
       })
       .filter((entry): entry is { appearanceFill: string; feature: AtlasFeature; id: string } => Boolean(entry))
 
-    solvedLayer
+    view.solvedLayer
       .selectAll<SVGPathElement, { appearanceFill: string; feature: AtlasFeature; id: string }>('path')
       .data(visibleSolvedFeatures, (entry) => entry.id)
       .join('path')
-      .attr('d', (entry) => projectedPathData(entry.feature))
+      .attr('d', (entry) => projectedPathData(view, entry.feature))
       .attr('fill', (entry) => entry.appearanceFill)
       .attr('stroke', SOLVED_COUNTRY_OUTLINE_COLOR)
       .attr('stroke-width', SOLVED_COUNTRY_OUTLINE_WIDTH)
       .attr('stroke-linejoin', 'round')
       .attr('stroke-linecap', 'round')
 
-    renderFlights()
+    renderFlights(view)
 
-    coastlinePath
-      .attr('d', projectedPathData(atlas.landFeature))
+    view.coastlinePath
+      .attr('d', projectedPathData(view, atlas.landFeature))
       .attr('fill', 'none')
       .attr('stroke', 'rgba(239, 247, 255, 0.76)')
       .attr('stroke-width', 1.3)
       .attr('stroke-linejoin', 'round')
       .attr('stroke-linecap', 'round')
 
-    borderPath
-      .attr('d', projectedPathData(atlas.borderMesh))
+    view.borderPath
+      .attr('d', projectedPathData(view, atlas.borderMesh))
       .attr('fill', 'none')
       .attr('stroke', 'rgba(227, 238, 247, 0.38)')
       .attr('stroke-width', 0.62)
@@ -993,11 +1442,11 @@ export async function createGlobe(
       }
     })
 
-    fallbackOutlineLayer
+    view.fallbackOutlineLayer
       .selectAll<SVGPathElement, { answered: boolean; feature: AtlasFeature; id: string }>('path')
       .data(fallbackOutlineData, (entry) => entry.id)
       .join('path')
-      .attr('d', (entry) => projectedPathData(entry.feature))
+      .attr('d', (entry) => projectedPathData(view, entry.feature))
       .attr('fill', 'none')
       .attr('stroke', (entry) =>
         entry.answered
@@ -1021,13 +1470,13 @@ export async function createGlobe(
       })
       .filter((entry): entry is { feature: AtlasFeature; id: string } => Boolean(entry))
 
-    hitTargetLayer
+    view.hitTargetLayer
       .selectAll<SVGPathElement, { feature: AtlasFeature; id: string }>('path')
       .data(hitTargetData, (entry) => entry.id)
       .join('path')
       .attr('class', 'globe__hit-target')
       .attr('data-country-id', (entry) => entry.id)
-      .attr('d', (entry) => projectedPathData(entry.feature))
+      .attr('d', (entry) => projectedPathData(view, entry.feature))
       .attr('fill', 'rgba(0, 0, 0, 0.001)')
       .attr('stroke', 'none')
       .on('click', function (event: MouseEvent, entry) {
@@ -1039,8 +1488,25 @@ export async function createGlobe(
         options?.onCountryCheat?.(entry.id)
       })
 
-    renderLabels()
-    renderPlane(mostRecentAnsweredId)
+    renderLabels(view)
+    renderPlane(view, mostRecentAnsweredId)
+  }
+
+  function renderNow(): void {
+    for (const view of projectionViews) {
+      syncViewProjection(view)
+      renderView(view)
+    }
+
+    if (projectionTransitionActive) {
+      renderView(transitionView)
+      transitionView.labelsRoot.attr('display', 'none')
+      transitionView.hitTargetLayer.selectAll('*').remove()
+      transitionView.planeLayer.attr('display', 'none')
+    }
+
+    updateViewVisibility()
+    writeRenderState()
   }
 
   function scheduleRender(): void {
@@ -1080,7 +1546,7 @@ export async function createGlobe(
   }
 
   function applyZoom(nextZoom: number): void {
-    currentZoom = clampZoom(nextZoom)
+    currentView().currentZoom = clampZoom(nextZoom)
     scheduleRender()
   }
 
@@ -1129,30 +1595,16 @@ export async function createGlobe(
     return Math.exp(-clampedDelta * WHEEL_ZOOM_SENSITIVITY)
   }
 
-  function snapToCountry(countryId: string): void {
-    const centroid = centroidForCountry(countryId)
-
-    if (!centroid) {
-      return
-    }
-
-    const [, , gamma] = projection.rotate()
-    projection.rotate([
-      shortestLongitudeTarget(projection.rotate()[0], -centroid[0]),
-      -centroid[1],
-      gamma,
-    ])
-    currentZoom = zoomForCountry(countryId)
-  }
-
   function animateFlight(segment: FlightSegment): void {
     cancelFlyAnimation()
 
-    const [startLongitude, startLatitude, startGamma] = projection.rotate()
-    const targetLongitude = shortestLongitudeTarget(startLongitude, -segment.toCoordinates[0])
-    const targetLatitude = -segment.toCoordinates[1]
-    const startZoom = currentZoom
-    const targetZoom = zoomForCountry(segment.toCountryId)
+    const animatedView = currentView()
+    const inactiveViews = projectionViews.filter((view) => view !== animatedView)
+
+    for (const inactiveView of inactiveViews) {
+      focusCountry(inactiveView, segment.toCountryId)
+    }
+
     const startTime = performance.now()
     const interpolatePlaneCoordinates = geoInterpolate(
       segment.fromCoordinates,
@@ -1163,16 +1615,48 @@ export async function createGlobe(
     activeFlightProgress = 0
     planeCoordinates = segment.fromCoordinates
 
+    const startZoom = animatedView.currentZoom
+    const targetZoom = zoomForCountry(segment.toCountryId, animatedView)
+
+    let startLongitude = 0
+    let startLatitude = 0
+    let startGamma = 0
+    let targetLongitude = 0
+    let targetLatitude = 0
+    let startPanOffsetX = 0
+    let startPanOffsetY = 0
+    let targetPanOffsetX = 0
+    let targetPanOffsetY = 0
+
+    if (animatedView.mode === 'globe') {
+      ;[startLongitude, startLatitude, startGamma] = animatedView.projection.rotate()
+      targetLongitude = shortestLongitudeTarget(startLongitude, -segment.toCoordinates[0])
+      targetLatitude = -segment.toCoordinates[1]
+    } else {
+      startPanOffsetX = animatedView.panOffsetX
+      startPanOffsetY = animatedView.panOffsetY
+      const targetPanOffsets = mapPanOffsetsForCountry(segment.toCountryId, targetZoom)
+      targetPanOffsetX = targetPanOffsets?.[0] ?? startPanOffsetX
+      targetPanOffsetY = targetPanOffsets?.[1] ?? startPanOffsetY
+    }
+
     const tick = (now: number) => {
       const progress = Math.min(1, (now - startTime) / FLY_DURATION_MS)
       const eased = easeInOutCubic(progress)
 
-      projection.rotate([
-        interpolateNumber(startLongitude, targetLongitude, eased),
-        interpolateNumber(startLatitude, targetLatitude, eased),
-        startGamma,
-      ])
-      currentZoom = clampZoom(interpolateNumber(startZoom, targetZoom, eased))
+      animatedView.currentZoom = clampZoom(interpolateNumber(startZoom, targetZoom, eased))
+
+      if (animatedView.mode === 'globe') {
+        animatedView.projection.rotate([
+          interpolateNumber(startLongitude, targetLongitude, eased),
+          interpolateNumber(startLatitude, targetLatitude, eased),
+          startGamma,
+        ])
+      } else {
+        animatedView.panOffsetX = interpolateNumber(startPanOffsetX, targetPanOffsetX, eased)
+        animatedView.panOffsetY = interpolateNumber(startPanOffsetY, targetPanOffsetY, eased)
+      }
+
       activeFlightProgress = eased
       planeCoordinates = interpolatePlaneCoordinates(eased) as [number, number]
       renderNow()
@@ -1186,6 +1670,7 @@ export async function createGlobe(
       activeFlightProgress = 1
       activeFlightSegmentId = null
       flyFrame = null
+      focusCountryAllViews(segment.toCountryId)
       renderNow()
     }
 
@@ -1193,6 +1678,7 @@ export async function createGlobe(
   }
 
   planeCoordinates = centroidForCountry(FLIGHT_START_COUNTRY_ID)
+  updateViewVisibility()
   desktopFlightTrailsMediaQuery.addEventListener('change', (event) => {
     showDesktopFlightTrails = event.matches
     scheduleRender()
@@ -1206,6 +1692,10 @@ export async function createGlobe(
 
   const dragBehavior = drag<SVGSVGElement, unknown>()
     .filter((event: MouseEvent | TouchEvent) => {
+      if (projectionTransitionActive) {
+        return false
+      }
+
       if (event instanceof TouchEvent) {
         return event.touches.length <= 1
       }
@@ -1216,15 +1706,23 @@ export async function createGlobe(
       cancelFlyAnimation()
     })
     .on('drag', (event: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
-      const [rotationLongitude, rotationLatitude, rotationGamma] = projection.rotate()
-      const sensitivity = 72 / currentScale()
-      const nextLatitude = Math.max(-75, Math.min(75, rotationLatitude - event.dy * sensitivity))
+      const activeView = currentView()
 
-      projection.rotate([
-        rotationLongitude + event.dx * sensitivity,
-        nextLatitude,
-        rotationGamma,
-      ])
+      if (activeView.mode === 'globe') {
+        const [rotationLongitude, rotationLatitude, rotationGamma] = activeView.projection.rotate()
+        const sensitivity = 72 / Math.max(currentScale(activeView), 1)
+        const nextLatitude = Math.max(-75, Math.min(75, rotationLatitude - event.dy * sensitivity))
+
+        activeView.projection.rotate([
+          rotationLongitude + event.dx * sensitivity,
+          nextLatitude,
+          rotationGamma,
+        ])
+      } else {
+        activeView.panOffsetX += event.dx
+        activeView.panOffsetY += event.dy
+      }
+
       scheduleRender()
     })
 
@@ -1253,9 +1751,13 @@ export async function createGlobe(
   mapSvgNode.addEventListener(
     'wheel',
     (event: WheelEvent) => {
+      if (projectionTransitionActive) {
+        return
+      }
+
       event.preventDefault()
       cancelFlyAnimation()
-      applyZoom(currentZoom * wheelZoomFactor(event))
+      applyZoom(currentView().currentZoom * wheelZoomFactor(event))
     },
     { passive: false },
   )
@@ -1263,6 +1765,10 @@ export async function createGlobe(
   mapSvgNode.addEventListener(
     'touchstart',
     (event: TouchEvent) => {
+      if (projectionTransitionActive) {
+        return
+      }
+
       const targetCountryId = countryIdFromTouchTarget(event.target)
 
       if (event.touches.length === 1 && targetCountryId) {
@@ -1290,7 +1796,7 @@ export async function createGlobe(
       cancelFlyAnimation()
       pinchZoomState = {
         distance,
-        zoom: currentZoom,
+        zoom: currentView().currentZoom,
       }
     },
     { capture: true, passive: false },
@@ -1299,6 +1805,10 @@ export async function createGlobe(
   mapSvgNode.addEventListener(
     'touchmove',
     (event: TouchEvent) => {
+      if (projectionTransitionActive) {
+        return
+      }
+
       if (event.touches.length === 1) {
         maintainTouchCheat(event.touches[0])
         pinchZoomState = null
@@ -1321,7 +1831,7 @@ export async function createGlobe(
       if (!pinchZoomState) {
         pinchZoomState = {
           distance,
-          zoom: currentZoom,
+          zoom: currentView().currentZoom,
         }
       }
 
@@ -1363,7 +1873,7 @@ export async function createGlobe(
 
         if (mostRecentAnsweredId) {
           cancelFlyAnimation()
-          snapToCountry(mostRecentAnsweredId)
+          focusCountryAllViews(mostRecentAnsweredId)
         }
       }
 
@@ -1389,13 +1899,90 @@ export async function createGlobe(
         return nextFlightState.status
       }
 
-      snapToCountry(lastSegment.toCountryId)
+      focusCountryAllViews(lastSegment.toCountryId)
       scheduleRender()
       return nextFlightState.status
     },
+    setProjectionMode(mode: ProjectionMode) {
+      if (mode === activeMode || projectionTransitionActive) {
+        return
+      }
+
+      cancelFlyAnimation()
+      clearTouchCheatState()
+      pinchZoomState = null
+
+      const sourceView = currentView()
+      const targetView = viewByMode[mode]
+      const sourceCenter = centerCoordinatesForView(sourceView)
+
+      projectionTransitionActive = true
+      projectionTransitionProgress = 0
+      projectionTransitionSourceMode = activeMode
+      projectionTransitionTargetMode = mode
+
+      if (sourceCenter) {
+        alignViewToCoordinates(targetView, sourceCenter, sourceView.currentZoom)
+      } else {
+        targetView.currentZoom = clampZoom(sourceView.currentZoom)
+      }
+
+      syncViewProjection(sourceView)
+      syncViewProjection(targetView)
+      const sourceProjection = cloneProjection(sourceView)
+      const targetProjection = cloneProjection(targetView)
+
+      if (sourceView.mode === 'globe') {
+        sourceProjection.clipAngle(179.999)
+      }
+
+      if (targetView.mode === 'globe') {
+        targetProjection.clipAngle(179.999)
+      }
+
+      updateViewVisibility()
+      transitionView.projection = createProjectionTweenProjection(
+        sourceProjection,
+        targetProjection,
+        0,
+      )
+      transitionView.mode = 'map'
+      transitionView.measurementPath = geoPath(transitionView.projection)
+      renderNow()
+
+      const finishTransition = (): void => {
+        projectionTransitionActive = false
+        projectionTransitionProgress = 1
+        projectionTransitionSourceMode = null
+        projectionTransitionTargetMode = null
+        activeMode = mode
+        updateViewVisibility()
+        scheduleRender()
+      }
+
+      select(container)
+        .interrupt('projection-morph')
+        .transition('projection-morph')
+        .duration(PROJECTION_TRANSITION_DURATION_MS)
+        .ease(easeCubicInOut)
+        .tween('projection-morph', () => {
+          return (t: number) => {
+            projectionTransitionProgress = t
+            transitionView.projection = createProjectionTweenProjection(
+              sourceProjection,
+              targetProjection,
+              t,
+            )
+            transitionView.measurementPath = geoPath(transitionView.projection)
+            renderNow()
+          }
+        })
+        .on('end', finishTransition)
+        .on('interrupt', finishTransition)
+    },
     zoomBy(factor: number) {
       cancelFlyAnimation()
-      applyZoom(currentZoom * factor)
+      applyZoom(currentView().currentZoom * factor)
     },
   }
 }
