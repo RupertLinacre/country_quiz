@@ -14,6 +14,7 @@ import { createGlobe, type GlobeFlightStatus } from './globe'
 registerSW({ immediate: true })
 
 const STARTING_COUNTRY_ID = 'GBR'
+const MOBILE_CHEAT_HOLD_MS = 2000
 
 function requireElement<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector)
@@ -123,6 +124,74 @@ let quizFinished = false
 let globe: Awaited<ReturnType<typeof createGlobe>> | null = null
 const trackerSlotByCountryId = new Map<string, HTMLLIElement>()
 const trackerSolvedCountByContinent = new Map<string, HTMLElement>()
+
+function attachTrackerCheatInteractions(
+  slot: HTMLLIElement,
+  countryId: string,
+): void {
+  let holdTimeoutId: number | null = null
+  let startX: number | null = null
+  let startY: number | null = null
+
+  const clearHold = (): void => {
+    if (holdTimeoutId !== null) {
+      window.clearTimeout(holdTimeoutId)
+      holdTimeoutId = null
+    }
+
+    startX = null
+    startY = null
+  }
+
+  slot.addEventListener('click', (event: MouseEvent) => {
+    if (!event.shiftKey) {
+      return
+    }
+
+    event.preventDefault()
+    solveCountry(countryId, 'cheat')
+  })
+
+  slot.addEventListener(
+    'touchstart',
+    (event: TouchEvent) => {
+      clearHold()
+
+      if (event.touches.length !== 1 || answeredIds.has(countryId) || quizFinished) {
+        return
+      }
+
+      const touch = event.touches[0]
+      startX = touch.clientX
+      startY = touch.clientY
+      holdTimeoutId = window.setTimeout(() => {
+        clearHold()
+        solveCountry(countryId, 'cheat')
+      }, MOBILE_CHEAT_HOLD_MS)
+    },
+    { passive: true },
+  )
+
+  slot.addEventListener(
+    'touchmove',
+    (event: TouchEvent) => {
+      if (event.touches.length !== 1 || startX === null || startY === null) {
+        clearHold()
+        return
+      }
+
+      const touch = event.touches[0]
+
+      if (touch.clientX !== startX || touch.clientY !== startY) {
+        clearHold()
+      }
+    },
+    { passive: true },
+  )
+
+  slot.addEventListener('touchend', clearHold)
+  slot.addEventListener('touchcancel', clearHold)
+}
 
 function createSolvedFlagNode(countryId: string): HTMLElement | null {
   const country = countriesById.get(countryId)
@@ -239,14 +308,7 @@ function renderTracker(): void {
       slot.className = 'country-slot country-slot--empty'
       slot.style.setProperty('--chars', String(Math.max(6, country.name.length)))
       slot.dataset.countryId = country.id
-      slot.addEventListener('click', (event: MouseEvent) => {
-        if (!event.shiftKey) {
-          return
-        }
-
-        event.preventDefault()
-        solveCountry(country.id, 'cheat')
-      })
+      attachTrackerCheatInteractions(slot, country.id)
       trackerSlotByCountryId.set(country.id, slot)
 
       if (answeredIds.has(country.id)) {
@@ -451,7 +513,7 @@ tick()
 answerInput.focus()
 
 globe = await createGlobe(globeContainer, quizCountries, {
-  onCountryShiftClick(countryId) {
+  onCountryCheat(countryId) {
     solveCountry(countryId, 'cheat')
   },
 })

@@ -91,6 +91,13 @@ type PinchZoomState = {
   zoom: number
 }
 
+type TouchCheatState = {
+  countryId: string
+  startX: number
+  startY: number
+  timeoutId: number
+}
+
 const BASE_SCALE_RATIO = 0.318
 const EARTH_RADIUS_MILES = 3958.7613
 const FLIGHT_PATH_SAMPLE_STEP_RADIANS = 0.045
@@ -106,6 +113,7 @@ const PLANE_TANGENT_SAMPLE_STEP = 0.018
 const WHEEL_ZOOM_SENSITIVITY = 0.0034
 const MAX_WHEEL_DELTA = 80
 const MIN_PINCH_DISTANCE_PX = 24
+const MOBILE_CHEAT_HOLD_MS = 2000
 const MAP_LABEL_NAME_OFFSET_PX = -4
 const MAP_LABEL_FLAG_OFFSET_PX = 17
 const MAP_LABEL_FLAG_WIDTH_PX = 26
@@ -408,7 +416,7 @@ export async function createGlobe(
   container: HTMLElement,
   countries: QuizCountry[],
   options?: {
-    onCountryShiftClick?: (countryId: string) => void
+    onCountryCheat?: (countryId: string) => void
   },
 ): Promise<GlobeController> {
   const topology = (await fetch(atlasUrl).then((response) => response.json())) as Topology
@@ -488,6 +496,7 @@ export async function createGlobe(
   let planeCoordinates: [number, number] | null = null
   let pinchZoomState: PinchZoomState | null = null
   let showDesktopFlightTrails = desktopFlightTrailsMediaQuery.matches
+  let touchCheatState: TouchCheatState | null = null
 
   function currentScale(): number {
     return Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO * currentZoom
@@ -1027,7 +1036,7 @@ export async function createGlobe(
         }
 
         event.preventDefault()
-        options?.onCountryShiftClick?.(entry.id)
+        options?.onCountryCheat?.(entry.id)
       })
 
     renderLabels()
@@ -1073,6 +1082,45 @@ export async function createGlobe(
   function applyZoom(nextZoom: number): void {
     currentZoom = clampZoom(nextZoom)
     scheduleRender()
+  }
+
+  function clearTouchCheatState(): void {
+    if (!touchCheatState) {
+      return
+    }
+
+    window.clearTimeout(touchCheatState.timeoutId)
+    touchCheatState = null
+  }
+
+  function startTouchCheat(countryId: string, touch: Touch): void {
+    clearTouchCheatState()
+    touchCheatState = {
+      countryId,
+      startX: touch.clientX,
+      startY: touch.clientY,
+      timeoutId: window.setTimeout(() => {
+        const activeCountryId = touchCheatState?.countryId ?? null
+        touchCheatState = null
+
+        if (activeCountryId) {
+          options?.onCountryCheat?.(activeCountryId)
+        }
+      }, MOBILE_CHEAT_HOLD_MS),
+    }
+  }
+
+  function maintainTouchCheat(touch: Touch): void {
+    if (!touchCheatState) {
+      return
+    }
+
+    if (
+      touch.clientX !== touchCheatState.startX ||
+      touch.clientY !== touchCheatState.startY
+    ) {
+      clearTouchCheatState()
+    }
   }
 
   function wheelZoomFactor(event: WheelEvent): number {
@@ -1188,6 +1236,20 @@ export async function createGlobe(
     throw new Error('Map SVG could not be created')
   }
 
+  const countryIdFromTouchTarget = (target: EventTarget | null): string | null => {
+    if (!(target instanceof Element)) {
+      return null
+    }
+
+    const hitTarget = target.closest('.globe__hit-target[data-country-id]')
+
+    if (!(hitTarget instanceof SVGPathElement)) {
+      return null
+    }
+
+    return hitTarget.dataset.countryId ?? null
+  }
+
   mapSvgNode.addEventListener(
     'wheel',
     (event: WheelEvent) => {
@@ -1201,6 +1263,16 @@ export async function createGlobe(
   mapSvgNode.addEventListener(
     'touchstart',
     (event: TouchEvent) => {
+      const targetCountryId = countryIdFromTouchTarget(event.target)
+
+      if (event.touches.length === 1 && targetCountryId) {
+        startTouchCheat(targetCountryId, event.touches[0])
+        pinchZoomState = null
+        return
+      }
+
+      clearTouchCheatState()
+
       if (event.touches.length !== 2) {
         pinchZoomState = null
         return
@@ -1227,6 +1299,14 @@ export async function createGlobe(
   mapSvgNode.addEventListener(
     'touchmove',
     (event: TouchEvent) => {
+      if (event.touches.length === 1) {
+        maintainTouchCheat(event.touches[0])
+        pinchZoomState = null
+        return
+      }
+
+      clearTouchCheatState()
+
       if (event.touches.length !== 2) {
         return
       }
@@ -1256,8 +1336,22 @@ export async function createGlobe(
     pinchZoomState = null
   }
 
-  mapSvgNode.addEventListener('touchend', clearPinchZoomState, { capture: true })
-  mapSvgNode.addEventListener('touchcancel', clearPinchZoomState, { capture: true })
+  mapSvgNode.addEventListener(
+    'touchend',
+    () => {
+      clearPinchZoomState()
+      clearTouchCheatState()
+    },
+    { capture: true },
+  )
+  mapSvgNode.addEventListener(
+    'touchcancel',
+    () => {
+      clearPinchZoomState()
+      clearTouchCheatState()
+    },
+    { capture: true },
+  )
 
   return {
     setAnswered(nextAnsweredIds: Set<string>, options) {
