@@ -34,6 +34,7 @@ const MANUAL_ALIASES = {
   STP: ['sao tome', 'sao tome and principe'],
   SWZ: ['swaziland'],
   SYR: ['syria'],
+  TUR: ['turkey'],
   TLS: ['east timor', 'timor leste'],
   TZA: ['tanzania'],
   USA: ['us', 'usa', 'united states of america', 'america'],
