@@ -85,6 +85,11 @@ type FlightSegment = {
   toName: string
 }
 
+type PinchZoomState = {
+  distance: number
+  zoom: number
+}
+
 const BASE_SCALE_RATIO = 0.318
 const EARTH_RADIUS_MILES = 3958.7613
 const FLIGHT_PATH_SAMPLE_STEP_RADIANS = 0.045
@@ -99,6 +104,7 @@ const PLANE_EMOJI_BASE_HEADING_DEGREES = -45
 const PLANE_TANGENT_SAMPLE_STEP = 0.018
 const WHEEL_ZOOM_SENSITIVITY = 0.0034
 const MAX_WHEEL_DELTA = 80
+const MIN_PINCH_DISTANCE_PX = 24
 const MAP_LABEL_NAME_OFFSET_PX = -4
 const MAP_LABEL_FLAG_OFFSET_PX = 17
 const PLANE_LABEL_OFFSET_PX = -MAP_LABEL_FLAG_OFFSET_PX
@@ -130,6 +136,13 @@ function easeInOutCubic(t: number): number {
 
 function interpolateNumber(start: number, end: number, t: number): number {
   return start + (end - start) * t
+}
+
+function distanceBetweenTouches(firstTouch: Touch, secondTouch: Touch): number {
+  return Math.hypot(
+    secondTouch.clientX - firstTouch.clientX,
+    secondTouch.clientY - firstTouch.clientY,
+  )
 }
 
 function toMiles(distanceRadians: number): number {
@@ -464,6 +477,7 @@ export async function createGlobe(
   let flyFrame: number | null = null
   let framePending = false
   let planeCoordinates: [number, number] | null = null
+  let pinchZoomState: PinchZoomState | null = null
   let showDesktopFlightTrails = desktopFlightTrailsMediaQuery.matches
 
   function currentScale(): number {
@@ -1096,6 +1110,13 @@ export async function createGlobe(
   syncCanvasSize()
 
   const dragBehavior = drag<SVGSVGElement, unknown>()
+    .filter((event: MouseEvent | TouchEvent) => {
+      if (event instanceof TouchEvent) {
+        return event.touches.length <= 1
+      }
+
+      return !event.ctrlKey && event.button === 0
+    })
     .on('start', () => {
       cancelFlyAnimation()
     })
@@ -1129,6 +1150,59 @@ export async function createGlobe(
     },
     { passive: false },
   )
+
+  mapSvgNode.addEventListener(
+    'touchstart',
+    (event: TouchEvent) => {
+      if (event.touches.length !== 2) {
+        pinchZoomState = null
+        return
+      }
+
+      const [firstTouch, secondTouch] = [event.touches[0], event.touches[1]]
+      const distance = distanceBetweenTouches(firstTouch, secondTouch)
+
+      if (distance < MIN_PINCH_DISTANCE_PX) {
+        pinchZoomState = null
+        return
+      }
+
+      event.preventDefault()
+      cancelFlyAnimation()
+      pinchZoomState = {
+        distance,
+        zoom: currentZoom,
+      }
+    },
+    { passive: false },
+  )
+
+  mapSvgNode.addEventListener(
+    'touchmove',
+    (event: TouchEvent) => {
+      if (event.touches.length !== 2 || !pinchZoomState) {
+        return
+      }
+
+      const [firstTouch, secondTouch] = [event.touches[0], event.touches[1]]
+      const distance = distanceBetweenTouches(firstTouch, secondTouch)
+
+      if (distance < MIN_PINCH_DISTANCE_PX) {
+        return
+      }
+
+      event.preventDefault()
+      applyZoom(pinchZoomState.zoom * (distance / pinchZoomState.distance))
+    },
+    { passive: false },
+  )
+
+  const clearPinchZoomState = (): void => {
+    pinchZoomState = null
+  }
+
+  mapSvgNode.addEventListener('touchend', clearPinchZoomState)
+  mapSvgNode.addEventListener('touchcancel', clearPinchZoomState)
 
   return {
     setAnswered(nextAnsweredIds: Set<string>, options) {

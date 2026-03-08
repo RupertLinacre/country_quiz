@@ -47,7 +47,14 @@ app.innerHTML = `
           </article>
         </div>
         <div class="answer-panel">
-          <label class="answer-panel__label" for="guess-input">Enter a country</label>
+          <div class="answer-panel__heading">
+            <label class="answer-panel__label" for="guess-input">Enter a country</label>
+            <div class="answer-panel__summary" aria-live="polite">
+              <span id="score-compact" class="answer-panel__summary-text">0/${totalCountryCount}</span>
+              <span class="answer-panel__summary-separator" aria-hidden="true">·</span>
+              <span id="timer-compact" class="answer-panel__summary-text">30:00 left</span>
+            </div>
+          </div>
           <input
             id="guess-input"
             name="guess"
@@ -90,7 +97,9 @@ app.innerHTML = `
 `
 
 const scoreElement = requireElement<HTMLElement>('#score')
+const compactScoreElement = requireElement<HTMLElement>('#score-compact')
 const timerElement = requireElement<HTMLElement>('#timer')
+const compactTimerElement = requireElement<HTMLElement>('#timer-compact')
 const remainingElement = requireElement<HTMLElement>('#remaining')
 const statusElement = requireElement<HTMLElement>('#status')
 const answerInput = requireElement<HTMLInputElement>('#guess-input')
@@ -256,6 +265,7 @@ function updateTracker(countryId: string): void {
 
 function renderScore(): void {
   scoreElement.textContent = `${answeredIds.size}/${totalCountryCount} countries`
+  compactScoreElement.textContent = `${answeredIds.size}/${totalCountryCount}`
   remainingElement.textContent = `${totalCountryCount - answeredIds.size} left`
 }
 
@@ -292,7 +302,9 @@ function finishQuiz(
   answerInput.disabled = true
   statusTone = 'muted'
   renderStatus(message)
-  timerElement.textContent = options?.timerText ?? '00:00'
+  const finalTimerText = options?.timerText ?? '00:00'
+  timerElement.textContent = finalTimerText
+  compactTimerElement.textContent = `${finalTimerText} left`
 }
 
 function solveCountry(countryId: string): void {
@@ -369,7 +381,9 @@ function tick(): void {
   }
 
   const millisecondsLeft = remainingMilliseconds()
-  timerElement.textContent = formatTime(millisecondsLeft)
+  const timerText = formatTime(millisecondsLeft)
+  timerElement.textContent = timerText
+  compactTimerElement.textContent = `${timerText} left`
 
   if (millisecondsLeft <= 0) {
     finishQuiz(`Time is up. You found ${answeredIds.size} of ${totalCountryCount} countries.`)
