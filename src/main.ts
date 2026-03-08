@@ -238,6 +238,15 @@ function renderTracker(): void {
       const slot = document.createElement('li')
       slot.className = 'country-slot country-slot--empty'
       slot.style.setProperty('--chars', String(Math.max(6, country.name.length)))
+      slot.dataset.countryId = country.id
+      slot.addEventListener('click', (event: MouseEvent) => {
+        if (!event.shiftKey) {
+          return
+        }
+
+        event.preventDefault()
+        solveCountry(country.id, 'cheat')
+      })
       trackerSlotByCountryId.set(country.id, slot)
 
       if (answeredIds.has(country.id)) {
