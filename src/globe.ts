@@ -17,7 +17,7 @@ import { feature, mesh } from 'topojson-client'
 
 import atlasUrl from './generated/globe-atlas.json?url'
 import fallbackFeatures from './generated/country-geometry-fallbacks.json'
-import type { QuizCountry } from './quiz-data'
+import type { QuizCountry, SolvedAppearance } from './quiz-data'
 
 type AtlasFeature = GeoPermissibleObjects & {
   id?: string | number
@@ -123,10 +123,15 @@ const PLANE_LABEL_OFFSET_PX = -MAP_LABEL_FLAG_OFFSET_PX
 const PLANE_EMOJI = '✈️'
 const SEA_FILL = '#126aa6'
 const UNSOLVED_LAND_FILL = '#34393f'
-const REVEALED_SOLVED_FILL = '#8f59ff'
+const LATEST_SOLVED_FILL = '#ffe45c'
+const CHEATED_SOLVED_FILL = '#8f59ff'
 const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
 const SOLVED_COUNTRY_OUTLINE_COLOR = 'rgba(8, 18, 28, 0.95)'
 const MAX_COUNTRY_POLYGON_AREA = Math.PI * 2
+
+function appearanceFill(appearance: SolvedAppearance): string {
+  return appearance.kind === 'flag' ? appearance.fallbackFill : appearance.fill
+}
 
 function latestAnsweredId(answeredIds: Set<string>): string | null {
   let latestId: string | null = null
@@ -480,6 +485,7 @@ export async function createGlobe(
   const desktopFlightTrailsMediaQuery = window.matchMedia(DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY)
 
   let answeredIds = new Set<string>()
+  let cheatedIds = new Set<string>()
   let flightSegments: FlightSegment[] = []
   let activeFlightSegmentId: string | null = null
   let activeFlightProgress = 1
@@ -939,7 +945,12 @@ export async function createGlobe(
         }
 
         return {
-          appearanceFill: REVEALED_SOLVED_FILL,
+          appearanceFill:
+            cheatedIds.has(countryId)
+              ? CHEATED_SOLVED_FILL
+              : countryId === mostRecentAnsweredId
+                ? LATEST_SOLVED_FILL
+                : appearanceFill(country.appearance),
           feature: countryFeature,
           id: countryId,
         }
@@ -1364,6 +1375,7 @@ export async function createGlobe(
   return {
     setAnswered(nextAnsweredIds: Set<string>, options) {
       answeredIds = new Set(nextAnsweredIds)
+      cheatedIds = new Set(options?.cheatedIds ?? [])
 
       if (options?.focusLatest) {
         const mostRecentAnsweredId = latestAnsweredId(answeredIds)
