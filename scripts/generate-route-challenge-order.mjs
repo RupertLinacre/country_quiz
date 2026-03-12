@@ -294,16 +294,16 @@ for (const featureEntry of countryFeatures) {
 const centroidByCountryId = new Map()
 
 for (const country of countries) {
-  const atlasFeature =
-    atlasFeatureByName.get(country.atlasName) ??
-    (country.ccn3 ? atlasFeatureByCcn3.get(normaliseAtlasId(country.ccn3)) : undefined)
   const fallbackFeature = fallbackFeatures.find((featureEntry) => {
     return (
-      normaliseAtlasId(featureEntry.id) === normaliseAtlasId(country.ccn3) ||
+      (country.ccn3 && normaliseAtlasId(featureEntry.id) === normaliseAtlasId(country.ccn3)) ||
       featureEntry.properties?.name === country.atlasName
     )
   })
-  const matchedFeature = atlasFeature ?? fallbackFeature
+  const atlasFeature =
+    atlasFeatureByName.get(country.atlasName) ??
+    (country.ccn3 ? atlasFeatureByCcn3.get(normaliseAtlasId(country.ccn3)) : undefined)
+  const matchedFeature = fallbackFeature ?? atlasFeature
 
   if (!matchedFeature) {
     throw new Error(`Missing geometry for ${country.id} (${country.name})`)

@@ -42,7 +42,25 @@ type AtlasBundle = {
   landFeature: GeoPermissibleObjects
 }
 
+export type GlobeFlightPerformance = {
+  averageFps: number | null
+  averageFrameMs: number | null
+  elapsedMs: number
+  frameCount: number
+  fromCountryId: string
+  fromName: string
+  maxFrameMs: number | null
+  minFps: number | null
+  status: 'running' | 'complete' | 'cancelled'
+  toCountryId: string
+  toName: string
+}
+
 type GlobeController = {
+  benchmarkFlight: (
+    fromCountryId: string,
+    toCountryId: string,
+  ) => Promise<GlobeFlightPerformance | null>
   setAnswered: (
     answeredIds: Set<string>,
     options?: {
@@ -109,6 +127,15 @@ type TouchCheatState = {
   timeoutId: number
 }
 
+type FlightPerformanceAccumulator = {
+  lastFrameTime: number | null
+  lastPublishedTime: number
+  maxFrameMs: number
+  sampledFrameCount: number
+  startTime: number
+  totalFrameMs: number
+}
+
 const BASE_SCALE_RATIO = 0.318
 const EARTH_RADIUS_MILES = 3958.7613
 const FLIGHT_PATH_SAMPLE_STEP_RADIANS = 0.045
@@ -172,6 +199,14 @@ function distanceBetweenTouches(firstTouch: Touch, secondTouch: Touch): number {
 
 function toMiles(distanceRadians: number): number {
   return Math.round(distanceRadians * EARTH_RADIUS_MILES)
+}
+
+function roundedMetric(value: number | null, fractionDigits = 1): number | null {
+  if (value === null || !Number.isFinite(value)) {
+    return null
+  }
+
+  return Number(value.toFixed(fractionDigits))
 }
 
 function normaliseAtlasId(value: string | number | undefined): string | null {
@@ -430,6 +465,7 @@ export async function createGlobe(
   countries: QuizCountry[],
   options?: {
     onCountryCheat?: (countryId: string) => void
+    onFlightPerformanceChange?: (performance: GlobeFlightPerformance | null) => void
   },
 ): Promise<GlobeController> {
   const topology = (await fetch(atlasUrl).then((response) => response.json())) as Topology
@@ -444,7 +480,7 @@ export async function createGlobe(
     const normalizedFeature = normaliseCountryFeature(rawFeature)
     const atlasId = normaliseAtlasId(rawFeature.id)
     const country = countries.find((candidate) => {
-      return candidate.ccn3 === atlasId || candidate.atlasName === rawFeature.properties?.name
+      return (candidate.ccn3 && candidate.ccn3 === atlasId) || candidate.atlasName === rawFeature.properties?.name
     })
 
     if (!country) {
@@ -514,9 +550,25 @@ export async function createGlobe(
   let pinchZoomState: PinchZoomState | null = null
   let showDesktopFlightTrails = desktopFlightTrailsMediaQuery.matches
   let touchCheatState: TouchCheatState | null = null
+  let debugFlightSequence = 0
+  let flightPerformance: GlobeFlightPerformance | null = null
+  let flightPerformanceAccumulator: FlightPerformanceAccumulator | null = null
+  let pendingFlightCompletion:
+    | ((performance: GlobeFlightPerformance | null) => void)
+    | null = null
 
   function currentScale(): number {
     return Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO * currentZoom
+  }
+
+  function publishFlightPerformance(): void {
+    options?.onFlightPerformanceChange?.(
+      flightPerformance
+        ? {
+          ...flightPerformance,
+        }
+        : null,
+    )
   }
 
   function clampZoom(nextZoom: number): number {
@@ -681,6 +733,140 @@ export async function createGlobe(
         }
         : null,
     }
+  }
+
+  function directFlightSegment(
+    fromCountryId: string,
+    toCountryId: string,
+  ): FlightSegment | null {
+    const fromCountry = countryById.get(fromCountryId)
+    const toCountry = countryById.get(toCountryId)
+    const fromCoordinates = centroidForCountry(fromCountryId)
+    const toCoordinates = centroidForCountry(toCountryId)
+
+    if (!fromCountry || !toCountry || !fromCoordinates || !toCoordinates) {
+      return null
+    }
+
+    return {
+      fromCoordinates,
+      fromCountryId,
+      fromName: answerKind === 'capital' ? fromCountry.capitalDisplayName : fromCountry.name,
+      id: `debug-${debugFlightSequence += 1}-${fromCountryId}-${toCountryId}`,
+      miles: toMiles(geoDistance(fromCoordinates, toCoordinates)),
+      pathCoordinates: greatArcCoordinates(fromCoordinates, toCoordinates),
+      toCoordinates,
+      toCountryId,
+      toName: answerKind === 'capital' ? toCountry.capitalDisplayName : toCountry.name,
+    }
+  }
+
+  function startFlightPerformance(segment: FlightSegment, startTime: number): void {
+    flightPerformance = {
+      averageFps: null,
+      averageFrameMs: null,
+      elapsedMs: 0,
+      frameCount: 0,
+      fromCountryId: segment.fromCountryId,
+      fromName: segment.fromName,
+      maxFrameMs: null,
+      minFps: null,
+      status: 'running',
+      toCountryId: segment.toCountryId,
+      toName: segment.toName,
+    }
+    flightPerformanceAccumulator = {
+      lastFrameTime: null,
+      lastPublishedTime: Number.NEGATIVE_INFINITY,
+      maxFrameMs: 0,
+      sampledFrameCount: 0,
+      startTime,
+      totalFrameMs: 0,
+    }
+    publishFlightPerformance()
+  }
+
+  function sampleFlightPerformance(now: number): void {
+    if (!flightPerformance || !flightPerformanceAccumulator) {
+      return
+    }
+
+    const accumulator = flightPerformanceAccumulator
+
+    if (accumulator.lastFrameTime !== null) {
+      const frameMs = now - accumulator.lastFrameTime
+      accumulator.sampledFrameCount += 1
+      accumulator.totalFrameMs += frameMs
+      accumulator.maxFrameMs = Math.max(accumulator.maxFrameMs, frameMs)
+      const averageFrameMs = accumulator.totalFrameMs / accumulator.sampledFrameCount
+
+      flightPerformance = {
+        ...flightPerformance,
+        averageFps: roundedMetric(1000 / averageFrameMs),
+        averageFrameMs: roundedMetric(averageFrameMs, 2),
+        elapsedMs: roundedMetric(now - accumulator.startTime, 1) ?? 0,
+        frameCount: accumulator.sampledFrameCount,
+        maxFrameMs: roundedMetric(accumulator.maxFrameMs, 2),
+        minFps: roundedMetric(1000 / accumulator.maxFrameMs),
+      }
+    } else {
+      flightPerformance = {
+        ...flightPerformance,
+        elapsedMs: roundedMetric(now - accumulator.startTime, 1) ?? 0,
+      }
+    }
+
+    accumulator.lastFrameTime = now
+
+    if (now - accumulator.lastPublishedTime >= 125) {
+      accumulator.lastPublishedTime = now
+      publishFlightPerformance()
+    }
+  }
+
+  function settleFlightPerformance(
+    status: 'complete' | 'cancelled',
+  ): GlobeFlightPerformance | null {
+    const accumulator = flightPerformanceAccumulator
+
+    if (!flightPerformance || !accumulator) {
+      if (pendingFlightCompletion) {
+        pendingFlightCompletion(null)
+        pendingFlightCompletion = null
+      }
+
+      return null
+    }
+
+    const now = performance.now()
+    const updatedPerformance =
+      accumulator.sampledFrameCount > 0
+        ? {
+          ...flightPerformance,
+          elapsedMs: roundedMetric(now - accumulator.startTime, 1) ?? flightPerformance.elapsedMs,
+        }
+        : {
+          ...flightPerformance,
+          elapsedMs: roundedMetric(now - accumulator.startTime, 1) ?? 0,
+        }
+
+    flightPerformance = {
+      ...updatedPerformance,
+      status,
+    }
+    flightPerformanceAccumulator = null
+    publishFlightPerformance()
+
+    const snapshot = {
+      ...flightPerformance,
+    }
+
+    if (pendingFlightCompletion) {
+      pendingFlightCompletion(snapshot)
+      pendingFlightCompletion = null
+    }
+
+    return snapshot
   }
 
   function renderFlights(): void {
@@ -1163,12 +1349,18 @@ export async function createGlobe(
   }
 
   function cancelFlyAnimation(): void {
+    const shouldCancelPerformance = flyFrame !== null || flightPerformanceAccumulator !== null
+
     if (flyFrame !== null) {
       window.cancelAnimationFrame(flyFrame)
       flyFrame = null
     }
 
     settleActiveFlight()
+
+    if (shouldCancelPerformance) {
+      settleFlightPerformance('cancelled')
+    }
   }
 
   function applyZoom(nextZoom: number): void {
@@ -1255,7 +1447,10 @@ export async function createGlobe(
     scheduleRender()
   }
 
-  function animateFlight(segment: FlightSegment): void {
+  function animateFlight(
+    segment: FlightSegment,
+    onComplete?: (performance: GlobeFlightPerformance | null) => void,
+  ): void {
     cancelFlyAnimation()
 
     const [startLongitude, startLatitude, startGamma] = projection.rotate()
@@ -1269,11 +1464,14 @@ export async function createGlobe(
       segment.toCoordinates,
     )
 
+    pendingFlightCompletion = onComplete ?? null
     activeFlightSegmentId = segment.id
     activeFlightProgress = 0
     planeCoordinates = segment.fromCoordinates
+    startFlightPerformance(segment, startTime)
 
     const tick = (now: number) => {
+      sampleFlightPerformance(now)
       const progress = Math.min(1, (now - startTime) / FLY_DURATION_MS)
       const eased = easeInOutCubic(progress)
 
@@ -1296,6 +1494,7 @@ export async function createGlobe(
       activeFlightProgress = 1
       activeFlightSegmentId = null
       flyFrame = null
+      settleFlightPerformance('complete')
       renderNow()
     }
 
@@ -1464,6 +1663,27 @@ export async function createGlobe(
   )
 
   return {
+    benchmarkFlight(fromCountryId, toCountryId) {
+      const segment = directFlightSegment(fromCountryId, toCountryId)
+
+      cancelFlyAnimation()
+
+      if (!segment) {
+        flightSegments = []
+        planeCoordinates =
+          centroidForCountry(fromCountryId) ?? centroidForCountry(FLIGHT_START_COUNTRY_ID)
+        scheduleRender()
+        return Promise.resolve(null)
+      }
+
+      flightSegments = [segment]
+      planeCoordinates = segment.fromCoordinates
+      scheduleRender()
+
+      return new Promise((resolve) => {
+        animateFlight(segment, resolve)
+      })
+    },
     setAnswered(nextAnsweredIds: Set<string>, options) {
       answeredIds = new Set(nextAnsweredIds)
       cheatedIds = new Set(options?.cheatedIds ?? [])

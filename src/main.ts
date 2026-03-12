@@ -1,7 +1,11 @@
 import './style.css'
 import { registerSW } from 'virtual:pwa-register'
 
-import { createGlobe, type GlobeFlightStatus } from './globe'
+import {
+  createGlobe,
+  type GlobeFlightPerformance,
+  type GlobeFlightStatus,
+} from './globe'
 import { normalizeAnswer } from './normalize'
 import {
   aliasToCountryId,
@@ -251,6 +255,11 @@ app.innerHTML = `
       </section>
       <div class="globe-card">
         <div class="globe-card__toolbar">
+          <div id="flight-performance" class="performance-meter">
+            <span class="performance-meter__label">Flight FPS</span>
+            <strong id="flight-performance-value" class="performance-meter__value">--</strong>
+            <span id="flight-performance-meta" class="performance-meter__meta">Awaiting benchmark</span>
+          </div>
           <div class="zoom-controls" aria-label="Globe zoom controls">
             <button id="zoom-out" class="zoom-controls__button" type="button" aria-label="Zoom out">−</button>
             <button id="zoom-in" class="zoom-controls__button" type="button" aria-label="Zoom in">+</button>
@@ -279,6 +288,9 @@ const flightEyebrowElement = requireElement<HTMLElement>('#flight-eyebrow')
 const flightRouteElement = requireElement<HTMLElement>('#flight-route')
 const flightDistanceElement = requireElement<HTMLElement>('#flight-distance')
 const flightTotalElement = requireElement<HTMLElement>('#flight-total')
+const flightPerformanceElement = requireElement<HTMLElement>('#flight-performance')
+const flightPerformanceValueElement = requireElement<HTMLElement>('#flight-performance-value')
+const flightPerformanceMetaElement = requireElement<HTMLElement>('#flight-performance-meta')
 const continentBoard = requireElement<HTMLElement>('#continent-board')
 const zoomInButton = requireElement<HTMLButtonElement>('#zoom-in')
 const zoomOutButton = requireElement<HTMLButtonElement>('#zoom-out')
@@ -296,6 +308,7 @@ let statusTone: 'neutral' | 'success' | 'muted' = 'neutral'
 let intervalHandle = window.setInterval(tick, 250)
 let quizFinished = false
 let globe: Awaited<ReturnType<typeof createGlobe>> | null = null
+let latestFlightPerformance: GlobeFlightPerformance | null = null
 const trackerSlotByCountryId = new Map<string, HTMLLIElement>()
 const trackerSolvedCountByContinent = new Map<string, HTMLElement>()
 
@@ -440,6 +453,10 @@ function formatMiles(miles: number): string {
   return `${new Intl.NumberFormat('en-GB').format(miles)} miles`
 }
 
+function formatFps(value: number | null): string {
+  return value === null ? '--' : `${value.toFixed(1)}`
+}
+
 function elapsedMilliseconds(): number {
   if (quizStartedAt === null) {
     return 0
@@ -564,6 +581,29 @@ function renderRoutePanel(): void {
   if (skipButton) {
     skipButton.disabled = quizFinished || routePromptQueue.length < 2
   }
+}
+
+function renderFlightPerformance(performance: GlobeFlightPerformance | null): void {
+  latestFlightPerformance = performance
+
+  if (!performance) {
+    flightPerformanceElement.dataset.state = 'idle'
+    flightPerformanceValueElement.textContent = '--'
+    flightPerformanceMetaElement.textContent = 'Awaiting benchmark'
+    return
+  }
+
+  flightPerformanceElement.dataset.state = performance.status
+  flightPerformanceValueElement.textContent = formatFps(performance.averageFps)
+  const statusLabel =
+    performance.status === 'running'
+      ? 'Live'
+      : performance.status === 'complete'
+        ? 'Last'
+        : 'Cancelled'
+  const lowFpsText = performance.minFps === null ? '--' : `${performance.minFps.toFixed(1)}`
+  flightPerformanceMetaElement.textContent =
+    `${statusLabel}: ${performance.fromName} to ${performance.toName} · low ${lowFpsText} · ${performance.frameCount} frames`
 }
 
 function syncSolvedCountries(options?: { focusLatest?: boolean }): void {
@@ -859,8 +899,27 @@ globe = await createGlobe(globeContainer, quizCountries, mode.layoutMode === 'fr
     onCountryCheat(countryId) {
       solveCountry(countryId, 'cheat')
     },
+    onFlightPerformanceChange(performance) {
+      renderFlightPerformance(performance)
+    },
   }
-  : undefined)
+  : {
+    onFlightPerformanceChange(performance) {
+      renderFlightPerformance(performance)
+    },
+  })
+
+window.__countriesQuizDebug = {
+  benchmarkFlight(fromCountryId, toCountryId) {
+    return globe?.benchmarkFlight(fromCountryId, toCountryId) ?? Promise.resolve(null)
+  },
+  benchmarkFlightTo(countryId) {
+    return globe?.benchmarkFlight(STARTING_COUNTRY_ID, countryId) ?? Promise.resolve(null)
+  },
+  getFlightPerformance() {
+    return latestFlightPerformance ? { ...latestFlightPerformance } : null
+  },
+}
 
 syncSolvedCountries({ focusLatest: mode.layoutMode === 'free' })
 

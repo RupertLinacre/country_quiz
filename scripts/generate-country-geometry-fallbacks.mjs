@@ -8,9 +8,8 @@ import atlas10 from 'world-atlas/countries-10m.json' with { type: 'json' }
 import atlas50 from 'world-atlas/countries-50m.json' with { type: 'json' }
 import quizCountries from '../src/generated/quiz-country-records.json' with { type: 'json' }
 
-const TINY_COUNTRY_AREA_THRESHOLD = 0.0001
-const ULTRA_TINY_COUNTRY_AREA_THRESHOLD = 0.000001
-const VISIBILITY_BOOST_RADIUS_DEGREES = 0.08
+const TINY_COUNTRY_DOT_AREA_THRESHOLD = 0.00002
+const TINY_COUNTRY_DOT_RADIUS_DEGREES = 0.16
 const MAX_COUNTRY_POLYGON_AREA = Math.PI * 2
 
 function normalisePolygonCoordinates(coordinates) {
@@ -54,39 +53,14 @@ function normaliseCountryGeometry(geometry) {
 
 function atlasMatchesCountry(geometry, country) {
   const atlasId = geometry.id === undefined ? null : String(geometry.id).padStart(3, '0')
-  return geometry.properties?.name === country.atlasName || atlasId === country.ccn3
+  return geometry.properties?.name === country.atlasName || (country.ccn3 && atlasId === country.ccn3)
 }
 
-function polygonCount(geometry) {
-  if (geometry.geometry.type === 'MultiPolygon') {
-    return geometry.geometry.coordinates.length
-  }
-
-  if (geometry.geometry.type === 'Polygon') {
-    return 1
-  }
-
-  return 0
+function shouldRenderAsTinyCountryDot(geometry) {
+  return geoArea(geometry) <= TINY_COUNTRY_DOT_AREA_THRESHOLD
 }
 
-function shouldOverrideWithAtlas10(country, geometry50, geometry10) {
-  const area50 = geoArea(geometry50)
-
-  if (area50 >= TINY_COUNTRY_AREA_THRESHOLD) {
-    return false
-  }
-
-  return (
-    geometry50.geometry.type !== geometry10.geometry.type ||
-    polygonCount(geometry10) > polygonCount(geometry50)
-  )
-}
-
-function needsVisibilityBoost(geometry) {
-  return geoArea(geometry) < ULTRA_TINY_COUNTRY_AREA_THRESHOLD
-}
-
-function createVisibilityBoostFeature(geometry) {
+function createTinyCountryDotFeature(geometry) {
   const [longitude, latitude] = geoCentroid(geometry)
 
   return {
@@ -94,11 +68,11 @@ function createVisibilityBoostFeature(geometry) {
     id: geometry.id,
     properties: {
       ...geometry.properties,
-      visibilityBoost: true,
+      tinyCountryDot: true,
     },
     geometry: geoCircle()
       .center([longitude, latitude])
-      .radius(VISIBILITY_BOOST_RADIUS_DEGREES)(),
+      .radius(TINY_COUNTRY_DOT_RADIUS_DEGREES)(),
   }
 }
 
@@ -111,20 +85,17 @@ const fallbackFeatures = quizCountries
     const geometry10Source = atlas10Features.find((geometry) => atlasMatchesCountry(geometry, country))
     const geometry50 = geometry50Source ? normaliseCountryGeometry(geometry50Source) : null
     const geometry10 = geometry10Source ? normaliseCountryGeometry(geometry10Source) : null
+    const referenceGeometry = geometry10 ?? geometry50
 
-    if (!geometry10) {
-      return geometry50 && needsVisibilityBoost(geometry50) ? createVisibilityBoostFeature(geometry50) : null
+    if (!referenceGeometry) {
+      return null
     }
 
-    if (!geometry50) {
-      return needsVisibilityBoost(geometry10) ? createVisibilityBoostFeature(geometry10) : geometry10
+    if (shouldRenderAsTinyCountryDot(referenceGeometry)) {
+      return createTinyCountryDotFeature(referenceGeometry)
     }
 
-    if (shouldOverrideWithAtlas10(country, geometry50, geometry10)) {
-      return needsVisibilityBoost(geometry10) ? createVisibilityBoostFeature(geometry10) : geometry10
-    }
-
-    return needsVisibilityBoost(geometry50) ? createVisibilityBoostFeature(geometry50) : null
+    return null
   })
   .filter(Boolean)
 
