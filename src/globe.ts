@@ -48,6 +48,14 @@ type GlobeController = {
     options?: {
       cheatedIds?: Set<string>
       focusLatest?: boolean
+      mode?: 'classic' | 'route'
+      skippedIds?: Set<string>
+    },
+  ) => void
+  setPromptedCountry: (
+    countryId: string | null,
+    options?: {
+      focus?: boolean
     },
   ) => void
   syncFlightPath: (
@@ -71,6 +79,7 @@ type GlobeLabel = {
   flagAssetUrl: string | null
   id: string
   name: string
+  tone: 'answered' | 'skipped'
   x: number
   y: number
 }
@@ -125,6 +134,8 @@ const SEA_FILL = '#126aa6'
 const UNSOLVED_LAND_FILL = '#34393f'
 const LATEST_SOLVED_FILL = '#ffe45c'
 const CHEATED_SOLVED_FILL = '#8f59ff'
+const ROUTE_SOLVED_FILL = '#57c46f'
+const ROUTE_SKIPPED_FILL = '#8f59ff'
 const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
 const SOLVED_COUNTRY_OUTLINE_COLOR = 'rgba(8, 18, 28, 0.95)'
 const MAX_COUNTRY_POLYGON_AREA = Math.PI * 2
@@ -486,9 +497,12 @@ export async function createGlobe(
 
   let answeredIds = new Set<string>()
   let cheatedIds = new Set<string>()
+  let skippedIds = new Set<string>()
   let flightSegments: FlightSegment[] = []
   let activeFlightSegmentId: string | null = null
   let activeFlightProgress = 1
+  let promptedCountryId: string | null = null
+  let renderMode: 'classic' | 'route' = 'classic'
   let currentZoom = 1
   let cssWidth = 760
   let cssHeight = 760
@@ -788,7 +802,12 @@ export async function createGlobe(
   }
 
   function renderLabels(): void {
-    const visibleLabels = [...answeredIds]
+    const labelIds =
+      renderMode === 'route'
+        ? [...new Set([...answeredIds, ...skippedIds])]
+        : [...answeredIds]
+
+    const visibleLabels = labelIds
       .map((countryId) => {
         const country = countryById.get(countryId)
         const centroid = centroidForCountry(countryId)
@@ -805,9 +824,15 @@ export async function createGlobe(
         }
 
         return {
-          flagAssetUrl: country.appearance.kind === 'flag' ? country.appearance.assetUrl : null,
+          flagAssetUrl:
+            skippedIds.has(countryId)
+              ? null
+              : country.appearance.kind === 'flag'
+                ? country.appearance.assetUrl
+                : null,
           id: country.id,
           name: country.name,
+          tone: skippedIds.has(countryId) ? 'skipped' : 'answered',
           x: projected[0],
           y: projected[1],
         }
@@ -841,6 +866,8 @@ export async function createGlobe(
           .text(label.name)
           .attr('x', 0)
           .attr('y', MAP_LABEL_NAME_OFFSET_PX)
+          .attr('fill', label.tone === 'skipped' ? '#f0d8ff' : '#fff4c8')
+          .attr('stroke', label.tone === 'skipped' ? 'rgba(48, 16, 78, 0.96)' : 'rgba(6, 15, 24, 0.92)')
         groupSelection
           .select<SVGImageElement>('.globe__label-flag-image')
           .attr('href', label.flagAssetUrl ?? '')
@@ -856,6 +883,10 @@ export async function createGlobe(
   function renderPlane(mostRecentAnsweredId: string | null): void {
     const activeSegment = flightSegments.find((segment) => segment.id === activeFlightSegmentId) ?? null
     const latestSegment = flightSegments.at(-1) ?? null
+    const restingCountryId =
+      renderMode === 'route'
+        ? promptedCountryId ?? latestSegment?.toCountryId ?? mostRecentAnsweredId
+        : mostRecentAnsweredId
 
     let anchorPoint: [number, number] | null = null
     let localOffsetY = 0
@@ -864,8 +895,8 @@ export async function createGlobe(
     if (activeSegment && planeCoordinates && isVisible(planeCoordinates)) {
       anchorPoint = correctedProjectedPlanePosition(activeSegment, activeFlightProgress)
       headingDegrees = planeHeadingDegrees(activeSegment, activeFlightProgress)
-    } else if (mostRecentAnsweredId) {
-      anchorPoint = projectedPlaneLabelAnchor(mostRecentAnsweredId)
+    } else if (restingCountryId) {
+      anchorPoint = projectedPlaneLabelAnchor(restingCountryId)
     } else if (planeCoordinates && isVisible(planeCoordinates)) {
       const projected = projection(planeCoordinates)
 
@@ -930,6 +961,29 @@ export async function createGlobe(
       .attr('fill', UNSOLVED_LAND_FILL)
       .attr('stroke', 'none')
 
+    const promptedFeature =
+      promptedCountryId && !answeredIds.has(promptedCountryId)
+        ? (() => {
+          const country = countryById.get(promptedCountryId)
+          const countryFeature = featureForCountry(promptedCountryId)
+          const promptedCentroid = centroidForCountry(promptedCountryId)
+
+          if (!country || !countryFeature) {
+            return null
+          }
+
+          if (promptedCentroid && !isVisible(promptedCentroid)) {
+            return null
+          }
+
+          return {
+            appearanceFill: LATEST_SOLVED_FILL,
+            feature: countryFeature,
+            id: promptedCountryId,
+          }
+        })()
+        : null
+
     const visibleSolvedFeatures = [...answeredIds]
       .map((countryId) => {
         const country = countryById.get(countryId)
@@ -946,20 +1000,52 @@ export async function createGlobe(
 
         return {
           appearanceFill:
-            cheatedIds.has(countryId)
-              ? CHEATED_SOLVED_FILL
-              : countryId === mostRecentAnsweredId
-                ? LATEST_SOLVED_FILL
-                : appearanceFill(country.appearance),
+            renderMode === 'route'
+              ? ROUTE_SOLVED_FILL
+              : cheatedIds.has(countryId)
+                ? CHEATED_SOLVED_FILL
+                : countryId === mostRecentAnsweredId
+                  ? LATEST_SOLVED_FILL
+                  : appearanceFill(country.appearance),
           feature: countryFeature,
           id: countryId,
         }
       })
       .filter((entry): entry is { appearanceFill: string; feature: AtlasFeature; id: string } => Boolean(entry))
 
+    const skippedFeatures =
+      renderMode === 'route'
+        ? [...skippedIds]
+          .filter((countryId) => !answeredIds.has(countryId) && countryId !== promptedCountryId)
+          .map((countryId) => {
+            const countryFeature = featureForCountry(countryId)
+            const skippedCentroid = centroidForCountry(countryId)
+
+            if (!countryFeature) {
+              return null
+            }
+
+            if (skippedCentroid && !isVisible(skippedCentroid)) {
+              return null
+            }
+
+            return {
+              appearanceFill: ROUTE_SKIPPED_FILL,
+              feature: countryFeature,
+              id: countryId,
+            }
+          })
+          .filter((entry): entry is { appearanceFill: string; feature: AtlasFeature; id: string } => Boolean(entry))
+        : []
+
     solvedLayer
       .selectAll<SVGPathElement, { appearanceFill: string; feature: AtlasFeature; id: string }>('path')
-      .data(visibleSolvedFeatures, (entry) => entry.id)
+      .data(
+        promptedFeature
+          ? [promptedFeature, ...skippedFeatures, ...visibleSolvedFeatures]
+          : [...skippedFeatures, ...visibleSolvedFeatures],
+        (entry) => entry.id,
+      )
       .join('path')
       .attr('d', (entry) => projectedPathData(entry.feature))
       .attr('fill', (entry) => entry.appearanceFill)
@@ -1376,6 +1462,8 @@ export async function createGlobe(
     setAnswered(nextAnsweredIds: Set<string>, options) {
       answeredIds = new Set(nextAnsweredIds)
       cheatedIds = new Set(options?.cheatedIds ?? [])
+      skippedIds = new Set(options?.skippedIds ?? [])
+      renderMode = options?.mode ?? 'classic'
 
       if (options?.focusLatest) {
         const mostRecentAnsweredId = latestAnsweredId(answeredIds)
@@ -1384,6 +1472,16 @@ export async function createGlobe(
           cancelFlyAnimation()
           snapToCountry(mostRecentAnsweredId)
         }
+      }
+
+      scheduleRender()
+    },
+    setPromptedCountry(countryId, options) {
+      promptedCountryId = countryId
+
+      if (options?.focus && countryId) {
+        cancelFlyAnimation()
+        snapToCountry(countryId)
       }
 
       scheduleRender()

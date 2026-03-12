@@ -75,6 +75,45 @@ button {
   padding: 1.5rem;
 }
 
+.mode-switch {
+  display: inline-flex;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+  padding: 0.28rem;
+  border-radius: 999px;
+  background: rgba(245, 240, 224, 0.08);
+  border: 1px solid rgba(245, 240, 224, 0.08);
+}
+
+.mode-switch__link {
+  padding: 0.42rem 0.9rem;
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.mode-switch__link:hover,
+.mode-switch__link:focus-visible {
+  color: #fff4c8;
+  background: rgba(246, 198, 77, 0.12);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.mode-switch__link--active {
+  background: rgba(246, 198, 77, 0.18);
+  color: #fff4c8;
+}
+
 .hero__flight-panel {
   grid-area: flight;
   align-self: start;
@@ -303,6 +342,13 @@ h1 {
   border: 1px solid rgba(246, 198, 77, 0.16);
 }
 
+.flight-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+}
+
 .flight-panel__eyebrow {
   margin: 0 0 0.42rem;
   font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
@@ -311,6 +357,42 @@ h1 {
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--accent);
+}
+
+.skip-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.36rem 0.76rem;
+  border: 1px solid rgba(246, 198, 77, 0.34);
+  border-radius: 999px;
+  background: rgba(246, 198, 77, 0.09);
+  color: #fff4c8;
+  font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    transform 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease,
+    opacity 140ms ease;
+}
+
+.skip-button:hover,
+.skip-button:focus-visible {
+  background: rgba(246, 198, 77, 0.18);
+  border-color: rgba(246, 198, 77, 0.56);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.skip-button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .flight-panel__route {
@@ -660,6 +742,10 @@ h1 {
     padding: 0.85rem 0.8rem 0.55rem;
   }
 
+  .mode-switch {
+    margin-bottom: 0.7rem;
+  }
+
   .hero__copy h1 {
     margin-bottom: 0.85rem;
     font-size: clamp(1.2rem, 6vw, 2.15rem);
@@ -742,6 +828,10 @@ h1 {
   .tracker {
     margin-top: 0.55rem;
     padding: 0.8rem;
+  }
+
+  .flight-panel__header {
+    align-items: flex-start;
   }
 
   .tracker__header {

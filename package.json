@@ -9,6 +9,7 @@
     "deploy": "npm run build && gh-pages -d dist",
     "preview": "vite preview",
     "generate:quiz-data": "node scripts/generate-quiz-country-records.mjs",
+    "generate:route-order": "node scripts/generate-route-challenge-order.mjs",
     "generate:geometry-fallbacks": "node scripts/generate-country-geometry-fallbacks.mjs",
     "generate:globe-atlases": "node scripts/generate-optimized-globe-atlases.mjs"
   },
