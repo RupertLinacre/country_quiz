@@ -255,11 +255,6 @@ app.innerHTML = `
       </section>
       <div class="globe-card">
         <div class="globe-card__toolbar">
-          <div id="flight-performance" class="performance-meter">
-            <span class="performance-meter__label">Flight FPS</span>
-            <strong id="flight-performance-value" class="performance-meter__value">--</strong>
-            <span id="flight-performance-meta" class="performance-meter__meta">Awaiting benchmark</span>
-          </div>
           <div class="zoom-controls" aria-label="Globe zoom controls">
             <button id="zoom-out" class="zoom-controls__button" type="button" aria-label="Zoom out">−</button>
             <button id="zoom-in" class="zoom-controls__button" type="button" aria-label="Zoom in">+</button>
@@ -288,9 +283,6 @@ const flightEyebrowElement = requireElement<HTMLElement>('#flight-eyebrow')
 const flightRouteElement = requireElement<HTMLElement>('#flight-route')
 const flightDistanceElement = requireElement<HTMLElement>('#flight-distance')
 const flightTotalElement = requireElement<HTMLElement>('#flight-total')
-const flightPerformanceElement = requireElement<HTMLElement>('#flight-performance')
-const flightPerformanceValueElement = requireElement<HTMLElement>('#flight-performance-value')
-const flightPerformanceMetaElement = requireElement<HTMLElement>('#flight-performance-meta')
 const continentBoard = requireElement<HTMLElement>('#continent-board')
 const zoomInButton = requireElement<HTMLButtonElement>('#zoom-in')
 const zoomOutButton = requireElement<HTMLButtonElement>('#zoom-out')
@@ -585,25 +577,6 @@ function renderRoutePanel(): void {
 
 function renderFlightPerformance(performance: GlobeFlightPerformance | null): void {
   latestFlightPerformance = performance
-
-  if (!performance) {
-    flightPerformanceElement.dataset.state = 'idle'
-    flightPerformanceValueElement.textContent = '--'
-    flightPerformanceMetaElement.textContent = 'Awaiting benchmark'
-    return
-  }
-
-  flightPerformanceElement.dataset.state = performance.status
-  flightPerformanceValueElement.textContent = formatFps(performance.averageFps)
-  const statusLabel =
-    performance.status === 'running'
-      ? 'Live'
-      : performance.status === 'complete'
-        ? 'Last'
-        : 'Cancelled'
-  const lowFpsText = performance.minFps === null ? '--' : `${performance.minFps.toFixed(1)}`
-  flightPerformanceMetaElement.textContent =
-    `${statusLabel}: ${performance.fromName} to ${performance.toName} · low ${lowFpsText} · ${performance.frameCount} frames`
 }
 
 function syncSolvedCountries(options?: { focusLatest?: boolean }): void {
@@ -911,10 +884,32 @@ globe = await createGlobe(globeContainer, quizCountries, mode.layoutMode === 'fr
 
 window.__countriesQuizDebug = {
   benchmarkFlight(fromCountryId, toCountryId) {
-    return globe?.benchmarkFlight(fromCountryId, toCountryId) ?? Promise.resolve(null)
+    return (
+      globe?.benchmarkFlight(fromCountryId, toCountryId).then((performance) => {
+        if (performance) {
+          console.info(
+            `[countries-quiz] Flight benchmark ${performance.fromCountryId} -> ${performance.toCountryId}: avg ${formatFps(performance.averageFps)} fps, low ${formatFps(performance.minFps)} fps, ${performance.frameCount} frames, ${performance.elapsedMs} ms`,
+            performance,
+          )
+        }
+
+        return performance
+      }) ?? Promise.resolve(null)
+    )
   },
   benchmarkFlightTo(countryId) {
-    return globe?.benchmarkFlight(STARTING_COUNTRY_ID, countryId) ?? Promise.resolve(null)
+    return (
+      globe?.benchmarkFlight(STARTING_COUNTRY_ID, countryId).then((performance) => {
+        if (performance) {
+          console.info(
+            `[countries-quiz] Flight benchmark ${performance.fromCountryId} -> ${performance.toCountryId}: avg ${formatFps(performance.averageFps)} fps, low ${formatFps(performance.minFps)} fps, ${performance.frameCount} frames, ${performance.elapsedMs} ms`,
+            performance,
+          )
+        }
+
+        return performance
+      }) ?? Promise.resolve(null)
+    )
   },
   getFlightPerformance() {
     return latestFlightPerformance ? { ...latestFlightPerformance } : null
