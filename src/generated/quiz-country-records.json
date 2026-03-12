@@ -3,6 +3,10 @@
     "id": "DZA",
     "ccn3": "012",
     "name": "Algeria",
+    "capitalDisplayName": "Algiers",
+    "capitalAliases": [
+      "algiers"
+    ],
     "flagEmoji": "🇩🇿",
     "atlasName": "Algeria",
     "continent": "Africa",
@@ -22,6 +26,10 @@
     "id": "AGO",
     "ccn3": "024",
     "name": "Angola",
+    "capitalDisplayName": "Luanda",
+    "capitalAliases": [
+      "luanda"
+    ],
     "flagEmoji": "🇦🇴",
     "atlasName": "Angola",
     "continent": "Africa",
@@ -41,6 +49,10 @@
     "id": "BEN",
     "ccn3": "204",
     "name": "Benin",
+    "capitalDisplayName": "Porto-Novo",
+    "capitalAliases": [
+      "porto novo"
+    ],
     "flagEmoji": "🇧🇯",
     "atlasName": "Benin",
     "continent": "Africa",
@@ -59,6 +71,10 @@
     "id": "BWA",
     "ccn3": "072",
     "name": "Botswana",
+    "capitalDisplayName": "Gaborone",
+    "capitalAliases": [
+      "gaborone"
+    ],
     "flagEmoji": "🇧🇼",
     "atlasName": "Botswana",
     "continent": "Africa",
@@ -77,6 +93,10 @@
     "id": "BFA",
     "ccn3": "854",
     "name": "Burkina Faso",
+    "capitalDisplayName": "Ouagadougou",
+    "capitalAliases": [
+      "ouagadougou"
+    ],
     "flagEmoji": "🇧🇫",
     "atlasName": "Burkina Faso",
     "continent": "Africa",
@@ -93,6 +113,10 @@
     "id": "BDI",
     "ccn3": "108",
     "name": "Burundi",
+    "capitalDisplayName": "Gitega",
+    "capitalAliases": [
+      "gitega"
+    ],
     "flagEmoji": "🇧🇮",
     "atlasName": "Burundi",
     "continent": "Africa",
@@ -112,6 +136,10 @@
     "id": "CMR",
     "ccn3": "120",
     "name": "Cameroon",
+    "capitalDisplayName": "Yaoundé",
+    "capitalAliases": [
+      "yaounde"
+    ],
     "flagEmoji": "🇨🇲",
     "atlasName": "Cameroon",
     "continent": "Africa",
@@ -130,6 +158,10 @@
     "id": "CPV",
     "ccn3": "132",
     "name": "Cape Verde",
+    "capitalDisplayName": "Praia",
+    "capitalAliases": [
+      "praia"
+    ],
     "flagEmoji": "🇨🇻",
     "atlasName": "Cape Verde",
     "continent": "Africa",
@@ -148,6 +180,10 @@
     "id": "CAF",
     "ccn3": "140",
     "name": "Central African Republic",
+    "capitalDisplayName": "Bangui",
+    "capitalAliases": [
+      "bangui"
+    ],
     "flagEmoji": "🇨🇫",
     "atlasName": "Central African Republic",
     "continent": "Africa",
@@ -165,6 +201,10 @@
     "id": "TCD",
     "ccn3": "148",
     "name": "Chad",
+    "capitalDisplayName": "N'Djamena",
+    "capitalAliases": [
+      "n djamena"
+    ],
     "flagEmoji": "🇹🇩",
     "atlasName": "Chad",
     "continent": "Africa",
@@ -184,6 +224,10 @@
     "id": "COM",
     "ccn3": "174",
     "name": "Comoros",
+    "capitalDisplayName": "Moroni",
+    "capitalAliases": [
+      "moroni"
+    ],
     "flagEmoji": "🇰🇲",
     "atlasName": "Comoros",
     "continent": "Africa",
@@ -204,6 +248,10 @@
     "id": "DJI",
     "ccn3": "262",
     "name": "Djibouti",
+    "capitalDisplayName": "Djibouti",
+    "capitalAliases": [
+      "djibouti"
+    ],
     "flagEmoji": "🇩🇯",
     "atlasName": "Djibouti",
     "continent": "Africa",
@@ -226,6 +274,10 @@
     "id": "COD",
     "ccn3": "180",
     "name": "DR Congo",
+    "capitalDisplayName": "Kinshasa",
+    "capitalAliases": [
+      "kinshasa"
+    ],
     "flagEmoji": "🇨🇩",
     "atlasName": "DR Congo",
     "continent": "Africa",
@@ -247,6 +299,10 @@
     "id": "EGY",
     "ccn3": "818",
     "name": "Egypt",
+    "capitalDisplayName": "Cairo",
+    "capitalAliases": [
+      "cairo"
+    ],
     "flagEmoji": "🇪🇬",
     "atlasName": "Egypt",
     "continent": "Africa",
@@ -264,6 +320,10 @@
     "id": "GNQ",
     "ccn3": "226",
     "name": "Equatorial Guinea",
+    "capitalDisplayName": "Malabo",
+    "capitalAliases": [
+      "malabo"
+    ],
     "flagEmoji": "🇬🇶",
     "atlasName": "Equatorial Guinea",
     "continent": "Africa",
@@ -284,6 +344,10 @@
     "id": "ERI",
     "ccn3": "232",
     "name": "Eritrea",
+    "capitalDisplayName": "Asmara",
+    "capitalAliases": [
+      "asmara"
+    ],
     "flagEmoji": "🇪🇷",
     "atlasName": "Eritrea",
     "continent": "Africa",
@@ -304,6 +368,10 @@
     "id": "SWZ",
     "ccn3": "748",
     "name": "Eswatini",
+    "capitalDisplayName": "Lobamba",
+    "capitalAliases": [
+      "lobamba"
+    ],
     "flagEmoji": "🇸🇿",
     "atlasName": "Eswatini",
     "continent": "Africa",
@@ -326,6 +394,10 @@
     "id": "ETH",
     "ccn3": "231",
     "name": "Ethiopia",
+    "capitalDisplayName": "Addis Ababa",
+    "capitalAliases": [
+      "addis ababa"
+    ],
     "flagEmoji": "🇪🇹",
     "atlasName": "Ethiopia",
     "continent": "Africa",
@@ -344,6 +416,10 @@
     "id": "GAB",
     "ccn3": "266",
     "name": "Gabon",
+    "capitalDisplayName": "Libreville",
+    "capitalAliases": [
+      "libreville"
+    ],
     "flagEmoji": "🇬🇦",
     "atlasName": "Gabon",
     "continent": "Africa",
@@ -362,6 +438,10 @@
     "id": "GMB",
     "ccn3": "270",
     "name": "Gambia",
+    "capitalDisplayName": "Banjul",
+    "capitalAliases": [
+      "banjul"
+    ],
     "flagEmoji": "🇬🇲",
     "atlasName": "Gambia",
     "continent": "Africa",
@@ -379,6 +459,10 @@
     "id": "GHA",
     "ccn3": "288",
     "name": "Ghana",
+    "capitalDisplayName": "Accra",
+    "capitalAliases": [
+      "accra"
+    ],
     "flagEmoji": "🇬🇭",
     "atlasName": "Ghana",
     "continent": "Africa",
@@ -396,6 +480,10 @@
     "id": "GIN",
     "ccn3": "324",
     "name": "Guinea",
+    "capitalDisplayName": "Conakry",
+    "capitalAliases": [
+      "conakry"
+    ],
     "flagEmoji": "🇬🇳",
     "atlasName": "Guinea",
     "continent": "Africa",
@@ -414,6 +502,10 @@
     "id": "GNB",
     "ccn3": "624",
     "name": "Guinea-Bissau",
+    "capitalDisplayName": "Bissau",
+    "capitalAliases": [
+      "bissau"
+    ],
     "flagEmoji": "🇬🇼",
     "atlasName": "Guinea-Bissau",
     "continent": "Africa",
@@ -432,6 +524,10 @@
     "id": "CIV",
     "ccn3": "384",
     "name": "Ivory Coast",
+    "capitalDisplayName": "Yamoussoukro",
+    "capitalAliases": [
+      "yamoussoukro"
+    ],
     "flagEmoji": "🇨🇮",
     "atlasName": "Ivory Coast",
     "continent": "Africa",
@@ -451,6 +547,10 @@
     "id": "KEN",
     "ccn3": "404",
     "name": "Kenya",
+    "capitalDisplayName": "Nairobi",
+    "capitalAliases": [
+      "nairobi"
+    ],
     "flagEmoji": "🇰🇪",
     "atlasName": "Kenya",
     "continent": "Africa",
@@ -469,6 +569,10 @@
     "id": "LSO",
     "ccn3": "426",
     "name": "Lesotho",
+    "capitalDisplayName": "Maseru",
+    "capitalAliases": [
+      "maseru"
+    ],
     "flagEmoji": "🇱🇸",
     "atlasName": "Lesotho",
     "continent": "Africa",
@@ -487,6 +591,10 @@
     "id": "LBR",
     "ccn3": "430",
     "name": "Liberia",
+    "capitalDisplayName": "Monrovia",
+    "capitalAliases": [
+      "monrovia"
+    ],
     "flagEmoji": "🇱🇷",
     "atlasName": "Liberia",
     "continent": "Africa",
@@ -504,6 +612,10 @@
     "id": "LBY",
     "ccn3": "434",
     "name": "Libya",
+    "capitalDisplayName": "Tripoli",
+    "capitalAliases": [
+      "tripoli"
+    ],
     "flagEmoji": "🇱🇾",
     "atlasName": "Libya",
     "continent": "Africa",
@@ -522,6 +634,10 @@
     "id": "MDG",
     "ccn3": "450",
     "name": "Madagascar",
+    "capitalDisplayName": "Antananarivo",
+    "capitalAliases": [
+      "antananarivo"
+    ],
     "flagEmoji": "🇲🇬",
     "atlasName": "Madagascar",
     "continent": "Africa",
@@ -541,6 +657,10 @@
     "id": "MWI",
     "ccn3": "454",
     "name": "Malawi",
+    "capitalDisplayName": "Lilongwe",
+    "capitalAliases": [
+      "lilongwe"
+    ],
     "flagEmoji": "🇲🇼",
     "atlasName": "Malawi",
     "continent": "Africa",
@@ -558,6 +678,10 @@
     "id": "MLI",
     "ccn3": "466",
     "name": "Mali",
+    "capitalDisplayName": "Bamako",
+    "capitalAliases": [
+      "bamako"
+    ],
     "flagEmoji": "🇲🇱",
     "atlasName": "Mali",
     "continent": "Africa",
@@ -576,6 +700,10 @@
     "id": "MRT",
     "ccn3": "478",
     "name": "Mauritania",
+    "capitalDisplayName": "Nouakchott",
+    "capitalAliases": [
+      "nouakchott"
+    ],
     "flagEmoji": "🇲🇷",
     "atlasName": "Mauritania",
     "continent": "Africa",
@@ -594,6 +722,10 @@
     "id": "MUS",
     "ccn3": "480",
     "name": "Mauritius",
+    "capitalDisplayName": "Port Louis",
+    "capitalAliases": [
+      "port louis"
+    ],
     "flagEmoji": "🇲🇺",
     "atlasName": "Mauritius",
     "continent": "Africa",
@@ -612,6 +744,10 @@
     "id": "MAR",
     "ccn3": "504",
     "name": "Morocco",
+    "capitalDisplayName": "Rabat",
+    "capitalAliases": [
+      "rabat"
+    ],
     "flagEmoji": "🇲🇦",
     "atlasName": "Morocco",
     "continent": "Africa",
@@ -630,6 +766,10 @@
     "id": "MOZ",
     "ccn3": "508",
     "name": "Mozambique",
+    "capitalDisplayName": "Maputo",
+    "capitalAliases": [
+      "maputo"
+    ],
     "flagEmoji": "🇲🇿",
     "atlasName": "Mozambique",
     "continent": "Africa",
@@ -648,6 +788,10 @@
     "id": "NAM",
     "ccn3": "516",
     "name": "Namibia",
+    "capitalDisplayName": "Windhoek",
+    "capitalAliases": [
+      "windhoek"
+    ],
     "flagEmoji": "🇳🇦",
     "atlasName": "Namibia",
     "continent": "Africa",
@@ -666,6 +810,10 @@
     "id": "NER",
     "ccn3": "562",
     "name": "Niger",
+    "capitalDisplayName": "Niamey",
+    "capitalAliases": [
+      "niamey"
+    ],
     "flagEmoji": "🇳🇪",
     "atlasName": "Niger",
     "continent": "Africa",
@@ -684,6 +832,10 @@
     "id": "NGA",
     "ccn3": "566",
     "name": "Nigeria",
+    "capitalDisplayName": "Abuja",
+    "capitalAliases": [
+      "abuja"
+    ],
     "flagEmoji": "🇳🇬",
     "atlasName": "Nigeria",
     "continent": "Africa",
@@ -703,6 +855,10 @@
     "id": "COG",
     "ccn3": "178",
     "name": "Republic of the Congo",
+    "capitalDisplayName": "Brazzaville",
+    "capitalAliases": [
+      "brazzaville"
+    ],
     "flagEmoji": "🇨🇬",
     "atlasName": "Republic of the Congo",
     "continent": "Africa",
@@ -721,6 +877,10 @@
     "id": "RWA",
     "ccn3": "646",
     "name": "Rwanda",
+    "capitalDisplayName": "Kigali",
+    "capitalAliases": [
+      "kigali"
+    ],
     "flagEmoji": "🇷🇼",
     "atlasName": "Rwanda",
     "continent": "Africa",
@@ -740,6 +900,10 @@
     "id": "STP",
     "ccn3": "678",
     "name": "São Tomé and Príncipe",
+    "capitalDisplayName": "São Tomé",
+    "capitalAliases": [
+      "sao tome"
+    ],
     "flagEmoji": "🇸🇹",
     "atlasName": "São Tomé and Príncipe",
     "continent": "Africa",
@@ -759,6 +923,10 @@
     "id": "SEN",
     "ccn3": "686",
     "name": "Senegal",
+    "capitalDisplayName": "Dakar",
+    "capitalAliases": [
+      "dakar"
+    ],
     "flagEmoji": "🇸🇳",
     "atlasName": "Senegal",
     "continent": "Africa",
@@ -777,6 +945,10 @@
     "id": "SYC",
     "ccn3": "690",
     "name": "Seychelles",
+    "capitalDisplayName": "Victoria",
+    "capitalAliases": [
+      "victoria"
+    ],
     "flagEmoji": "🇸🇨",
     "atlasName": "Seychelles",
     "continent": "Africa",
@@ -796,6 +968,10 @@
     "id": "SLE",
     "ccn3": "694",
     "name": "Sierra Leone",
+    "capitalDisplayName": "Freetown",
+    "capitalAliases": [
+      "freetown"
+    ],
     "flagEmoji": "🇸🇱",
     "atlasName": "Sierra Leone",
     "continent": "Africa",
@@ -813,6 +989,10 @@
     "id": "SOM",
     "ccn3": "706",
     "name": "Somalia",
+    "capitalDisplayName": "Mogadishu",
+    "capitalAliases": [
+      "mogadishu"
+    ],
     "flagEmoji": "🇸🇴",
     "atlasName": "Somalia",
     "continent": "Africa",
@@ -833,6 +1013,12 @@
     "id": "ZAF",
     "ccn3": "710",
     "name": "South Africa",
+    "capitalDisplayName": "Pretoria / Bloemfontein / Cape Town",
+    "capitalAliases": [
+      "pretoria",
+      "bloemfontein",
+      "cape town"
+    ],
     "flagEmoji": "🇿🇦",
     "atlasName": "South Africa",
     "continent": "Africa",
@@ -851,6 +1037,10 @@
     "id": "SSD",
     "ccn3": "728",
     "name": "South Sudan",
+    "capitalDisplayName": "Juba",
+    "capitalAliases": [
+      "juba"
+    ],
     "flagEmoji": "🇸🇸",
     "atlasName": "South Sudan",
     "continent": "Africa",
@@ -868,6 +1058,10 @@
     "id": "SDN",
     "ccn3": "729",
     "name": "Sudan",
+    "capitalDisplayName": "Khartoum",
+    "capitalAliases": [
+      "khartoum"
+    ],
     "flagEmoji": "🇸🇩",
     "atlasName": "Sudan",
     "continent": "Africa",
@@ -886,6 +1080,10 @@
     "id": "TZA",
     "ccn3": "834",
     "name": "Tanzania",
+    "capitalDisplayName": "Dodoma",
+    "capitalAliases": [
+      "dodoma"
+    ],
     "flagEmoji": "🇹🇿",
     "atlasName": "Tanzania",
     "continent": "Africa",
@@ -905,6 +1103,10 @@
     "id": "TGO",
     "ccn3": "768",
     "name": "Togo",
+    "capitalDisplayName": "Lomé",
+    "capitalAliases": [
+      "lome"
+    ],
     "flagEmoji": "🇹🇬",
     "atlasName": "Togo",
     "continent": "Africa",
@@ -924,6 +1126,10 @@
     "id": "TUN",
     "ccn3": "788",
     "name": "Tunisia",
+    "capitalDisplayName": "Tunis",
+    "capitalAliases": [
+      "tunis"
+    ],
     "flagEmoji": "🇹🇳",
     "atlasName": "Tunisia",
     "continent": "Africa",
@@ -943,6 +1149,10 @@
     "id": "UGA",
     "ccn3": "800",
     "name": "Uganda",
+    "capitalDisplayName": "Kampala",
+    "capitalAliases": [
+      "kampala"
+    ],
     "flagEmoji": "🇺🇬",
     "atlasName": "Uganda",
     "continent": "Africa",
@@ -961,6 +1171,10 @@
     "id": "ZMB",
     "ccn3": "894",
     "name": "Zambia",
+    "capitalDisplayName": "Lusaka",
+    "capitalAliases": [
+      "lusaka"
+    ],
     "flagEmoji": "🇿🇲",
     "atlasName": "Zambia",
     "continent": "Africa",
@@ -978,6 +1192,10 @@
     "id": "ZWE",
     "ccn3": "716",
     "name": "Zimbabwe",
+    "capitalDisplayName": "Harare",
+    "capitalAliases": [
+      "harare"
+    ],
     "flagEmoji": "🇿🇼",
     "atlasName": "Zimbabwe",
     "continent": "Africa",
@@ -995,6 +1213,10 @@
     "id": "AFG",
     "ccn3": "004",
     "name": "Afghanistan",
+    "capitalDisplayName": "Kabul",
+    "capitalAliases": [
+      "kabul"
+    ],
     "flagEmoji": "🇦🇫",
     "atlasName": "Afghanistan",
     "continent": "Asia",
@@ -1013,6 +1235,10 @@
     "id": "ARM",
     "ccn3": "051",
     "name": "Armenia",
+    "capitalDisplayName": "Yerevan",
+    "capitalAliases": [
+      "yerevan"
+    ],
     "flagEmoji": "🇦🇲",
     "atlasName": "Armenia",
     "continent": "Asia",
@@ -1031,6 +1257,10 @@
     "id": "AZE",
     "ccn3": "031",
     "name": "Azerbaijan",
+    "capitalDisplayName": "Baku",
+    "capitalAliases": [
+      "baku"
+    ],
     "flagEmoji": "🇦🇿",
     "atlasName": "Azerbaijan",
     "continent": "Asia",
@@ -1049,6 +1279,10 @@
     "id": "BHR",
     "ccn3": "048",
     "name": "Bahrain",
+    "capitalDisplayName": "Manama",
+    "capitalAliases": [
+      "manama"
+    ],
     "flagEmoji": "🇧🇭",
     "atlasName": "Bahrain",
     "continent": "Asia",
@@ -1067,6 +1301,10 @@
     "id": "BGD",
     "ccn3": "050",
     "name": "Bangladesh",
+    "capitalDisplayName": "Dhaka",
+    "capitalAliases": [
+      "dhaka"
+    ],
     "flagEmoji": "🇧🇩",
     "atlasName": "Bangladesh",
     "continent": "Asia",
@@ -1085,6 +1323,10 @@
     "id": "BTN",
     "ccn3": "064",
     "name": "Bhutan",
+    "capitalDisplayName": "Thimphu",
+    "capitalAliases": [
+      "thimphu"
+    ],
     "flagEmoji": "🇧🇹",
     "atlasName": "Bhutan",
     "continent": "Asia",
@@ -1102,6 +1344,10 @@
     "id": "BRN",
     "ccn3": "096",
     "name": "Brunei",
+    "capitalDisplayName": "Bandar Seri Begawan",
+    "capitalAliases": [
+      "bandar seri begawan"
+    ],
     "flagEmoji": "🇧🇳",
     "atlasName": "Brunei",
     "continent": "Asia",
@@ -1122,6 +1368,10 @@
     "id": "KHM",
     "ccn3": "116",
     "name": "Cambodia",
+    "capitalDisplayName": "Phnom Penh",
+    "capitalAliases": [
+      "phnom penh"
+    ],
     "flagEmoji": "🇰🇭",
     "atlasName": "Cambodia",
     "continent": "Asia",
@@ -1139,6 +1389,10 @@
     "id": "CHN",
     "ccn3": "156",
     "name": "China",
+    "capitalDisplayName": "Beijing",
+    "capitalAliases": [
+      "beijing"
+    ],
     "flagEmoji": "🇨🇳",
     "atlasName": "China",
     "continent": "Asia",
@@ -1159,6 +1413,10 @@
     "id": "GEO",
     "ccn3": "268",
     "name": "Georgia",
+    "capitalDisplayName": "Tbilisi",
+    "capitalAliases": [
+      "tbilisi"
+    ],
     "flagEmoji": "🇬🇪",
     "atlasName": "Georgia",
     "continent": "Asia",
@@ -1176,6 +1434,10 @@
     "id": "IND",
     "ccn3": "356",
     "name": "India",
+    "capitalDisplayName": "New Delhi",
+    "capitalAliases": [
+      "new delhi"
+    ],
     "flagEmoji": "🇮🇳",
     "atlasName": "India",
     "continent": "Asia",
@@ -1195,6 +1457,10 @@
     "id": "IDN",
     "ccn3": "360",
     "name": "Indonesia",
+    "capitalDisplayName": "Jakarta",
+    "capitalAliases": [
+      "jakarta"
+    ],
     "flagEmoji": "🇮🇩",
     "atlasName": "Indonesia",
     "continent": "Asia",
@@ -1213,6 +1479,10 @@
     "id": "IRN",
     "ccn3": "364",
     "name": "Iran",
+    "capitalDisplayName": "Tehran",
+    "capitalAliases": [
+      "tehran"
+    ],
     "flagEmoji": "🇮🇷",
     "atlasName": "Iran",
     "continent": "Asia",
@@ -1232,6 +1502,10 @@
     "id": "IRQ",
     "ccn3": "368",
     "name": "Iraq",
+    "capitalDisplayName": "Baghdad",
+    "capitalAliases": [
+      "baghdad"
+    ],
     "flagEmoji": "🇮🇶",
     "atlasName": "Iraq",
     "continent": "Asia",
@@ -1250,6 +1524,10 @@
     "id": "ISR",
     "ccn3": "376",
     "name": "Israel",
+    "capitalDisplayName": "Jerusalem",
+    "capitalAliases": [
+      "jerusalem"
+    ],
     "flagEmoji": "🇮🇱",
     "atlasName": "Israel",
     "continent": "Asia",
@@ -1268,6 +1546,10 @@
     "id": "JPN",
     "ccn3": "392",
     "name": "Japan",
+    "capitalDisplayName": "Tokyo",
+    "capitalAliases": [
+      "tokyo"
+    ],
     "flagEmoji": "🇯🇵",
     "atlasName": "Japan",
     "continent": "Asia",
@@ -1286,6 +1568,10 @@
     "id": "JOR",
     "ccn3": "400",
     "name": "Jordan",
+    "capitalDisplayName": "Amman",
+    "capitalAliases": [
+      "amman"
+    ],
     "flagEmoji": "🇯🇴",
     "atlasName": "Jordan",
     "continent": "Asia",
@@ -1304,6 +1590,10 @@
     "id": "KAZ",
     "ccn3": "398",
     "name": "Kazakhstan",
+    "capitalDisplayName": "Astana",
+    "capitalAliases": [
+      "astana"
+    ],
     "flagEmoji": "🇰🇿",
     "atlasName": "Kazakhstan",
     "continent": "Asia",
@@ -1324,6 +1614,10 @@
     "id": "KWT",
     "ccn3": "414",
     "name": "Kuwait",
+    "capitalDisplayName": "Kuwait City",
+    "capitalAliases": [
+      "kuwait city"
+    ],
     "flagEmoji": "🇰🇼",
     "atlasName": "Kuwait",
     "continent": "Asia",
@@ -1342,6 +1636,10 @@
     "id": "KGZ",
     "ccn3": "417",
     "name": "Kyrgyzstan",
+    "capitalDisplayName": "Bishkek",
+    "capitalAliases": [
+      "bishkek"
+    ],
     "flagEmoji": "🇰🇬",
     "atlasName": "Kyrgyzstan",
     "continent": "Asia",
@@ -1360,6 +1658,10 @@
     "id": "LAO",
     "ccn3": "418",
     "name": "Laos",
+    "capitalDisplayName": "Vientiane",
+    "capitalAliases": [
+      "vientiane"
+    ],
     "flagEmoji": "🇱🇦",
     "atlasName": "Laos",
     "continent": "Asia",
@@ -1378,6 +1680,10 @@
     "id": "LBN",
     "ccn3": "422",
     "name": "Lebanon",
+    "capitalDisplayName": "Beirut",
+    "capitalAliases": [
+      "beirut"
+    ],
     "flagEmoji": "🇱🇧",
     "atlasName": "Lebanon",
     "continent": "Asia",
@@ -1396,6 +1702,10 @@
     "id": "MYS",
     "ccn3": "458",
     "name": "Malaysia",
+    "capitalDisplayName": "Kuala Lumpur",
+    "capitalAliases": [
+      "kuala lumpur"
+    ],
     "flagEmoji": "🇲🇾",
     "atlasName": "Malaysia",
     "continent": "Asia",
@@ -1412,6 +1722,10 @@
     "id": "MDV",
     "ccn3": "462",
     "name": "Maldives",
+    "capitalDisplayName": "Malé",
+    "capitalAliases": [
+      "male"
+    ],
     "flagEmoji": "🇲🇻",
     "atlasName": "Maldives",
     "continent": "Asia",
@@ -1431,6 +1745,10 @@
     "id": "MNG",
     "ccn3": "496",
     "name": "Mongolia",
+    "capitalDisplayName": "Ulan Bator",
+    "capitalAliases": [
+      "ulan bator"
+    ],
     "flagEmoji": "🇲🇳",
     "atlasName": "Mongolia",
     "continent": "Asia",
@@ -1447,6 +1765,10 @@
     "id": "MMR",
     "ccn3": "104",
     "name": "Myanmar",
+    "capitalDisplayName": "Naypyidaw",
+    "capitalAliases": [
+      "naypyidaw"
+    ],
     "flagEmoji": "🇲🇲",
     "atlasName": "Myanmar",
     "continent": "Asia",
@@ -1466,6 +1788,10 @@
     "id": "NPL",
     "ccn3": "524",
     "name": "Nepal",
+    "capitalDisplayName": "Kathmandu",
+    "capitalAliases": [
+      "kathmandu"
+    ],
     "flagEmoji": "🇳🇵",
     "atlasName": "Nepal",
     "continent": "Asia",
@@ -1484,6 +1810,10 @@
     "id": "PRK",
     "ccn3": "408",
     "name": "North Korea",
+    "capitalDisplayName": "Pyongyang",
+    "capitalAliases": [
+      "pyongyang"
+    ],
     "flagEmoji": "🇰🇵",
     "atlasName": "North Korea",
     "continent": "Asia",
@@ -1504,6 +1834,10 @@
     "id": "OMN",
     "ccn3": "512",
     "name": "Oman",
+    "capitalDisplayName": "Muscat",
+    "capitalAliases": [
+      "muscat"
+    ],
     "flagEmoji": "🇴🇲",
     "atlasName": "Oman",
     "continent": "Asia",
@@ -1522,6 +1856,10 @@
     "id": "PAK",
     "ccn3": "586",
     "name": "Pakistan",
+    "capitalDisplayName": "Islamabad",
+    "capitalAliases": [
+      "islamabad"
+    ],
     "flagEmoji": "🇵🇰",
     "atlasName": "Pakistan",
     "continent": "Asia",
@@ -1540,6 +1878,10 @@
     "id": "PSE",
     "ccn3": "275",
     "name": "Palestine",
+    "capitalDisplayName": "Ramallah",
+    "capitalAliases": [
+      "ramallah"
+    ],
     "flagEmoji": "🇵🇸",
     "atlasName": "Palestine",
     "continent": "Asia",
@@ -1559,6 +1901,10 @@
     "id": "PHL",
     "ccn3": "608",
     "name": "Philippines",
+    "capitalDisplayName": "Manila",
+    "capitalAliases": [
+      "manila"
+    ],
     "flagEmoji": "🇵🇭",
     "atlasName": "Philippines",
     "continent": "Asia",
@@ -1577,6 +1923,10 @@
     "id": "QAT",
     "ccn3": "634",
     "name": "Qatar",
+    "capitalDisplayName": "Doha",
+    "capitalAliases": [
+      "doha"
+    ],
     "flagEmoji": "🇶🇦",
     "atlasName": "Qatar",
     "continent": "Asia",
@@ -1595,6 +1945,10 @@
     "id": "SAU",
     "ccn3": "682",
     "name": "Saudi Arabia",
+    "capitalDisplayName": "Riyadh",
+    "capitalAliases": [
+      "riyadh"
+    ],
     "flagEmoji": "🇸🇦",
     "atlasName": "Saudi Arabia",
     "continent": "Asia",
@@ -1614,6 +1968,10 @@
     "id": "SGP",
     "ccn3": "702",
     "name": "Singapore",
+    "capitalDisplayName": "Singapore",
+    "capitalAliases": [
+      "singapore"
+    ],
     "flagEmoji": "🇸🇬",
     "atlasName": "Singapore",
     "continent": "Asia",
@@ -1633,6 +1991,10 @@
     "id": "KOR",
     "ccn3": "410",
     "name": "South Korea",
+    "capitalDisplayName": "Seoul",
+    "capitalAliases": [
+      "seoul"
+    ],
     "flagEmoji": "🇰🇷",
     "atlasName": "South Korea",
     "continent": "Asia",
@@ -1651,6 +2013,10 @@
     "id": "LKA",
     "ccn3": "144",
     "name": "Sri Lanka",
+    "capitalDisplayName": "Colombo",
+    "capitalAliases": [
+      "colombo"
+    ],
     "flagEmoji": "🇱🇰",
     "atlasName": "Sri Lanka",
     "continent": "Asia",
@@ -1669,6 +2035,10 @@
     "id": "SYR",
     "ccn3": "760",
     "name": "Syria",
+    "capitalDisplayName": "Damascus",
+    "capitalAliases": [
+      "damascus"
+    ],
     "flagEmoji": "🇸🇾",
     "atlasName": "Syria",
     "continent": "Asia",
@@ -1687,6 +2057,10 @@
     "id": "TWN",
     "ccn3": "158",
     "name": "Taiwan",
+    "capitalDisplayName": "Taipei",
+    "capitalAliases": [
+      "taipei"
+    ],
     "flagEmoji": "🇹🇼",
     "atlasName": "Taiwan",
     "continent": "Asia",
@@ -1707,6 +2081,10 @@
     "id": "TJK",
     "ccn3": "762",
     "name": "Tajikistan",
+    "capitalDisplayName": "Dushanbe",
+    "capitalAliases": [
+      "dushanbe"
+    ],
     "flagEmoji": "🇹🇯",
     "atlasName": "Tajikistan",
     "continent": "Asia",
@@ -1726,6 +2104,10 @@
     "id": "THA",
     "ccn3": "764",
     "name": "Thailand",
+    "capitalDisplayName": "Bangkok",
+    "capitalAliases": [
+      "bangkok"
+    ],
     "flagEmoji": "🇹🇭",
     "atlasName": "Thailand",
     "continent": "Asia",
@@ -1746,6 +2128,10 @@
     "id": "TLS",
     "ccn3": "626",
     "name": "Timor-Leste",
+    "capitalDisplayName": "Dili",
+    "capitalAliases": [
+      "dili"
+    ],
     "flagEmoji": "🇹🇱",
     "atlasName": "Timor-Leste",
     "continent": "Asia",
@@ -1769,6 +2155,10 @@
     "id": "TUR",
     "ccn3": "792",
     "name": "Türkiye",
+    "capitalDisplayName": "Ankara",
+    "capitalAliases": [
+      "ankara"
+    ],
     "flagEmoji": "🇹🇷",
     "atlasName": "Türkiye",
     "continent": "Asia",
@@ -1789,6 +2179,10 @@
     "id": "TKM",
     "ccn3": "795",
     "name": "Turkmenistan",
+    "capitalDisplayName": "Ashgabat",
+    "capitalAliases": [
+      "ashgabat"
+    ],
     "flagEmoji": "🇹🇲",
     "atlasName": "Turkmenistan",
     "continent": "Asia",
@@ -1805,6 +2199,10 @@
     "id": "ARE",
     "ccn3": "784",
     "name": "United Arab Emirates",
+    "capitalDisplayName": "Abu Dhabi",
+    "capitalAliases": [
+      "abu dhabi"
+    ],
     "flagEmoji": "🇦🇪",
     "atlasName": "United Arab Emirates",
     "continent": "Asia",
@@ -1823,6 +2221,10 @@
     "id": "UZB",
     "ccn3": "860",
     "name": "Uzbekistan",
+    "capitalDisplayName": "Tashkent",
+    "capitalAliases": [
+      "tashkent"
+    ],
     "flagEmoji": "🇺🇿",
     "atlasName": "Uzbekistan",
     "continent": "Asia",
@@ -1841,6 +2243,10 @@
     "id": "VNM",
     "ccn3": "704",
     "name": "Vietnam",
+    "capitalDisplayName": "Hanoi",
+    "capitalAliases": [
+      "hanoi"
+    ],
     "flagEmoji": "🇻🇳",
     "atlasName": "Vietnam",
     "continent": "Asia",
@@ -1860,6 +2266,10 @@
     "id": "YEM",
     "ccn3": "887",
     "name": "Yemen",
+    "capitalDisplayName": "Sana'a",
+    "capitalAliases": [
+      "sana a"
+    ],
     "flagEmoji": "🇾🇪",
     "atlasName": "Yemen",
     "continent": "Asia",
@@ -1879,6 +2289,10 @@
     "id": "ALB",
     "ccn3": "008",
     "name": "Albania",
+    "capitalDisplayName": "Tirana",
+    "capitalAliases": [
+      "tirana"
+    ],
     "flagEmoji": "🇦🇱",
     "atlasName": "Albania",
     "continent": "Europe",
@@ -1899,6 +2313,10 @@
     "id": "AND",
     "ccn3": "020",
     "name": "Andorra",
+    "capitalDisplayName": "Andorra la Vella",
+    "capitalAliases": [
+      "andorra la vella"
+    ],
     "flagEmoji": "🇦🇩",
     "atlasName": "Andorra",
     "continent": "Europe",
@@ -1917,6 +2335,10 @@
     "id": "AUT",
     "ccn3": "040",
     "name": "Austria",
+    "capitalDisplayName": "Vienna",
+    "capitalAliases": [
+      "vienna"
+    ],
     "flagEmoji": "🇦🇹",
     "atlasName": "Austria",
     "continent": "Europe",
@@ -1936,6 +2358,10 @@
     "id": "BLR",
     "ccn3": "112",
     "name": "Belarus",
+    "capitalDisplayName": "Minsk",
+    "capitalAliases": [
+      "minsk"
+    ],
     "flagEmoji": "🇧🇾",
     "atlasName": "Belarus",
     "continent": "Europe",
@@ -1954,6 +2380,10 @@
     "id": "BEL",
     "ccn3": "056",
     "name": "Belgium",
+    "capitalDisplayName": "Brussels",
+    "capitalAliases": [
+      "brussels"
+    ],
     "flagEmoji": "🇧🇪",
     "atlasName": "Belgium",
     "continent": "Europe",
@@ -1977,6 +2407,10 @@
     "id": "BIH",
     "ccn3": "070",
     "name": "Bosnia and Herzegovina",
+    "capitalDisplayName": "Sarajevo",
+    "capitalAliases": [
+      "sarajevo"
+    ],
     "flagEmoji": "🇧🇦",
     "atlasName": "Bosnia and Herzegovina",
     "continent": "Europe",
@@ -1994,6 +2428,10 @@
     "id": "BGR",
     "ccn3": "100",
     "name": "Bulgaria",
+    "capitalDisplayName": "Sofia",
+    "capitalAliases": [
+      "sofia"
+    ],
     "flagEmoji": "🇧🇬",
     "atlasName": "Bulgaria",
     "continent": "Europe",
@@ -2011,6 +2449,10 @@
     "id": "HRV",
     "ccn3": "191",
     "name": "Croatia",
+    "capitalDisplayName": "Zagreb",
+    "capitalAliases": [
+      "zagreb"
+    ],
     "flagEmoji": "🇭🇷",
     "atlasName": "Croatia",
     "continent": "Europe",
@@ -2030,6 +2472,10 @@
     "id": "CYP",
     "ccn3": "196",
     "name": "Cyprus",
+    "capitalDisplayName": "Nicosia",
+    "capitalAliases": [
+      "nicosia"
+    ],
     "flagEmoji": "🇨🇾",
     "atlasName": "Cyprus",
     "continent": "Europe",
@@ -2050,6 +2496,10 @@
     "id": "CZE",
     "ccn3": "203",
     "name": "Czechia",
+    "capitalDisplayName": "Prague",
+    "capitalAliases": [
+      "prague"
+    ],
     "flagEmoji": "🇨🇿",
     "atlasName": "Czechia",
     "continent": "Europe",
@@ -2069,6 +2519,10 @@
     "id": "DNK",
     "ccn3": "208",
     "name": "Denmark",
+    "capitalDisplayName": "Copenhagen",
+    "capitalAliases": [
+      "copenhagen"
+    ],
     "flagEmoji": "🇩🇰",
     "atlasName": "Denmark",
     "continent": "Europe",
@@ -2088,6 +2542,10 @@
     "id": "EST",
     "ccn3": "233",
     "name": "Estonia",
+    "capitalDisplayName": "Tallinn",
+    "capitalAliases": [
+      "tallinn"
+    ],
     "flagEmoji": "🇪🇪",
     "atlasName": "Estonia",
     "continent": "Europe",
@@ -2107,6 +2565,10 @@
     "id": "FIN",
     "ccn3": "246",
     "name": "Finland",
+    "capitalDisplayName": "Helsinki",
+    "capitalAliases": [
+      "helsinki"
+    ],
     "flagEmoji": "🇫🇮",
     "atlasName": "Finland",
     "continent": "Europe",
@@ -2127,6 +2589,10 @@
     "id": "FRA",
     "ccn3": "250",
     "name": "France",
+    "capitalDisplayName": "Paris",
+    "capitalAliases": [
+      "paris"
+    ],
     "flagEmoji": "🇫🇷",
     "atlasName": "France",
     "continent": "Europe",
@@ -2145,6 +2611,10 @@
     "id": "DEU",
     "ccn3": "276",
     "name": "Germany",
+    "capitalDisplayName": "Berlin",
+    "capitalAliases": [
+      "berlin"
+    ],
     "flagEmoji": "🇩🇪",
     "atlasName": "Germany",
     "continent": "Europe",
@@ -2163,6 +2633,10 @@
     "id": "GRC",
     "ccn3": "300",
     "name": "Greece",
+    "capitalDisplayName": "Athens",
+    "capitalAliases": [
+      "athens"
+    ],
     "flagEmoji": "🇬🇷",
     "atlasName": "Greece",
     "continent": "Europe",
@@ -2181,6 +2655,10 @@
     "id": "HUN",
     "ccn3": "348",
     "name": "Hungary",
+    "capitalDisplayName": "Budapest",
+    "capitalAliases": [
+      "budapest"
+    ],
     "flagEmoji": "🇭🇺",
     "atlasName": "Hungary",
     "continent": "Europe",
@@ -2197,6 +2675,10 @@
     "id": "ISL",
     "ccn3": "352",
     "name": "Iceland",
+    "capitalDisplayName": "Reykjavik",
+    "capitalAliases": [
+      "reykjavik"
+    ],
     "flagEmoji": "🇮🇸",
     "atlasName": "Iceland",
     "continent": "Europe",
@@ -2216,6 +2698,10 @@
     "id": "IRL",
     "ccn3": "372",
     "name": "Ireland",
+    "capitalDisplayName": "Dublin",
+    "capitalAliases": [
+      "dublin"
+    ],
     "flagEmoji": "🇮🇪",
     "atlasName": "Ireland",
     "continent": "Europe",
@@ -2235,6 +2721,10 @@
     "id": "ITA",
     "ccn3": "380",
     "name": "Italy",
+    "capitalDisplayName": "Rome",
+    "capitalAliases": [
+      "rome"
+    ],
     "flagEmoji": "🇮🇹",
     "atlasName": "Italy",
     "continent": "Europe",
@@ -2253,6 +2743,10 @@
     "id": "UNK",
     "ccn3": null,
     "name": "Kosovo",
+    "capitalDisplayName": "Pristina",
+    "capitalAliases": [
+      "pristina"
+    ],
     "flagEmoji": "🇽🇰",
     "atlasName": "Kosovo",
     "continent": "Europe",
@@ -2270,6 +2764,10 @@
     "id": "LVA",
     "ccn3": "428",
     "name": "Latvia",
+    "capitalDisplayName": "Riga",
+    "capitalAliases": [
+      "riga"
+    ],
     "flagEmoji": "🇱🇻",
     "atlasName": "Latvia",
     "continent": "Europe",
@@ -2288,6 +2786,10 @@
     "id": "LIE",
     "ccn3": "438",
     "name": "Liechtenstein",
+    "capitalDisplayName": "Vaduz",
+    "capitalAliases": [
+      "vaduz"
+    ],
     "flagEmoji": "🇱🇮",
     "atlasName": "Liechtenstein",
     "continent": "Europe",
@@ -2306,6 +2808,10 @@
     "id": "LTU",
     "ccn3": "440",
     "name": "Lithuania",
+    "capitalDisplayName": "Vilnius",
+    "capitalAliases": [
+      "vilnius"
+    ],
     "flagEmoji": "🇱🇹",
     "atlasName": "Lithuania",
     "continent": "Europe",
@@ -2324,6 +2830,10 @@
     "id": "LUX",
     "ccn3": "442",
     "name": "Luxembourg",
+    "capitalDisplayName": "Luxembourg",
+    "capitalAliases": [
+      "luxembourg"
+    ],
     "flagEmoji": "🇱🇺",
     "atlasName": "Luxembourg",
     "continent": "Europe",
@@ -2344,6 +2854,10 @@
     "id": "MLT",
     "ccn3": "470",
     "name": "Malta",
+    "capitalDisplayName": "Valletta",
+    "capitalAliases": [
+      "valletta"
+    ],
     "flagEmoji": "🇲🇹",
     "atlasName": "Malta",
     "continent": "Europe",
@@ -2362,6 +2876,10 @@
     "id": "MDA",
     "ccn3": "498",
     "name": "Moldova",
+    "capitalDisplayName": "Chișinău",
+    "capitalAliases": [
+      "chisinau"
+    ],
     "flagEmoji": "🇲🇩",
     "atlasName": "Moldova",
     "continent": "Europe",
@@ -2381,6 +2899,10 @@
     "id": "MCO",
     "ccn3": "492",
     "name": "Monaco",
+    "capitalDisplayName": "Monaco",
+    "capitalAliases": [
+      "monaco"
+    ],
     "flagEmoji": "🇲🇨",
     "atlasName": "Monaco",
     "continent": "Europe",
@@ -2399,6 +2921,10 @@
     "id": "MNE",
     "ccn3": "499",
     "name": "Montenegro",
+    "capitalDisplayName": "Podgorica",
+    "capitalAliases": [
+      "podgorica"
+    ],
     "flagEmoji": "🇲🇪",
     "atlasName": "Montenegro",
     "continent": "Europe",
@@ -2416,6 +2942,10 @@
     "id": "NLD",
     "ccn3": "528",
     "name": "Netherlands",
+    "capitalDisplayName": "Amsterdam",
+    "capitalAliases": [
+      "amsterdam"
+    ],
     "flagEmoji": "🇳🇱",
     "atlasName": "Netherlands",
     "continent": "Europe",
@@ -2435,6 +2965,10 @@
     "id": "MKD",
     "ccn3": "807",
     "name": "North Macedonia",
+    "capitalDisplayName": "Skopje",
+    "capitalAliases": [
+      "skopje"
+    ],
     "flagEmoji": "🇲🇰",
     "atlasName": "North Macedonia",
     "continent": "Europe",
@@ -2455,6 +2989,10 @@
     "id": "NOR",
     "ccn3": "578",
     "name": "Norway",
+    "capitalDisplayName": "Oslo",
+    "capitalAliases": [
+      "oslo"
+    ],
     "flagEmoji": "🇳🇴",
     "atlasName": "Norway",
     "continent": "Europe",
@@ -2476,6 +3014,10 @@
     "id": "POL",
     "ccn3": "616",
     "name": "Poland",
+    "capitalDisplayName": "Warsaw",
+    "capitalAliases": [
+      "warsaw"
+    ],
     "flagEmoji": "🇵🇱",
     "atlasName": "Poland",
     "continent": "Europe",
@@ -2494,6 +3036,10 @@
     "id": "PRT",
     "ccn3": "620",
     "name": "Portugal",
+    "capitalDisplayName": "Lisbon",
+    "capitalAliases": [
+      "lisbon"
+    ],
     "flagEmoji": "🇵🇹",
     "atlasName": "Portugal",
     "continent": "Europe",
@@ -2513,6 +3059,10 @@
     "id": "ROU",
     "ccn3": "642",
     "name": "Romania",
+    "capitalDisplayName": "Bucharest",
+    "capitalAliases": [
+      "bucharest"
+    ],
     "flagEmoji": "🇷🇴",
     "atlasName": "Romania",
     "continent": "Europe",
@@ -2531,6 +3081,10 @@
     "id": "RUS",
     "ccn3": "643",
     "name": "Russia",
+    "capitalDisplayName": "Moscow",
+    "capitalAliases": [
+      "moscow"
+    ],
     "flagEmoji": "🇷🇺",
     "atlasName": "Russia",
     "continent": "Europe",
@@ -2548,6 +3102,10 @@
     "id": "SMR",
     "ccn3": "674",
     "name": "San Marino",
+    "capitalDisplayName": "City of San Marino",
+    "capitalAliases": [
+      "city of san marino"
+    ],
     "flagEmoji": "🇸🇲",
     "atlasName": "San Marino",
     "continent": "Europe",
@@ -2567,6 +3125,10 @@
     "id": "SRB",
     "ccn3": "688",
     "name": "Serbia",
+    "capitalDisplayName": "Belgrade",
+    "capitalAliases": [
+      "belgrade"
+    ],
     "flagEmoji": "🇷🇸",
     "atlasName": "Serbia",
     "continent": "Europe",
@@ -2586,6 +3148,10 @@
     "id": "SVK",
     "ccn3": "703",
     "name": "Slovakia",
+    "capitalDisplayName": "Bratislava",
+    "capitalAliases": [
+      "bratislava"
+    ],
     "flagEmoji": "🇸🇰",
     "atlasName": "Slovakia",
     "continent": "Europe",
@@ -2604,6 +3170,10 @@
     "id": "SVN",
     "ccn3": "705",
     "name": "Slovenia",
+    "capitalDisplayName": "Ljubljana",
+    "capitalAliases": [
+      "ljubljana"
+    ],
     "flagEmoji": "🇸🇮",
     "atlasName": "Slovenia",
     "continent": "Europe",
@@ -2622,6 +3192,10 @@
     "id": "ESP",
     "ccn3": "724",
     "name": "Spain",
+    "capitalDisplayName": "Madrid",
+    "capitalAliases": [
+      "madrid"
+    ],
     "flagEmoji": "🇪🇸",
     "atlasName": "Spain",
     "continent": "Europe",
@@ -2640,6 +3214,10 @@
     "id": "SWE",
     "ccn3": "752",
     "name": "Sweden",
+    "capitalDisplayName": "Stockholm",
+    "capitalAliases": [
+      "stockholm"
+    ],
     "flagEmoji": "🇸🇪",
     "atlasName": "Sweden",
     "continent": "Europe",
@@ -2658,6 +3236,10 @@
     "id": "CHE",
     "ccn3": "756",
     "name": "Switzerland",
+    "capitalDisplayName": "Bern",
+    "capitalAliases": [
+      "bern"
+    ],
     "flagEmoji": "🇨🇭",
     "atlasName": "Switzerland",
     "continent": "Europe",
@@ -2679,6 +3261,10 @@
     "id": "UKR",
     "ccn3": "804",
     "name": "Ukraine",
+    "capitalDisplayName": "Kyiv",
+    "capitalAliases": [
+      "kyiv"
+    ],
     "flagEmoji": "🇺🇦",
     "atlasName": "Ukraine",
     "continent": "Europe",
@@ -2696,6 +3282,10 @@
     "id": "GBR",
     "ccn3": "826",
     "name": "United Kingdom",
+    "capitalDisplayName": "London",
+    "capitalAliases": [
+      "london"
+    ],
     "flagEmoji": "🇬🇧",
     "atlasName": "United Kingdom",
     "continent": "Europe",
@@ -2716,6 +3306,10 @@
     "id": "VAT",
     "ccn3": "336",
     "name": "Vatican City",
+    "capitalDisplayName": "Vatican City",
+    "capitalAliases": [
+      "vatican city"
+    ],
     "flagEmoji": "🇻🇦",
     "atlasName": "Vatican",
     "continent": "Europe",
@@ -2737,6 +3331,10 @@
     "id": "ATG",
     "ccn3": "028",
     "name": "Antigua and Barbuda",
+    "capitalDisplayName": "Saint John's",
+    "capitalAliases": [
+      "saint john s"
+    ],
     "flagEmoji": "🇦🇬",
     "atlasName": "Antigua and Barbuda",
     "continent": "North America",
@@ -2753,6 +3351,10 @@
     "id": "BHS",
     "ccn3": "044",
     "name": "Bahamas",
+    "capitalDisplayName": "Nassau",
+    "capitalAliases": [
+      "nassau"
+    ],
     "flagEmoji": "🇧🇸",
     "atlasName": "Bahamas",
     "continent": "North America",
@@ -2770,6 +3372,10 @@
     "id": "BRB",
     "ccn3": "052",
     "name": "Barbados",
+    "capitalDisplayName": "Bridgetown",
+    "capitalAliases": [
+      "bridgetown"
+    ],
     "flagEmoji": "🇧🇧",
     "atlasName": "Barbados",
     "continent": "North America",
@@ -2786,6 +3392,10 @@
     "id": "BLZ",
     "ccn3": "084",
     "name": "Belize",
+    "capitalDisplayName": "Belmopan",
+    "capitalAliases": [
+      "belmopan"
+    ],
     "flagEmoji": "🇧🇿",
     "atlasName": "Belize",
     "continent": "North America",
@@ -2802,6 +3412,10 @@
     "id": "CAN",
     "ccn3": "124",
     "name": "Canada",
+    "capitalDisplayName": "Ottawa",
+    "capitalAliases": [
+      "ottawa"
+    ],
     "flagEmoji": "🇨🇦",
     "atlasName": "Canada",
     "continent": "North America",
@@ -2818,6 +3432,10 @@
     "id": "CRI",
     "ccn3": "188",
     "name": "Costa Rica",
+    "capitalDisplayName": "San José",
+    "capitalAliases": [
+      "san jose"
+    ],
     "flagEmoji": "🇨🇷",
     "atlasName": "Costa Rica",
     "continent": "North America",
@@ -2836,6 +3454,10 @@
     "id": "CUB",
     "ccn3": "192",
     "name": "Cuba",
+    "capitalDisplayName": "Havana",
+    "capitalAliases": [
+      "havana"
+    ],
     "flagEmoji": "🇨🇺",
     "atlasName": "Cuba",
     "continent": "North America",
@@ -2854,6 +3476,10 @@
     "id": "DMA",
     "ccn3": "212",
     "name": "Dominica",
+    "capitalDisplayName": "Roseau",
+    "capitalAliases": [
+      "roseau"
+    ],
     "flagEmoji": "🇩🇲",
     "atlasName": "Dominica",
     "continent": "North America",
@@ -2873,6 +3499,10 @@
     "id": "DOM",
     "ccn3": "214",
     "name": "Dominican Republic",
+    "capitalDisplayName": "Santo Domingo",
+    "capitalAliases": [
+      "santo domingo"
+    ],
     "flagEmoji": "🇩🇴",
     "atlasName": "Dominican Republic",
     "continent": "North America",
@@ -2889,6 +3519,10 @@
     "id": "SLV",
     "ccn3": "222",
     "name": "El Salvador",
+    "capitalDisplayName": "San Salvador",
+    "capitalAliases": [
+      "san salvador"
+    ],
     "flagEmoji": "🇸🇻",
     "atlasName": "El Salvador",
     "continent": "North America",
@@ -2907,6 +3541,10 @@
     "id": "GRD",
     "ccn3": "308",
     "name": "Grenada",
+    "capitalDisplayName": "St. George's",
+    "capitalAliases": [
+      "saint george s"
+    ],
     "flagEmoji": "🇬🇩",
     "atlasName": "Grenada",
     "continent": "North America",
@@ -2923,6 +3561,10 @@
     "id": "GTM",
     "ccn3": "320",
     "name": "Guatemala",
+    "capitalDisplayName": "Guatemala City",
+    "capitalAliases": [
+      "guatemala city"
+    ],
     "flagEmoji": "🇬🇹",
     "atlasName": "Guatemala",
     "continent": "North America",
@@ -2940,6 +3582,10 @@
     "id": "HTI",
     "ccn3": "332",
     "name": "Haiti",
+    "capitalDisplayName": "Port-au-Prince",
+    "capitalAliases": [
+      "port au prince"
+    ],
     "flagEmoji": "🇭🇹",
     "atlasName": "Haiti",
     "continent": "North America",
@@ -2959,6 +3605,10 @@
     "id": "HND",
     "ccn3": "340",
     "name": "Honduras",
+    "capitalDisplayName": "Tegucigalpa",
+    "capitalAliases": [
+      "tegucigalpa"
+    ],
     "flagEmoji": "🇭🇳",
     "atlasName": "Honduras",
     "continent": "North America",
@@ -2977,6 +3627,10 @@
     "id": "JAM",
     "ccn3": "388",
     "name": "Jamaica",
+    "capitalDisplayName": "Kingston",
+    "capitalAliases": [
+      "kingston"
+    ],
     "flagEmoji": "🇯🇲",
     "atlasName": "Jamaica",
     "continent": "North America",
@@ -2993,6 +3647,10 @@
     "id": "MEX",
     "ccn3": "484",
     "name": "Mexico",
+    "capitalDisplayName": "Mexico City",
+    "capitalAliases": [
+      "mexico city"
+    ],
     "flagEmoji": "🇲🇽",
     "atlasName": "Mexico",
     "continent": "North America",
@@ -3012,6 +3670,10 @@
     "id": "NIC",
     "ccn3": "558",
     "name": "Nicaragua",
+    "capitalDisplayName": "Managua",
+    "capitalAliases": [
+      "managua"
+    ],
     "flagEmoji": "🇳🇮",
     "atlasName": "Nicaragua",
     "continent": "North America",
@@ -3030,6 +3692,10 @@
     "id": "PAN",
     "ccn3": "591",
     "name": "Panama",
+    "capitalDisplayName": "Panama City",
+    "capitalAliases": [
+      "panama city"
+    ],
     "flagEmoji": "🇵🇦",
     "atlasName": "Panama",
     "continent": "North America",
@@ -3048,6 +3714,10 @@
     "id": "KNA",
     "ccn3": "659",
     "name": "Saint Kitts and Nevis",
+    "capitalDisplayName": "Basseterre",
+    "capitalAliases": [
+      "basseterre"
+    ],
     "flagEmoji": "🇰🇳",
     "atlasName": "Saint Kitts and Nevis",
     "continent": "North America",
@@ -3066,6 +3736,10 @@
     "id": "LCA",
     "ccn3": "662",
     "name": "Saint Lucia",
+    "capitalDisplayName": "Castries",
+    "capitalAliases": [
+      "castries"
+    ],
     "flagEmoji": "🇱🇨",
     "atlasName": "Saint Lucia",
     "continent": "North America",
@@ -3082,6 +3756,10 @@
     "id": "VCT",
     "ccn3": "670",
     "name": "Saint Vincent and the Grenadines",
+    "capitalDisplayName": "Kingstown",
+    "capitalAliases": [
+      "kingstown"
+    ],
     "flagEmoji": "🇻🇨",
     "atlasName": "Saint Vincent and the Grenadines",
     "continent": "North America",
@@ -3099,6 +3777,10 @@
     "id": "TTO",
     "ccn3": "780",
     "name": "Trinidad and Tobago",
+    "capitalDisplayName": "Port of Spain",
+    "capitalAliases": [
+      "port of spain"
+    ],
     "flagEmoji": "🇹🇹",
     "atlasName": "Trinidad and Tobago",
     "continent": "North America",
@@ -3116,6 +3798,11 @@
     "id": "USA",
     "ccn3": "840",
     "name": "United States",
+    "capitalDisplayName": "Washington D.C.",
+    "capitalAliases": [
+      "washington d c",
+      "washington dc"
+    ],
     "flagEmoji": "🇺🇸",
     "atlasName": "United States",
     "continent": "North America",
@@ -3136,6 +3823,10 @@
     "id": "ARG",
     "ccn3": "032",
     "name": "Argentina",
+    "capitalDisplayName": "Buenos Aires",
+    "capitalAliases": [
+      "buenos aires"
+    ],
     "flagEmoji": "🇦🇷",
     "atlasName": "Argentina",
     "continent": "South America",
@@ -3154,6 +3845,10 @@
     "id": "BOL",
     "ccn3": "068",
     "name": "Bolivia",
+    "capitalDisplayName": "Sucre",
+    "capitalAliases": [
+      "sucre"
+    ],
     "flagEmoji": "🇧🇴",
     "atlasName": "Bolivia",
     "continent": "South America",
@@ -3178,6 +3873,10 @@
     "id": "BRA",
     "ccn3": "076",
     "name": "Brazil",
+    "capitalDisplayName": "Brasília",
+    "capitalAliases": [
+      "brasilia"
+    ],
     "flagEmoji": "🇧🇷",
     "atlasName": "Brazil",
     "continent": "South America",
@@ -3197,6 +3896,10 @@
     "id": "CHL",
     "ccn3": "152",
     "name": "Chile",
+    "capitalDisplayName": "Santiago",
+    "capitalAliases": [
+      "santiago"
+    ],
     "flagEmoji": "🇨🇱",
     "atlasName": "Chile",
     "continent": "South America",
@@ -3215,6 +3918,10 @@
     "id": "COL",
     "ccn3": "170",
     "name": "Colombia",
+    "capitalDisplayName": "Bogotá",
+    "capitalAliases": [
+      "bogota"
+    ],
     "flagEmoji": "🇨🇴",
     "atlasName": "Colombia",
     "continent": "South America",
@@ -3233,6 +3940,10 @@
     "id": "ECU",
     "ccn3": "218",
     "name": "Ecuador",
+    "capitalDisplayName": "Quito",
+    "capitalAliases": [
+      "quito"
+    ],
     "flagEmoji": "🇪🇨",
     "atlasName": "Ecuador",
     "continent": "South America",
@@ -3251,6 +3962,10 @@
     "id": "GUY",
     "ccn3": "328",
     "name": "Guyana",
+    "capitalDisplayName": "Georgetown",
+    "capitalAliases": [
+      "georgetown"
+    ],
     "flagEmoji": "🇬🇾",
     "atlasName": "Guyana",
     "continent": "South America",
@@ -3268,6 +3983,10 @@
     "id": "PRY",
     "ccn3": "600",
     "name": "Paraguay",
+    "capitalDisplayName": "Asunción",
+    "capitalAliases": [
+      "asuncion"
+    ],
     "flagEmoji": "🇵🇾",
     "atlasName": "Paraguay",
     "continent": "South America",
@@ -3287,6 +4006,10 @@
     "id": "PER",
     "ccn3": "604",
     "name": "Peru",
+    "capitalDisplayName": "Lima",
+    "capitalAliases": [
+      "lima"
+    ],
     "flagEmoji": "🇵🇪",
     "atlasName": "Peru",
     "continent": "South America",
@@ -3305,6 +4028,10 @@
     "id": "SUR",
     "ccn3": "740",
     "name": "Suriname",
+    "capitalDisplayName": "Paramaribo",
+    "capitalAliases": [
+      "paramaribo"
+    ],
     "flagEmoji": "🇸🇷",
     "atlasName": "Suriname",
     "continent": "South America",
@@ -3325,6 +4052,10 @@
     "id": "URY",
     "ccn3": "858",
     "name": "Uruguay",
+    "capitalDisplayName": "Montevideo",
+    "capitalAliases": [
+      "montevideo"
+    ],
     "flagEmoji": "🇺🇾",
     "atlasName": "Uruguay",
     "continent": "South America",
@@ -3343,6 +4074,10 @@
     "id": "VEN",
     "ccn3": "862",
     "name": "Venezuela",
+    "capitalDisplayName": "Caracas",
+    "capitalAliases": [
+      "caracas"
+    ],
     "flagEmoji": "🇻🇪",
     "atlasName": "Venezuela",
     "continent": "South America",
@@ -3362,6 +4097,10 @@
     "id": "AUS",
     "ccn3": "036",
     "name": "Australia",
+    "capitalDisplayName": "Canberra",
+    "capitalAliases": [
+      "canberra"
+    ],
     "flagEmoji": "🇦🇺",
     "atlasName": "Australia",
     "continent": "Oceania",
@@ -3379,6 +4118,10 @@
     "id": "FJI",
     "ccn3": "242",
     "name": "Fiji",
+    "capitalDisplayName": "Suva",
+    "capitalAliases": [
+      "suva"
+    ],
     "flagEmoji": "🇫🇯",
     "atlasName": "Fiji",
     "continent": "Oceania",
@@ -3399,6 +4142,10 @@
     "id": "KIR",
     "ccn3": "296",
     "name": "Kiribati",
+    "capitalDisplayName": "South Tarawa",
+    "capitalAliases": [
+      "south tarawa"
+    ],
     "flagEmoji": "🇰🇮",
     "atlasName": "Kiribati",
     "continent": "Oceania",
@@ -3418,6 +4165,10 @@
     "id": "MHL",
     "ccn3": "584",
     "name": "Marshall Islands",
+    "capitalDisplayName": "Majuro",
+    "capitalAliases": [
+      "majuro"
+    ],
     "flagEmoji": "🇲🇭",
     "atlasName": "Marshall Islands",
     "continent": "Oceania",
@@ -3436,6 +4187,10 @@
     "id": "FSM",
     "ccn3": "583",
     "name": "Micronesia",
+    "capitalDisplayName": "Palikir",
+    "capitalAliases": [
+      "palikir"
+    ],
     "flagEmoji": "🇫🇲",
     "atlasName": "Micronesia",
     "continent": "Oceania",
@@ -3454,6 +4209,10 @@
     "id": "NRU",
     "ccn3": "520",
     "name": "Nauru",
+    "capitalDisplayName": "Yaren",
+    "capitalAliases": [
+      "yaren"
+    ],
     "flagEmoji": "🇳🇷",
     "atlasName": "Nauru",
     "continent": "Oceania",
@@ -3474,6 +4233,10 @@
     "id": "NZL",
     "ccn3": "554",
     "name": "New Zealand",
+    "capitalDisplayName": "Wellington",
+    "capitalAliases": [
+      "wellington"
+    ],
     "flagEmoji": "🇳🇿",
     "atlasName": "New Zealand",
     "continent": "Oceania",
@@ -3491,6 +4254,10 @@
     "id": "PLW",
     "ccn3": "585",
     "name": "Palau",
+    "capitalDisplayName": "Ngerulmud",
+    "capitalAliases": [
+      "ngerulmud"
+    ],
     "flagEmoji": "🇵🇼",
     "atlasName": "Palau",
     "continent": "Oceania",
@@ -3509,6 +4276,10 @@
     "id": "PNG",
     "ccn3": "598",
     "name": "Papua New Guinea",
+    "capitalDisplayName": "Port Moresby",
+    "capitalAliases": [
+      "port moresby"
+    ],
     "flagEmoji": "🇵🇬",
     "atlasName": "Papua New Guinea",
     "continent": "Oceania",
@@ -3527,6 +4298,10 @@
     "id": "WSM",
     "ccn3": "882",
     "name": "Samoa",
+    "capitalDisplayName": "Apia",
+    "capitalAliases": [
+      "apia"
+    ],
     "flagEmoji": "🇼🇸",
     "atlasName": "Samoa",
     "continent": "Oceania",
@@ -3545,6 +4320,10 @@
     "id": "SLB",
     "ccn3": "090",
     "name": "Solomon Islands",
+    "capitalDisplayName": "Honiara",
+    "capitalAliases": [
+      "honiara"
+    ],
     "flagEmoji": "🇸🇧",
     "atlasName": "Solomon Islands",
     "continent": "Oceania",
@@ -3561,6 +4340,10 @@
     "id": "TON",
     "ccn3": "776",
     "name": "Tonga",
+    "capitalDisplayName": "Nuku'alofa",
+    "capitalAliases": [
+      "nuku alofa"
+    ],
     "flagEmoji": "🇹🇴",
     "atlasName": "Tonga",
     "continent": "Oceania",
@@ -3578,6 +4361,10 @@
     "id": "TUV",
     "ccn3": "798",
     "name": "Tuvalu",
+    "capitalDisplayName": "Funafuti",
+    "capitalAliases": [
+      "funafuti"
+    ],
     "flagEmoji": "🇹🇻",
     "atlasName": "Tuvalu",
     "continent": "Oceania",
@@ -3594,6 +4381,10 @@
     "id": "VUT",
     "ccn3": "548",
     "name": "Vanuatu",
+    "capitalDisplayName": "Port Vila",
+    "capitalAliases": [
+      "port vila"
+    ],
     "flagEmoji": "🇻🇺",
     "atlasName": "Vanuatu",
     "continent": "Oceania",

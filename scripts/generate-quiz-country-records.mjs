@@ -49,6 +49,10 @@ const MANUAL_ALIASES = {
   VNM: ['vietnam'],
 }
 
+const MANUAL_CAPITAL_ALIASES = {
+  USA: ['washington dc', 'washington d c'],
+}
+
 const CONTINENT_ORDER = [
   'Africa',
   'Asia',
@@ -120,6 +124,30 @@ function collectAliases(country, displayName) {
   return [...new Set(aliasCandidates.map(normalizeAnswer).filter(Boolean))]
 }
 
+function collectCapitalNames(country) {
+  return [...new Set((country.capital ?? []).map((capital) => capital.trim()).filter(Boolean))]
+}
+
+function capitalDisplayNameFor(country) {
+  const capitalNames = collectCapitalNames(country)
+
+  if (capitalNames.length === 0) {
+    throw new Error(`Missing capital for ${country.cca3} (${country.name.common})`)
+  }
+
+  return capitalNames.join(' / ')
+}
+
+function collectCapitalAliases(country) {
+  const capitalNames = collectCapitalNames(country)
+  const aliasCandidates = [
+    ...capitalNames,
+    ...(MANUAL_CAPITAL_ALIASES[country.cca3] ?? []),
+  ]
+
+  return [...new Set(aliasCandidates.map(normalizeAnswer).filter(Boolean))]
+}
+
 const records = rawCountries
   .filter((country) => country.unMember || INCLUDED_NON_UN_MEMBERS.has(country.cca3))
   .map((country) => {
@@ -129,6 +157,8 @@ const records = rawCountries
       id: country.cca3,
       ccn3: country.ccn3 || null,
       name,
+      capitalDisplayName: capitalDisplayNameFor(country),
+      capitalAliases: collectCapitalAliases(country),
       flagEmoji: country.flag,
       atlasName: atlasNameFor(country),
       continent: toContinent(country.region, country.subregion),

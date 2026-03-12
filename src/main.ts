@@ -5,10 +5,12 @@ import { createGlobe, type GlobeFlightStatus } from './globe'
 import { normalizeAnswer } from './normalize'
 import {
   aliasToCountryId,
+  capitalAliasToCountryId,
   countriesByContinent,
   countriesById,
   quizCountries,
   totalCountryCount,
+  type QuizCountry,
 } from './quiz-data'
 import { routeChallengeMetadata, routeChallengeOrder } from './route-order'
 
@@ -16,10 +18,75 @@ registerSW({ immediate: true })
 
 const STARTING_COUNTRY_ID = 'GBR'
 const MOBILE_CHEAT_HOLD_MS = 2000
-const ROUTE_MODE_QUERY_PARAM = 'mode'
-const ROUTE_MODE_QUERY_VALUE = 'route'
+const MODE_QUERY_PARAM = 'mode'
 
-type GameMode = 'classic' | 'route'
+type LayoutMode = 'free' | 'route'
+type AnswerKind = 'country' | 'capital'
+type ModeKey = 'free' | 'route' | 'free-capitals' | 'route-capitals'
+
+type ModeConfig = {
+  answerKind: AnswerKind
+  heading: string
+  inputLabel: string
+  layoutMode: LayoutMode
+  modeEyebrow: string
+  navLabel: string
+  navTitle: string
+  placeholder: string
+  routeStatusHint: string
+  title: string
+}
+
+const MODE_CONFIGS: Record<ModeKey, ModeConfig> = {
+  free: {
+    answerKind: 'country',
+    heading: 'Can you name all 197 countries of the world?',
+    inputLabel: 'Enter a country',
+    layoutMode: 'free',
+    modeEyebrow: 'Flight Path',
+    navLabel: 'Free Entry',
+    navTitle: 'Countries',
+    placeholder: 'Start typing a country name...',
+    routeStatusHint: 'Type the highlighted country, or skip it for later.',
+    title: 'Countries Quiz',
+  },
+  route: {
+    answerKind: 'country',
+    heading: 'Can you identify every highlighted country on the globe?',
+    inputLabel: 'Type the highlighted country',
+    layoutMode: 'route',
+    modeEyebrow: 'Route Drill',
+    navLabel: 'Route Drill',
+    navTitle: 'Route Countries',
+    placeholder: 'Type the highlighted country...',
+    routeStatusHint: 'Type the highlighted country, or skip it for later.',
+    title: 'Countries Quiz - Route Drill',
+  },
+  'free-capitals': {
+    answerKind: 'capital',
+    heading: 'Can you name all 197 capital cities of the world?',
+    inputLabel: 'Enter a capital city',
+    layoutMode: 'free',
+    modeEyebrow: 'Flight Path',
+    navLabel: 'Capital Entry',
+    navTitle: 'Capitals',
+    placeholder: 'Start typing a capital city...',
+    routeStatusHint: "Type the highlighted country's capital city, or skip it for later.",
+    title: 'Countries Quiz - Capital Cities',
+  },
+  'route-capitals': {
+    answerKind: 'capital',
+    heading: "Can you identify every highlighted country by its capital city?",
+    inputLabel: "Type the highlighted country's capital city",
+    layoutMode: 'route',
+    modeEyebrow: 'Route Drill',
+    navLabel: 'Capital Route',
+    navTitle: 'Route Capitals',
+    placeholder: "Type the highlighted country's capital city...",
+    routeStatusHint: "Type the highlighted country's capital city, or skip it for later.",
+    title: 'Countries Quiz - Route Capitals',
+  },
+}
 
 function requireElement<T extends Element>(selector: string): T {
   const element = document.querySelector<T>(selector)
@@ -31,28 +98,67 @@ function requireElement<T extends Element>(selector: string): T {
   return element
 }
 
-function readGameMode(): GameMode {
-  const url = new URL(window.location.href)
-  return url.searchParams.get(ROUTE_MODE_QUERY_PARAM) === ROUTE_MODE_QUERY_VALUE ? 'route' : 'classic'
+function readModeKey(): ModeKey {
+  const rawMode = new URL(window.location.href).searchParams.get(MODE_QUERY_PARAM)
+
+  if (rawMode === 'route' || rawMode === 'capitals' || rawMode === 'route-capitals') {
+    return rawMode === 'capitals' ? 'free-capitals' : rawMode
+  }
+
+  return 'free'
 }
 
-function modeUrl(mode: GameMode): string {
+function modeUrl(modeKey: ModeKey): string {
   const url = new URL(window.location.href)
 
-  if (mode === 'route') {
-    url.searchParams.set(ROUTE_MODE_QUERY_PARAM, ROUTE_MODE_QUERY_VALUE)
-  } else {
-    url.searchParams.delete(ROUTE_MODE_QUERY_PARAM)
+  switch (modeKey) {
+    case 'free':
+      url.searchParams.delete(MODE_QUERY_PARAM)
+      break
+    case 'route':
+      url.searchParams.set(MODE_QUERY_PARAM, 'route')
+      break
+    case 'free-capitals':
+      url.searchParams.set(MODE_QUERY_PARAM, 'capitals')
+      break
+    case 'route-capitals':
+      url.searchParams.set(MODE_QUERY_PARAM, 'route-capitals')
+      break
   }
 
   return `${url.pathname}${url.search}${url.hash}`
 }
 
-const gameMode = readGameMode()
-const routePromptQueue = gameMode === 'route' ? [...routeChallengeOrder] : []
-let currentPromptId = gameMode === 'route' ? routePromptQueue[0] ?? null : null
+const modeKey = readModeKey()
+const mode = MODE_CONFIGS[modeKey]
+const aliasMap = mode.answerKind === 'capital' ? capitalAliasToCountryId : aliasToCountryId
+const routePromptQueue = mode.layoutMode === 'route' ? [...routeChallengeOrder] : []
+let currentPromptId = mode.layoutMode === 'route' ? routePromptQueue[0] ?? null : null
 const routeFlightOrder: string[] = []
 let skippedPromptCount = 0
+
+function answerLabelForCountry(country: QuizCountry): string {
+  return mode.answerKind === 'capital' ? country.capitalDisplayName : country.name
+}
+
+function answerLabelForCountryId(countryId: string): string {
+  const country = countriesById.get(countryId)
+  return country ? answerLabelForCountry(country) : 'That answer'
+}
+
+function solvedPreviewLabelForCountry(country: QuizCountry): string {
+  return mode.answerKind === 'capital'
+    ? `${country.name} - ${country.capitalDisplayName}`
+    : country.name
+}
+
+function answerThing(): string {
+  return mode.answerKind === 'capital' ? 'capital city' : 'country'
+}
+
+function answerThingPlural(): string {
+  return mode.answerKind === 'capital' ? 'capital cities' : 'countries'
+}
 
 const app = document.querySelector<HTMLDivElement>('#app')
 
@@ -60,46 +166,29 @@ if (!app) {
   throw new Error('App root not found')
 }
 
-const modeCopy =
-  gameMode === 'route'
-    ? {
-      heading: 'Can you identify every highlighted country on the globe?',
-      inputLabel: 'Type the highlighted country',
-      modeEyebrow: 'Route Drill',
-      placeholder: 'Type the highlighted country...',
-      statusHint: 'Type the highlighted country, or skip it for later.',
-      title: 'Countries Quiz - Route Drill',
-    }
-    : {
-      heading: 'Can you name all 197 countries of the world?',
-      inputLabel: 'Enter a country',
-      modeEyebrow: 'Flight Path',
-      placeholder: 'Start typing a country name...',
-      statusHint: 'Plane standing by in the United Kingdom',
-      title: 'Countries Quiz',
-    }
-
-document.title = modeCopy.title
+document.title = mode.title
 
 app.innerHTML = `
   <main class="shell">
     <section class="hero">
       <div class="hero__copy">
         <nav class="mode-switch" aria-label="Game mode">
-          <a
-            class="mode-switch__link ${gameMode === 'classic' ? 'mode-switch__link--active' : ''}"
-            href="${modeUrl('classic')}"
-          >
-            Free Entry
-          </a>
-          <a
-            class="mode-switch__link ${gameMode === 'route' ? 'mode-switch__link--active' : ''}"
-            href="${modeUrl('route')}"
-          >
-            Route Drill
-          </a>
+          ${(['free', 'route', 'free-capitals', 'route-capitals'] satisfies ModeKey[])
+            .map((candidate) => {
+              const candidateMode = MODE_CONFIGS[candidate]
+              return `
+                <a
+                  class="mode-switch__link ${modeKey === candidate ? 'mode-switch__link--active' : ''}"
+                  href="${modeUrl(candidate)}"
+                  title="${candidateMode.navTitle}"
+                >
+                  ${candidateMode.navLabel}
+                </a>
+              `
+            })
+            .join('')}
         </nav>
-        <h1>${modeCopy.heading}</h1>
+        <h1>${mode.heading}</h1>
         <div class="hero__stats">
           <article class="stat-card">
             <span class="stat-card__label">Score</span>
@@ -117,7 +206,7 @@ app.innerHTML = `
         </div>
         <div class="answer-panel">
           <div class="answer-panel__heading">
-            <label class="answer-panel__label" for="guess-input">${modeCopy.inputLabel}</label>
+            <label class="answer-panel__label" for="guess-input">${mode.inputLabel}</label>
             <div class="answer-panel__summary" aria-live="polite">
               <span id="score-compact" class="answer-panel__summary-text">0/${totalCountryCount}</span>
               <span class="answer-panel__summary-separator" aria-hidden="true">·</span>
@@ -142,21 +231,21 @@ app.innerHTML = `
             spellcheck="false"
             inputmode="search"
             enterkeyhint="search"
-            placeholder="${modeCopy.placeholder}"
+            placeholder="${mode.placeholder}"
           />
           <p id="status" class="status" aria-live="polite"></p>
         </div>
       </div>
       <section class="flight-panel hero__flight-panel" aria-live="polite">
         <div class="flight-panel__header">
-          <p id="flight-eyebrow" class="flight-panel__eyebrow">${modeCopy.modeEyebrow}</p>
+          <p id="flight-eyebrow" class="flight-panel__eyebrow">${mode.modeEyebrow}</p>
           ${
-            gameMode === 'route'
+            mode.layoutMode === 'route'
               ? '<button id="skip-button" class="skip-button" type="button">Skip</button>'
               : ''
           }
         </div>
-        <strong id="flight-route" class="flight-panel__route">${modeCopy.statusHint}</strong>
+        <strong id="flight-route" class="flight-panel__route"></strong>
         <span id="flight-distance" class="flight-panel__meta"></span>
         <span id="flight-total" class="flight-panel__meta"></span>
       </section>
@@ -198,7 +287,7 @@ const giveUpButton = requireElement<HTMLButtonElement>('#give-up-button')
 const compactGiveUpButton = requireElement<HTMLButtonElement>('#give-up-button-compact')
 const skipButton = document.querySelector<HTMLButtonElement>('#skip-button')
 
-const answeredIds = new Set<string>(gameMode === 'classic' ? [STARTING_COUNTRY_ID] : [])
+const answeredIds = new Set<string>(mode.layoutMode === 'free' ? [STARTING_COUNTRY_ID] : [])
 const cheatedIds = new Set<string>()
 const skippedIds = new Set<string>()
 const answerOrder: string[] = []
@@ -210,11 +299,8 @@ let globe: Awaited<ReturnType<typeof createGlobe>> | null = null
 const trackerSlotByCountryId = new Map<string, HTMLLIElement>()
 const trackerSolvedCountByContinent = new Map<string, HTMLElement>()
 
-function attachTrackerCheatInteractions(
-  slot: HTMLLIElement,
-  countryId: string,
-): void {
-  if (gameMode !== 'classic') {
+function attachTrackerCheatInteractions(slot: HTMLLIElement, countryId: string): void {
+  if (mode.layoutMode !== 'free') {
     return
   }
 
@@ -310,7 +396,7 @@ function createSolvedFlagNode(countryId: string): HTMLElement | null {
 
   const previewLabel = document.createElement('span')
   previewLabel.className = 'country-slot__flag-preview-label'
-  previewLabel.textContent = country.name
+  previewLabel.textContent = solvedPreviewLabelForCountry(country)
 
   preview.append(previewImage, previewLabel)
   anchor.append(icon, preview)
@@ -333,7 +419,7 @@ function applySolvedCountrySlot(slot: HTMLLIElement, countryId: string): void {
   const flagNode = createSolvedFlagNode(countryId)
   const name = document.createElement('span')
   name.className = 'country-slot__name'
-  name.textContent = country.name
+  name.textContent = answerLabelForCountry(country)
 
   if (flagNode) {
     slot.append(flagNode)
@@ -394,8 +480,9 @@ function renderTracker(): void {
 
     for (const country of countries) {
       const slot = document.createElement('li')
+      const answerLabel = answerLabelForCountry(country)
       slot.className = 'country-slot country-slot--empty'
-      slot.style.setProperty('--chars', String(Math.max(6, country.name.length)))
+      slot.style.setProperty('--chars', String(Math.max(6, answerLabel.length)))
       slot.dataset.countryId = country.id
       attachTrackerCheatInteractions(slot, country.id)
       trackerSlotByCountryId.set(country.id, slot)
@@ -448,7 +535,7 @@ function renderClassicFlightStatus(status: GlobeFlightStatus | null): void {
   flightEyebrowElement.textContent = 'Flight Path'
 
   if (!status) {
-    flightRouteElement.textContent = 'Plane standing by in the United Kingdom'
+    flightRouteElement.textContent = `Plane standing by in ${answerLabelForCountryId(STARTING_COUNTRY_ID)}`
     flightDistanceElement.textContent = 'Leg distance: 0 miles'
     flightTotalElement.textContent = 'Total distance flown: 0 miles'
     return
@@ -483,13 +570,14 @@ function syncSolvedCountries(options?: { focusLatest?: boolean }): void {
   globe?.setAnswered(answeredIds, {
     cheatedIds,
     focusLatest: options?.focusLatest,
-    mode: gameMode,
+    answerKind: mode.answerKind,
+    layoutMode: mode.layoutMode,
     skippedIds,
   })
 }
 
 function syncPromptedCountry(options?: { focus?: boolean }): void {
-  if (gameMode !== 'route') {
+  if (mode.layoutMode !== 'route') {
     return
   }
 
@@ -497,7 +585,7 @@ function syncPromptedCountry(options?: { focus?: boolean }): void {
 }
 
 function advanceRouteFlight(options?: { animate?: boolean }): void {
-  if (gameMode !== 'route' || !currentPromptId) {
+  if (mode.layoutMode !== 'route' || !currentPromptId) {
     return
   }
 
@@ -531,7 +619,7 @@ function finishQuiz(
   timerElement.textContent = finalTimerText
   compactTimerElement.textContent = finalTimerText
 
-  if (gameMode === 'route') {
+  if (mode.layoutMode === 'route') {
     renderRoutePanel()
   }
 }
@@ -556,7 +644,7 @@ function giveUp(): void {
     answerOrder.push(countryId)
   }
 
-  if (gameMode === 'route') {
+  if (mode.layoutMode === 'route') {
     routePromptQueue.length = 0
     currentPromptId = null
   }
@@ -569,33 +657,30 @@ function giveUp(): void {
   renderScore()
   renderTracker()
 
-  if (gameMode === 'route') {
+  if (mode.layoutMode === 'route') {
     renderRoutePanel()
   } else {
     renderClassicFlightStatus(null)
   }
 
   const elapsedTimeText = formatTime(elapsedMilliseconds())
-  const countryNoun = remainingCountryIds.length === 1 ? 'country' : 'countries'
+  const itemNoun = remainingCountryIds.length === 1 ? answerThing() : answerThingPlural()
   finishQuiz(
-    `Gave up at ${solvedBeforeGiveUp}/${totalCountryCount}. Revealed ${remainingCountryIds.length} remaining ${countryNoun}.`,
+    `Gave up at ${solvedBeforeGiveUp}/${totalCountryCount}. Revealed ${remainingCountryIds.length} remaining ${itemNoun}.`,
     {
       timerText: elapsedTimeText,
     },
   )
 }
 
-function solveCountry(
-  countryId: string,
-  source: 'answer' | 'cheat' = 'answer',
-): void {
+function solveCountry(countryId: string, source: 'answer' | 'cheat' = 'answer'): void {
   const country = countriesById.get(countryId)
 
   if (!country || answeredIds.has(countryId) || quizFinished) {
     return
   }
 
-  if (gameMode === 'route' && countryId !== currentPromptId) {
+  if (mode.layoutMode === 'route' && countryId !== currentPromptId) {
     return
   }
 
@@ -610,11 +695,11 @@ function solveCountry(
   } else {
     cheatedIds.delete(countryId)
   }
-  skippedIds.delete(countryId)
 
+  skippedIds.delete(countryId)
   answerOrder.push(countryId)
 
-  if (gameMode === 'route') {
+  if (mode.layoutMode === 'route') {
     routePromptQueue.shift()
     currentPromptId = routePromptQueue[0] ?? null
   }
@@ -624,7 +709,7 @@ function solveCountry(
   renderScore()
   updateTracker(countryId)
 
-  if (gameMode === 'route') {
+  if (mode.layoutMode === 'route') {
     syncPromptedCountry()
     advanceRouteFlight({ animate: Boolean(currentPromptId) })
     renderRoutePanel()
@@ -634,7 +719,7 @@ function solveCountry(
 
   if (answeredIds.size === totalCountryCount) {
     const elapsedTimeText = formatTime(elapsedMilliseconds())
-    finishQuiz(`All ${totalCountryCount} countries solved in ${elapsedTimeText}.`, {
+    finishQuiz(`All ${totalCountryCount} ${answerThingPlural()} solved in ${elapsedTimeText}.`, {
       timerText: elapsedTimeText,
     })
     return
@@ -643,13 +728,15 @@ function solveCountry(
   statusTone = source === 'cheat' ? 'neutral' : 'success'
   renderStatus(
     source === 'cheat'
-      ? `${country.name} revealed via cheat.`
-      : `${country.name} accepted.`,
+      ? `${answerLabelForCountry(country)} revealed via cheat.`
+      : mode.answerKind === 'capital'
+        ? `${country.capitalDisplayName} accepted for ${country.name}.`
+        : `${country.name} accepted.`,
   )
 }
 
 function skipPrompt(): void {
-  if (gameMode !== 'route' || quizFinished || !currentPromptId || routePromptQueue.length < 2) {
+  if (mode.layoutMode !== 'route' || quizFinished || !currentPromptId || routePromptQueue.length < 2) {
     return
   }
 
@@ -659,15 +746,13 @@ function skipPrompt(): void {
     return
   }
 
-  const skippedCountryName = countriesById.get(skippedCountryId)?.name ?? 'That country'
-
   routePromptQueue.push(skippedCountryId)
   currentPromptId = routePromptQueue[0] ?? null
   skippedIds.add(skippedCountryId)
   skippedPromptCount += 1
   answerInput.value = ''
   statusTone = 'neutral'
-  renderStatus(`Skipped ${skippedCountryName}. It will come back later.`)
+  renderStatus(`Skipped ${answerLabelForCountryId(skippedCountryId)}. It will come back later.`)
   syncSolvedCountries()
   syncPromptedCountry()
   advanceRouteFlight({ animate: true })
@@ -682,13 +767,13 @@ function maybeAcceptGuess(): void {
     return
   }
 
-  const matchedCountryId = aliasToCountryId.get(normalizedGuess)
+  const matchedCountryId = aliasMap.get(normalizedGuess)
 
   if (!matchedCountryId || answeredIds.has(matchedCountryId)) {
     return
   }
 
-  if (gameMode === 'route') {
+  if (mode.layoutMode === 'route') {
     if (matchedCountryId === currentPromptId) {
       solveCountry(matchedCountryId)
     }
@@ -706,7 +791,7 @@ function submitGuess(): void {
     return
   }
 
-  const matchedCountryId = aliasToCountryId.get(normalizedGuess)
+  const matchedCountryId = aliasMap.get(normalizedGuess)
 
   if (!matchedCountryId) {
     return
@@ -714,13 +799,13 @@ function submitGuess(): void {
 
   if (answeredIds.has(matchedCountryId)) {
     statusTone = 'muted'
-    renderStatus(`${countriesById.get(matchedCountryId)?.name ?? 'That country'} is already solved.`)
+    renderStatus(`${answerLabelForCountryId(matchedCountryId)} is already solved.`)
     return
   }
 
-  if (gameMode === 'route' && matchedCountryId !== currentPromptId) {
+  if (mode.layoutMode === 'route' && matchedCountryId !== currentPromptId) {
     statusTone = 'muted'
-    renderStatus(`${countriesById.get(matchedCountryId)?.name ?? 'That country'} is not the highlighted country.`)
+    renderStatus(`${answerLabelForCountryId(matchedCountryId)} is not the highlighted ${answerThing()}.`)
     return
   }
 
@@ -761,15 +846,15 @@ renderTracker()
 tick()
 answerInput.focus()
 
-if (gameMode === 'route') {
+if (mode.layoutMode === 'route') {
   renderRoutePanel()
-  renderStatus('Type the highlighted country, or skip it for later.')
+  renderStatus(mode.routeStatusHint)
 } else {
   renderClassicFlightStatus(null)
   renderStatus('')
 }
 
-globe = await createGlobe(globeContainer, quizCountries, gameMode === 'classic'
+globe = await createGlobe(globeContainer, quizCountries, mode.layoutMode === 'free'
   ? {
     onCountryCheat(countryId) {
       solveCountry(countryId, 'cheat')
@@ -777,9 +862,9 @@ globe = await createGlobe(globeContainer, quizCountries, gameMode === 'classic'
   }
   : undefined)
 
-syncSolvedCountries({ focusLatest: gameMode === 'classic' })
+syncSolvedCountries({ focusLatest: mode.layoutMode === 'free' })
 
-if (gameMode === 'route') {
+if (mode.layoutMode === 'route') {
   globe.syncFlightPath([], { animate: false })
   syncPromptedCountry({ focus: true })
 } else {

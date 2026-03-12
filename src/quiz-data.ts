@@ -25,6 +25,8 @@ export type QuizCountry = {
   id: string
   ccn3: string | null
   name: string
+  capitalDisplayName: string
+  capitalAliases: string[]
   flagEmoji: string
   atlasName: string
   continent: Continent
@@ -44,6 +46,7 @@ export const continentOrder: Continent[] = [
 export const quizCountries = (rawCountries as QuizCountry[]).map((country) => ({
   ...country,
   aliases: [...new Set(country.aliases.map(normalizeAnswer).filter(Boolean))],
+  capitalAliases: [...new Set(country.capitalAliases.map(normalizeAnswer).filter(Boolean))],
   appearance: country.appearance satisfies SolvedAppearance,
 }))
 
@@ -57,6 +60,7 @@ export const countriesByContinent = continentOrder.map((continent) => ({
 }))
 
 const aliasOwners = new Map<string, string[]>()
+const capitalAliasOwners = new Map<string, string[]>()
 
 for (const country of quizCountries) {
   for (const alias of country.aliases) {
@@ -64,9 +68,16 @@ for (const country of quizCountries) {
     owners.push(country.id)
     aliasOwners.set(alias, owners)
   }
+
+  for (const alias of country.capitalAliases) {
+    const owners = capitalAliasOwners.get(alias) ?? []
+    owners.push(country.id)
+    capitalAliasOwners.set(alias, owners)
+  }
 }
 
 export const aliasToCountryId = new Map<string, string>()
+export const capitalAliasToCountryId = new Map<string, string>()
 
 for (const country of quizCountries) {
   for (const alias of country.aliases) {
@@ -74,6 +85,14 @@ for (const country of quizCountries) {
 
     if (owners.length === 1) {
       aliasToCountryId.set(alias, country.id)
+    }
+  }
+
+  for (const alias of country.capitalAliases) {
+    const owners = capitalAliasOwners.get(alias) ?? []
+
+    if (owners.length === 1) {
+      capitalAliasToCountryId.set(alias, country.id)
     }
   }
 }

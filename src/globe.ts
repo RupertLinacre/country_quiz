@@ -48,7 +48,8 @@ type GlobeController = {
     options?: {
       cheatedIds?: Set<string>
       focusLatest?: boolean
-      mode?: 'classic' | 'route'
+      answerKind?: 'country' | 'capital'
+      layoutMode?: 'free' | 'route'
       skippedIds?: Set<string>
     },
   ) => void
@@ -502,7 +503,8 @@ export async function createGlobe(
   let activeFlightSegmentId: string | null = null
   let activeFlightProgress = 1
   let promptedCountryId: string | null = null
-  let renderMode: 'classic' | 'route' = 'classic'
+  let answerKind: 'country' | 'capital' = 'country'
+  let renderMode: 'free' | 'route' = 'free'
   let currentZoom = 1
   let cssWidth = 760
   let cssHeight = 760
@@ -645,18 +647,21 @@ export async function createGlobe(
         continue
       }
 
+      const fromLabel = answerKind === 'capital' ? fromCountry.capitalDisplayName : fromCountry.name
+      const toLabel = answerKind === 'capital' ? toCountry.capitalDisplayName : toCountry.name
+
       const miles = toMiles(geoDistance(previousCoordinates, toCoordinates))
       totalMiles += miles
       segments.push({
         fromCoordinates: previousCoordinates,
         fromCountryId: previousCountryId,
-        fromName: fromCountry.name,
+        fromName: fromLabel,
         id: `${index}-${previousCountryId}-${countryId}`,
         miles,
         pathCoordinates: greatArcCoordinates(previousCoordinates, toCoordinates),
         toCoordinates,
         toCountryId: countryId,
-        toName: toCountry.name,
+        toName: toLabel,
       })
       previousCountryId = countryId
       previousCoordinates = toCoordinates
@@ -831,7 +836,7 @@ export async function createGlobe(
                 ? country.appearance.assetUrl
                 : null,
           id: country.id,
-          name: country.name,
+          name: answerKind === 'capital' ? country.capitalDisplayName : country.name,
           tone: skippedIds.has(countryId) ? 'skipped' : 'answered',
           x: projected[0],
           y: projected[1],
@@ -1463,7 +1468,8 @@ export async function createGlobe(
       answeredIds = new Set(nextAnsweredIds)
       cheatedIds = new Set(options?.cheatedIds ?? [])
       skippedIds = new Set(options?.skippedIds ?? [])
-      renderMode = options?.mode ?? 'classic'
+      answerKind = options?.answerKind ?? 'country'
+      renderMode = options?.layoutMode ?? 'free'
 
       if (options?.focusLatest) {
         const mostRecentAnsweredId = latestAnsweredId(answeredIds)
