@@ -16,6 +16,7 @@ import {
 import { feature, mesh } from 'topojson-client'
 
 import atlasUrl from './generated/globe-atlas.json?url'
+import interactionAtlasUrl from './generated/globe-interaction-atlas.json?url'
 import fallbackFeatures from './generated/country-geometry-fallbacks.json'
 import type { QuizCountry, SolvedAppearance } from './quiz-data'
 
@@ -68,6 +69,8 @@ type GlobeController = {
       focusLatest?: boolean
       answerKind?: 'country' | 'capital'
       layoutMode?: 'free' | 'route'
+      showCapitalSublabels?: boolean
+      showAllCountryLabels?: boolean
       skippedIds?: Set<string>
     },
   ) => void
@@ -97,8 +100,9 @@ export type GlobeFlightStatus = {
 type GlobeLabel = {
   flagAssetUrl: string | null
   id: string
+  detail: string | null
   name: string
-  tone: 'answered' | 'skipped'
+  tone: 'answered' | 'default' | 'prompt' | 'skipped'
   x: number
   y: number
 }
@@ -156,6 +160,7 @@ const MAP_LABEL_NAME_OFFSET_PX = -4
 const MAP_LABEL_FLAG_OFFSET_PX = 17
 const MAP_LABEL_FLAG_WIDTH_PX = 26
 const MAP_LABEL_FLAG_HEIGHT_PX = 18
+const MAP_LABEL_DETAIL_OFFSET_PX = 35
 const PLANE_LABEL_OFFSET_PX = -MAP_LABEL_FLAG_OFFSET_PX
 const PLANE_EMOJI = '✈️'
 const SEA_FILL = '#126aa6'
@@ -468,8 +473,12 @@ export async function createGlobe(
     onFlightPerformanceChange?: (performance: GlobeFlightPerformance | null) => void
   },
 ): Promise<GlobeController> {
-  const topology = (await fetch(atlasUrl).then((response) => response.json())) as Topology
+  const [topology, interactionTopology] = await Promise.all([
+    fetch(atlasUrl).then((response) => response.json()) as Promise<Topology>,
+    fetch(interactionAtlasUrl).then((response) => response.json()) as Promise<Topology>,
+  ])
   const atlas = buildAtlasBundle(topology, countries)
+  const interactionAtlas = buildAtlasBundle(interactionTopology, countries)
   const fallbackFeatureByCountryId = new Map<string, AtlasFeature>()
   const fallbackLabelFeatureByCountryId = new Map<string, GeoPermissibleObjects>()
   const fallbackCentroidByCountryId = new Map<string, [number, number]>()
@@ -541,6 +550,8 @@ export async function createGlobe(
   let promptedCountryId: string | null = null
   let answerKind: 'country' | 'capital' = 'country'
   let renderMode: 'free' | 'route' = 'free'
+  let showCapitalSublabels = false
+  let showAllCountryLabels = false
   let currentZoom = 1
   let cssWidth = 760
   let cssHeight = 760
@@ -615,6 +626,15 @@ export async function createGlobe(
   function featureForCountry(countryId: string): AtlasFeature | null {
     return (
       fallbackFeatureByCountryId.get(countryId) ??
+      atlas.featureByCountryId.get(countryId) ??
+      null
+    )
+  }
+
+  function interactionFeatureForCountry(countryId: string): AtlasFeature | null {
+    return (
+      fallbackFeatureByCountryId.get(countryId) ??
+      interactionAtlas.featureByCountryId.get(countryId) ??
       atlas.featureByCountryId.get(countryId) ??
       null
     )
@@ -872,6 +892,10 @@ export async function createGlobe(
   function renderFlights(): void {
     const renderedSegments = showDesktopFlightTrails ? flightSegments : []
 
+    const activeSegment = showDesktopFlightTrails
+      ? flightSegments.find((segment) => segment.id === activeFlightSegmentId) ?? null
+      : null
+
     flightTrailLayer
       .selectAll<SVGPathElement, FlightSegment>('path.globe__flight-trail')
       .data(renderedSegments, (segment) => segment.id)
@@ -890,10 +914,6 @@ export async function createGlobe(
       .attr('stroke-dasharray', (segment) =>
         segment.id === activeFlightSegmentId ? '4.5 7.5' : '3.2 8.2',
       )
-
-    const activeSegment = showDesktopFlightTrails
-      ? flightSegments.find((segment) => segment.id === activeFlightSegmentId) ?? null
-      : null
 
     flightActiveLayer
       .selectAll<SVGPathElement, FlightSegment>('path.globe__flight-progress')
@@ -993,12 +1013,13 @@ export async function createGlobe(
   }
 
   function renderLabels(): void {
-    const labelIds =
-      renderMode === 'route'
+    const labelIds: string[] = showAllCountryLabels
+      ? countries.map((country) => country.id)
+      : renderMode === 'route'
         ? [...new Set([...answeredIds, ...skippedIds])]
         : [...answeredIds]
 
-    const visibleLabels = labelIds
+    const visibleLabels: GlobeLabel[] = labelIds
       .map((countryId) => {
         const country = countryById.get(countryId)
         const centroid = centroidForCountry(countryId)
@@ -1014,16 +1035,30 @@ export async function createGlobe(
           return null
         }
 
+        const tone =
+          skippedIds.has(countryId)
+            ? 'skipped'
+            : promptedCountryId === countryId
+              ? 'prompt'
+              : answeredIds.has(countryId)
+                ? 'answered'
+                : 'default'
+        const answered = answeredIds.has(countryId)
+
         return {
+          detail:
+            showCapitalSublabels && answered
+              ? country.capitalDisplayName
+              : null,
           flagAssetUrl:
-            skippedIds.has(countryId)
+            tone === 'skipped' || tone === 'default' || tone === 'prompt'
               ? null
               : country.appearance.kind === 'flag'
                 ? country.appearance.assetUrl
                 : null,
           id: country.id,
           name: answerKind === 'capital' ? country.capitalDisplayName : country.name,
-          tone: skippedIds.has(countryId) ? 'skipped' : 'answered',
+          tone,
           x: projected[0],
           y: projected[1],
         }
@@ -1043,6 +1078,10 @@ export async function createGlobe(
                 .attr('class', 'globe__label-name')
                 .attr('text-anchor', 'middle')
               groupSelection
+                .append('text')
+                .attr('class', 'globe__label-detail')
+                .attr('text-anchor', 'middle')
+              groupSelection
                 .append('image')
                 .attr('class', 'globe__label-flag-image')
             }),
@@ -1057,8 +1096,37 @@ export async function createGlobe(
           .text(label.name)
           .attr('x', 0)
           .attr('y', MAP_LABEL_NAME_OFFSET_PX)
-          .attr('fill', label.tone === 'skipped' ? '#f0d8ff' : '#fff4c8')
+          .attr(
+            'fill',
+            label.tone === 'skipped'
+              ? '#f0d8ff'
+              : label.tone === 'prompt'
+                ? '#ffe27a'
+                : label.tone === 'answered'
+                  ? '#fff4c8'
+                  : 'rgba(219, 235, 248, 0.78)',
+          )
+          .attr(
+            'stroke',
+            label.tone === 'skipped'
+              ? 'rgba(48, 16, 78, 0.96)'
+              : label.tone === 'prompt'
+                ? 'rgba(48, 34, 4, 0.98)'
+                : label.tone === 'answered'
+                  ? 'rgba(6, 15, 24, 0.92)'
+                  : 'rgba(6, 15, 24, 0.78)',
+          )
+          .attr('font-size', label.tone === 'default' ? 11 : 13)
+          .attr('font-weight', label.tone === 'default' ? 600 : 700)
+          .attr('opacity', label.tone === 'default' ? 0.86 : 1)
+        groupSelection
+          .select<SVGTextElement>('.globe__label-detail')
+          .text(label.detail ?? '')
+          .attr('x', 0)
+          .attr('y', MAP_LABEL_DETAIL_OFFSET_PX)
+          .attr('fill', label.tone === 'skipped' ? '#f0d8ff' : '#f6d67c')
           .attr('stroke', label.tone === 'skipped' ? 'rgba(48, 16, 78, 0.96)' : 'rgba(6, 15, 24, 0.92)')
+          .attr('display', label.detail ? null : 'none')
         groupSelection
           .select<SVGImageElement>('.globe__label-flag-image')
           .attr('href', label.flagAssetUrl ?? '')
@@ -1123,6 +1191,7 @@ export async function createGlobe(
     projection.scale(currentScale())
     writeRenderState()
     const mostRecentAnsweredId = latestAnsweredId(answeredIds)
+    const isFlightAnimating = Boolean(activeFlightSegmentId && activeFlightProgress < 1)
 
     spherePath
       .attr('d', projectedPathData(sphere))
@@ -1261,15 +1330,23 @@ export async function createGlobe(
       .attr('stroke', 'rgba(227, 238, 247, 0.38)')
       .attr('stroke-width', 0.62)
 
-    const fallbackOutlineData = [...fallbackFeatureByCountryId.entries()].map(([countryId, fallbackFeature]) => {
-      const country = countryById.get(countryId)
-      const answered = Boolean(country && answeredIds.has(countryId))
-      return {
-        answered,
-        feature: fallbackFeature,
-        id: countryId,
-      }
-    })
+    const fallbackOutlineData = [...fallbackFeatureByCountryId.entries()]
+      .map(([countryId, fallbackFeature]) => {
+        const country = countryById.get(countryId)
+        const centroid = fallbackCentroidByCountryId.get(countryId) ?? centroidForCountry(countryId)
+
+        if (centroid && !isVisible(centroid)) {
+          return null
+        }
+
+        const answered = Boolean(country && answeredIds.has(countryId))
+        return {
+          answered,
+          feature: fallbackFeature,
+          id: countryId,
+        }
+      })
+      .filter((entry): entry is { answered: boolean; feature: AtlasFeature; id: string } => Boolean(entry))
 
     fallbackOutlineLayer
       .selectAll<SVGPathElement, { answered: boolean; feature: AtlasFeature; id: string }>('path')
@@ -1284,38 +1361,48 @@ export async function createGlobe(
       )
       .attr('stroke-width', (entry) => (entry.answered ? 0.85 : 0.95))
 
-    const hitTargetData = countries
-      .map((country) => {
-        const feature = featureForCountry(country.id)
+    if (isFlightAnimating) {
+      hitTargetLayer.style('pointer-events', 'none')
+    } else {
+      const hitTargetData = countries
+        .map((country) => {
+          const feature = interactionFeatureForCountry(country.id)
+          const centroid = centroidForCountry(country.id)
 
-        if (!feature) {
-          return null
-        }
+          if (!feature) {
+            return null
+          }
 
-        return {
-          feature,
-          id: country.id,
-        }
-      })
-      .filter((entry): entry is { feature: AtlasFeature; id: string } => Boolean(entry))
+          if (centroid && !isVisible(centroid)) {
+            return null
+          }
 
-    hitTargetLayer
-      .selectAll<SVGPathElement, { feature: AtlasFeature; id: string }>('path')
-      .data(hitTargetData, (entry) => entry.id)
-      .join('path')
-      .attr('class', 'globe__hit-target')
-      .attr('data-country-id', (entry) => entry.id)
-      .attr('d', (entry) => projectedPathData(entry.feature))
-      .attr('fill', 'rgba(0, 0, 0, 0.001)')
-      .attr('stroke', 'none')
-      .on('click', function (event: MouseEvent, entry) {
-        if (!event.shiftKey) {
-          return
-        }
+          return {
+            feature,
+            id: country.id,
+          }
+        })
+        .filter((entry): entry is { feature: AtlasFeature; id: string } => Boolean(entry))
 
-        event.preventDefault()
-        options?.onCountryCheat?.(entry.id)
-      })
+      hitTargetLayer
+        .style('pointer-events', null)
+        .selectAll<SVGPathElement, { feature: AtlasFeature; id: string }>('path')
+        .data(hitTargetData, (entry) => entry.id)
+        .join('path')
+        .attr('class', 'globe__hit-target')
+        .attr('data-country-id', (entry) => entry.id)
+        .attr('d', (entry) => projectedPathData(entry.feature))
+        .attr('fill', 'rgba(0, 0, 0, 0.001)')
+        .attr('stroke', 'none')
+        .on('click', function (event: MouseEvent, entry) {
+          if (!event.shiftKey) {
+            return
+          }
+
+          event.preventDefault()
+          options?.onCountryCheat?.(entry.id)
+        })
+    }
 
     renderLabels()
     renderPlane(mostRecentAnsweredId)
@@ -1690,6 +1777,8 @@ export async function createGlobe(
       skippedIds = new Set(options?.skippedIds ?? [])
       answerKind = options?.answerKind ?? 'country'
       renderMode = options?.layoutMode ?? 'free'
+      showCapitalSublabels = options?.showCapitalSublabels ?? false
+      showAllCountryLabels = options?.showAllCountryLabels ?? false
 
       if (options?.focusLatest) {
         const mostRecentAnsweredId = latestAnsweredId(answeredIds)

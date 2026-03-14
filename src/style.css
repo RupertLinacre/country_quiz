@@ -484,11 +484,13 @@ h1 {
 .globe__labels,
 .globe__label,
 .globe__label-name,
+.globe__label-detail,
 .globe__label-flag-image {
   pointer-events: none;
 }
 
-.globe__label-name {
+.globe__label-name,
+.globe__label-detail {
   fill: #fff4c8;
   font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
   font-weight: 700;
@@ -502,6 +504,11 @@ h1 {
 .globe__label-name {
   font-size: 13px;
   letter-spacing: 0.04em;
+}
+
+.globe__label-detail {
+  font-size: 11px;
+  letter-spacing: 0.03em;
 }
 
 .globe__label-flag-image {
@@ -623,6 +630,30 @@ h1 {
   color: #f5ebff;
 }
 
+.country-slot--capital {
+  inline-size: clamp(7.6rem, calc(var(--chars) * 0.54ch + 2.2rem), 11rem);
+  min-height: 6.7rem;
+  padding: 0.7rem 0.75rem 0.65rem;
+  border-radius: 20px;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.28rem;
+  text-align: center;
+}
+
+.country-slot--capital.country-slot--capital-pending {
+  border: 1px solid rgba(244, 240, 226, 0.16);
+  background:
+    linear-gradient(180deg, rgba(244, 240, 226, 0.08), rgba(244, 240, 226, 0.04)),
+    rgba(6, 22, 34, 0.86);
+}
+
+.country-slot--capital.country-slot--solved {
+  justify-content: initial;
+  padding-inline: 0.75rem;
+}
+
 .country-slot--solved .country-slot__flag-icon {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
 }
@@ -633,6 +664,28 @@ h1 {
 
 .country-slot__name {
   white-space: nowrap;
+}
+
+.country-slot--capital .country-slot__name {
+  white-space: normal;
+  line-height: 1.15;
+}
+
+.country-slot__capital {
+  min-height: 1rem;
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.country-slot--capital.country-slot--solved .country-slot__capital {
+  color: #f6d67c;
+}
+
+.country-slot__capital--hidden {
+  visibility: hidden;
 }
 
 .country-slot__flag-anchor {
@@ -653,6 +706,12 @@ h1 {
 .country-slot__flag-icon {
   width: 1.2rem;
   height: 0.9rem;
+}
+
+.country-slot--capital .country-slot__flag-icon {
+  width: 1.85rem;
+  height: 1.38rem;
+  border-radius: 5px;
 }
 
 .country-slot__flag-preview {
@@ -704,7 +763,9 @@ h1 {
 }
 
 .country-slot--solved:hover .country-slot__flag-preview,
-.country-slot--solved:focus-within .country-slot__flag-preview {
+.country-slot--solved:focus-within .country-slot__flag-preview,
+.country-slot--capital:hover .country-slot__flag-preview,
+.country-slot--capital:focus-within .country-slot__flag-preview {
   opacity: 1;
   transform: translate(-50%, 0);
 }

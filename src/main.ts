@@ -150,6 +150,18 @@ function answerLabelForCountryId(countryId: string): string {
   return country ? answerLabelForCountry(country) : 'That answer'
 }
 
+function trackerNameForCountry(country: QuizCountry): string {
+  return mode.answerKind === 'capital' ? country.name : answerLabelForCountry(country)
+}
+
+function trackerPreviewLabelForCountry(country: QuizCountry, solved: boolean): string {
+  if (mode.answerKind !== 'capital') {
+    return solvedPreviewLabelForCountry(country)
+  }
+
+  return solved ? `${country.name} - ${country.capitalDisplayName}` : country.name
+}
+
 function solvedPreviewLabelForCountry(country: QuizCountry): string {
   return mode.answerKind === 'capital'
     ? `${country.name} - ${country.capitalDisplayName}`
@@ -196,8 +208,8 @@ app.innerHTML = `
         <div class="hero__stats">
           <article class="stat-card">
             <span class="stat-card__label">Score</span>
-            <strong id="score" class="stat-card__value">0/${totalCountryCount} countries</strong>
-            <span class="stat-card__meta">countries found</span>
+            <strong id="score" class="stat-card__value">0/${totalCountryCount} ${answerThingPlural()}</strong>
+            <span class="stat-card__meta">${mode.answerKind === 'capital' ? 'capital cities solved' : 'countries found'}</span>
           </article>
           <article class="stat-card stat-card--timer">
             <div class="stat-card__header">
@@ -373,7 +385,7 @@ function attachTrackerCheatInteractions(slot: HTMLLIElement, countryId: string):
   slot.addEventListener('touchcancel', clearHold)
 }
 
-function createSolvedFlagNode(countryId: string): HTMLElement | null {
+function createTrackerFlagNode(countryId: string, previewText: string): HTMLElement | null {
   const country = countriesById.get(countryId)
 
   if (!country || country.appearance.kind !== 'flag') {
@@ -401,7 +413,7 @@ function createSolvedFlagNode(countryId: string): HTMLElement | null {
 
   const previewLabel = document.createElement('span')
   previewLabel.className = 'country-slot__flag-preview-label'
-  previewLabel.textContent = solvedPreviewLabelForCountry(country)
+  previewLabel.textContent = previewText
 
   preview.append(previewImage, previewLabel)
   anchor.append(icon, preview)
@@ -421,7 +433,7 @@ function applySolvedCountrySlot(slot: HTMLLIElement, countryId: string): void {
     : 'country-slot country-slot--solved'
   slot.replaceChildren()
 
-  const flagNode = createSolvedFlagNode(countryId)
+  const flagNode = createTrackerFlagNode(countryId, solvedPreviewLabelForCountry(country))
   const name = document.createElement('span')
   name.className = 'country-slot__name'
   name.textContent = answerLabelForCountry(country)
@@ -431,6 +443,48 @@ function applySolvedCountrySlot(slot: HTMLLIElement, countryId: string): void {
   }
 
   slot.append(name)
+}
+
+function applyCapitalTrackerSlot(slot: HTMLLIElement, countryId: string): void {
+  const country = countriesById.get(countryId)
+
+  if (!country) {
+    return
+  }
+
+  const solved = answeredIds.has(countryId)
+  const cheated = cheatedIds.has(countryId)
+
+  slot.className = [
+    'country-slot',
+    'country-slot--capital',
+    solved ? 'country-slot--solved' : 'country-slot--capital-pending',
+    cheated ? 'country-slot--cheated' : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
+  slot.replaceChildren()
+
+  const flagNode = createTrackerFlagNode(countryId, trackerPreviewLabelForCountry(country, solved))
+  const name = document.createElement('span')
+  name.className = 'country-slot__name'
+  name.textContent = trackerNameForCountry(country)
+
+  const capital = document.createElement('span')
+  capital.className = solved
+    ? 'country-slot__capital'
+    : 'country-slot__capital country-slot__capital--hidden'
+  capital.textContent = country.capitalDisplayName
+
+  if (!solved) {
+    capital.setAttribute('aria-hidden', 'true')
+  }
+
+  if (flagNode) {
+    slot.append(flagNode)
+  }
+
+  slot.append(name, capital)
 }
 
 function formatTime(milliseconds: number): string {
@@ -489,14 +543,21 @@ function renderTracker(): void {
 
     for (const country of countries) {
       const slot = document.createElement('li')
-      const answerLabel = answerLabelForCountry(country)
-      slot.className = 'country-slot country-slot--empty'
-      slot.style.setProperty('--chars', String(Math.max(6, answerLabel.length)))
+      const trackerLabel = trackerNameForCountry(country)
+      const slotChars = mode.answerKind === 'capital'
+        ? Math.max(12, trackerLabel.length)
+        : Math.max(6, trackerLabel.length)
+      slot.className = mode.answerKind === 'capital'
+        ? 'country-slot country-slot--capital country-slot--capital-pending'
+        : 'country-slot country-slot--empty'
+      slot.style.setProperty('--chars', String(slotChars))
       slot.dataset.countryId = country.id
       attachTrackerCheatInteractions(slot, country.id)
       trackerSlotByCountryId.set(country.id, slot)
 
-      if (answeredIds.has(country.id)) {
+      if (mode.answerKind === 'capital') {
+        applyCapitalTrackerSlot(slot, country.id)
+      } else if (answeredIds.has(country.id)) {
         applySolvedCountrySlot(slot, country.id)
       }
 
@@ -516,7 +577,9 @@ function updateTracker(countryId: string): void {
     return
   }
 
-  if (!slot.classList.contains('country-slot--solved')) {
+  if (mode.answerKind === 'capital') {
+    applyCapitalTrackerSlot(slot, countryId)
+  } else if (!slot.classList.contains('country-slot--solved')) {
     applySolvedCountrySlot(slot, countryId)
   }
 
@@ -530,7 +593,7 @@ function updateTracker(countryId: string): void {
 }
 
 function renderScore(): void {
-  scoreElement.textContent = `${answeredIds.size}/${totalCountryCount} countries`
+  scoreElement.textContent = `${answeredIds.size}/${totalCountryCount} ${answerThingPlural()}`
   compactScoreElement.textContent = `${answeredIds.size}/${totalCountryCount}`
   remainingElement.textContent = `${totalCountryCount - answeredIds.size} left`
 }
@@ -544,7 +607,8 @@ function renderClassicFlightStatus(status: GlobeFlightStatus | null): void {
   flightEyebrowElement.textContent = 'Flight Path'
 
   if (!status) {
-    flightRouteElement.textContent = `Plane standing by in ${answerLabelForCountryId(STARTING_COUNTRY_ID)}`
+    const startCountry = countriesById.get(STARTING_COUNTRY_ID)
+    flightRouteElement.textContent = `Plane standing by in ${startCountry?.name ?? answerLabelForCountryId(STARTING_COUNTRY_ID)}`
     flightDistanceElement.textContent = 'Leg distance: 0 miles'
     flightTotalElement.textContent = 'Total distance flown: 0 miles'
     return
@@ -583,8 +647,10 @@ function syncSolvedCountries(options?: { focusLatest?: boolean }): void {
   globe?.setAnswered(answeredIds, {
     cheatedIds,
     focusLatest: options?.focusLatest,
-    answerKind: mode.answerKind,
+    answerKind: 'country',
+    showCapitalSublabels: mode.answerKind === 'capital',
     layoutMode: mode.layoutMode,
+    showAllCountryLabels: mode.answerKind === 'capital',
     skippedIds,
   })
 }
