@@ -57,6 +57,8 @@ export type GlobeFlightPerformance = {
   toName: string
 }
 
+type PreAnswerLabelMode = 'none' | 'country' | 'capital'
+
 type GlobeController = {
   benchmarkFlight: (
     fromCountryId: string,
@@ -69,8 +71,9 @@ type GlobeController = {
       focusLatest?: boolean
       answerKind?: 'country' | 'capital'
       layoutMode?: 'free' | 'route'
-      showCapitalSublabels?: boolean
+      preAnswerLabelMode?: PreAnswerLabelMode
       showAllCountryLabels?: boolean
+      showPreAnswerFlags?: boolean
       skippedIds?: Set<string>
     },
   ) => void
@@ -101,7 +104,7 @@ type GlobeLabel = {
   flagAssetUrl: string | null
   id: string
   detail: string | null
-  name: string
+  name: string | null
   tone: 'answered' | 'default' | 'prompt' | 'skipped'
   x: number
   y: number
@@ -519,7 +522,6 @@ export async function createGlobe(
   const spherePath = mapLayer.append('path').attr('class', 'globe__sphere')
   const graticulePath = mapLayer.append('path').attr('class', 'globe__graticule')
   const countriesLayer = mapLayer.append('g').attr('class', 'globe__countries')
-  const fallbackLayer = mapLayer.append('g').attr('class', 'globe__fallbacks')
   const solvedLayer = mapLayer.append('g').attr('class', 'globe__solved')
   const flightLayer = mapLayer.append('g').attr('class', 'globe__flights')
   const flightTrailLayer = flightLayer.append('g').attr('class', 'globe__flight-trails')
@@ -548,8 +550,9 @@ export async function createGlobe(
   let promptedCountryId: string | null = null
   let answerKind: 'country' | 'capital' = 'country'
   let renderMode: 'free' | 'route' = 'free'
-  let showCapitalSublabels = false
+  let preAnswerLabelMode: PreAnswerLabelMode = 'none'
   let showAllCountryLabels = false
+  let showPreAnswerFlags = false
   let currentZoom = 1
   let cssWidth = 760
   let cssHeight = 760
@@ -1042,20 +1045,26 @@ export async function createGlobe(
                 ? 'answered'
                 : 'default'
         const answered = answeredIds.has(countryId)
+        const skipped = skippedIds.has(countryId)
+        const topLabel =
+          answered || skipped || preAnswerLabelMode === 'country'
+            ? country.name
+            : null
+        const bottomLabel =
+          answered || skipped || preAnswerLabelMode === 'capital'
+            ? country.capitalDisplayName
+            : null
 
         return {
-          detail:
-            showCapitalSublabels && answered
-              ? country.capitalDisplayName
-              : null,
+          detail: bottomLabel,
           flagAssetUrl:
-            tone === 'skipped' || tone === 'default' || tone === 'prompt'
-              ? null
-              : country.appearance.kind === 'flag'
+            answered || skipped || showPreAnswerFlags
+              ? country.appearance.kind === 'flag'
                 ? country.appearance.assetUrl
-                : null,
+                : null
+              : null,
           id: country.id,
-          name: answerKind === 'capital' ? country.capitalDisplayName : country.name,
+          name: topLabel,
           tone,
           x: projected[0],
           y: projected[1],
@@ -1091,7 +1100,7 @@ export async function createGlobe(
         const groupSelection = select(this)
         groupSelection
           .select<SVGTextElement>('.globe__label-name')
-          .text(label.name)
+          .text(label.name ?? '')
           .attr('x', 0)
           .attr('y', MAP_LABEL_NAME_OFFSET_PX)
           .attr(
@@ -1117,6 +1126,7 @@ export async function createGlobe(
           .attr('font-size', label.tone === 'default' ? 11 : 13)
           .attr('font-weight', label.tone === 'default' ? 600 : 700)
           .attr('opacity', label.tone === 'default' ? 0.86 : 1)
+          .attr('display', label.name ? null : 'none')
         groupSelection
           .select<SVGTextElement>('.globe__label-detail')
           .text(label.detail ?? '')
@@ -1208,14 +1218,6 @@ export async function createGlobe(
       .data([atlas.landFeature])
       .join('path')
       .attr('d', (featureEntry) => projectedPathData(featureEntry))
-      .attr('fill', UNSOLVED_LAND_FILL)
-      .attr('stroke', 'none')
-
-    fallbackLayer
-      .selectAll<SVGPathElement, AtlasFeature>('path')
-      .data([])
-      .join('path')
-      .attr('d', (fallbackFeature) => projectedPathData(fallbackFeature))
       .attr('fill', UNSOLVED_LAND_FILL)
       .attr('stroke', 'none')
 
@@ -1779,8 +1781,9 @@ export async function createGlobe(
       skippedIds = new Set(options?.skippedIds ?? [])
       answerKind = options?.answerKind ?? 'country'
       renderMode = options?.layoutMode ?? 'free'
-      showCapitalSublabels = options?.showCapitalSublabels ?? false
+      preAnswerLabelMode = options?.preAnswerLabelMode ?? 'none'
       showAllCountryLabels = options?.showAllCountryLabels ?? false
+      showPreAnswerFlags = options?.showPreAnswerFlags ?? false
 
       if (options?.focusLatest) {
         const mostRecentAnsweredId = latestAnsweredId(answeredIds)

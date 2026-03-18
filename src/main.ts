@@ -23,10 +23,26 @@ registerSW({ immediate: true })
 const STARTING_COUNTRY_ID = 'GBR'
 const MOBILE_CHEAT_HOLD_MS = 2000
 const MODE_QUERY_PARAM = 'mode'
+const SHOW_FLAGS_QUERY_PARAM = 'flags'
+const LEGACY_SHOW_MAPS_QUERY_PARAM = 'maps'
+const SHOW_CAPITALS_QUERY_PARAM = 'capitals'
+const SHOW_COUNTRIES_QUERY_PARAM = 'countries'
+const RANDOM_ROUTE_QUERY_PARAM = 'random-route'
+const ROUTE_SEED_QUERY_PARAM = 'route-seed'
+const SETTINGS_DIALOG_QUERY_PARAM = 'settings'
 
 type LayoutMode = 'free' | 'route'
 type AnswerKind = 'country' | 'capital'
 type ModeKey = 'free' | 'route' | 'free-capitals' | 'route-capitals'
+type PreAnswerLabelMode = 'none' | 'country' | 'capital'
+
+type QuizSettings = {
+  randomRoute: boolean
+  routeSeed: string | null
+  showCapitals: boolean
+  showCountries: boolean
+  showFlags: boolean
+}
 
 type ModeConfig = {
   answerKind: AnswerKind
@@ -44,11 +60,11 @@ type ModeConfig = {
 const MODE_CONFIGS: Record<ModeKey, ModeConfig> = {
   free: {
     answerKind: 'country',
-    heading: 'Can you name all 197 countries of the world?',
+    heading: 'Name all 197 countries in any order',
     inputLabel: 'Enter a country',
     layoutMode: 'free',
     modeEyebrow: 'Flight Path',
-    navLabel: 'Free Entry',
+    navLabel: 'Countries',
     navTitle: 'Countries',
     placeholder: 'Start typing a country name...',
     routeStatusHint: 'Type the highlighted country, or skip it for later.',
@@ -56,23 +72,23 @@ const MODE_CONFIGS: Record<ModeKey, ModeConfig> = {
   },
   route: {
     answerKind: 'country',
-    heading: 'Can you identify every highlighted country on the globe?',
+    heading: 'Name the highlighted country',
     inputLabel: 'Type the highlighted country',
     layoutMode: 'route',
     modeEyebrow: 'Route Drill',
-    navLabel: 'Route Drill',
-    navTitle: 'Route Countries',
+    navLabel: 'Specific Countries',
+    navTitle: 'Specific Countries',
     placeholder: 'Type the highlighted country...',
     routeStatusHint: 'Type the highlighted country, or skip it for later.',
     title: 'Countries Quiz - Route Drill',
   },
   'free-capitals': {
     answerKind: 'capital',
-    heading: 'Can you name all 197 capital cities of the world?',
+    heading: 'Name all 197 capital cities in any order',
     inputLabel: 'Enter a capital city',
     layoutMode: 'free',
     modeEyebrow: 'Flight Path',
-    navLabel: 'Capital Entry',
+    navLabel: 'Capitals',
     navTitle: 'Capitals',
     placeholder: 'Start typing a capital city...',
     routeStatusHint: "Type the highlighted country's capital city, or skip it for later.",
@@ -80,12 +96,12 @@ const MODE_CONFIGS: Record<ModeKey, ModeConfig> = {
   },
   'route-capitals': {
     answerKind: 'capital',
-    heading: "Can you identify every highlighted country by its capital city?",
+    heading: 'Name the highlighted capital city',
     inputLabel: "Type the highlighted country's capital city",
     layoutMode: 'route',
     modeEyebrow: 'Route Drill',
-    navLabel: 'Capital Route',
-    navTitle: 'Route Capitals',
+    navLabel: 'Specific Capitals',
+    navTitle: 'Specific Capitals',
     placeholder: "Type the highlighted country's capital city...",
     routeStatusHint: "Type the highlighted country's capital city, or skip it for later.",
     title: 'Countries Quiz - Route Capitals',
@@ -112,7 +128,67 @@ function readModeKey(): ModeKey {
   return 'free'
 }
 
-function modeUrl(modeKey: ModeKey): string {
+function routeSeedFromText(value: string): number {
+  let hash = 1779033703 ^ value.length
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = Math.imul(hash ^ value.charCodeAt(index), 3432918353)
+    hash = (hash << 13) | (hash >>> 19)
+  }
+
+  hash = Math.imul(hash ^ (hash >>> 16), 2246822507)
+  hash = Math.imul(hash ^ (hash >>> 13), 3266489909)
+  return (hash ^= hash >>> 16) >>> 0
+}
+
+function seededRandom(seed: string): () => number {
+  let state = routeSeedFromText(seed) || 1
+
+  return () => {
+    state += 0x6d2b79f5
+    let next = Math.imul(state ^ (state >>> 15), 1 | state)
+    next ^= next + Math.imul(next ^ (next >>> 7), 61 | next)
+    return ((next ^ (next >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+function createRouteSeed(): string {
+  return Math.random().toString(36).slice(2, 10)
+}
+
+function readBooleanSearchParam(searchParams: URLSearchParams, name: string): boolean {
+  const value = searchParams.get(name)
+  return value === '1' || value === 'true'
+}
+
+function setBooleanSearchParam(searchParams: URLSearchParams, name: string, enabled: boolean): void {
+  if (enabled) {
+    searchParams.set(name, '1')
+  } else {
+    searchParams.delete(name)
+  }
+}
+
+function urlPathWithQuery(url: URL): string {
+  return `${url.pathname}${url.search}${url.hash}`
+}
+
+function readSettings(): QuizSettings {
+  const url = new URL(window.location.href)
+  const randomRoute = readBooleanSearchParam(url.searchParams, RANDOM_ROUTE_QUERY_PARAM)
+
+  return {
+    showFlags:
+      readBooleanSearchParam(url.searchParams, SHOW_FLAGS_QUERY_PARAM) ||
+      readBooleanSearchParam(url.searchParams, LEGACY_SHOW_MAPS_QUERY_PARAM),
+    showCapitals: readBooleanSearchParam(url.searchParams, SHOW_CAPITALS_QUERY_PARAM),
+    showCountries: readBooleanSearchParam(url.searchParams, SHOW_COUNTRIES_QUERY_PARAM),
+    randomRoute,
+    routeSeed: randomRoute ? url.searchParams.get(ROUTE_SEED_QUERY_PARAM) ?? createRouteSeed() : null,
+  }
+}
+
+function modeUrl(modeKey: ModeKey, options?: { settingsOpen?: boolean }): string {
   const url = new URL(window.location.href)
 
   switch (modeKey) {
@@ -130,13 +206,56 @@ function modeUrl(modeKey: ModeKey): string {
       break
   }
 
-  return `${url.pathname}${url.search}${url.hash}`
+  setBooleanSearchParam(url.searchParams, SETTINGS_DIALOG_QUERY_PARAM, options?.settingsOpen ?? false)
+
+  return urlPathWithQuery(url)
 }
 
 const modeKey = readModeKey()
 const mode = MODE_CONFIGS[modeKey]
+let settings = readSettings()
+const settingsOpenOnLoad = readBooleanSearchParam(
+  new URL(window.location.href).searchParams,
+  SETTINGS_DIALOG_QUERY_PARAM,
+)
+
+function syncSettingsUrl(): void {
+  const url = new URL(window.location.href)
+  setBooleanSearchParam(url.searchParams, SHOW_FLAGS_QUERY_PARAM, settings.showFlags)
+  url.searchParams.delete(LEGACY_SHOW_MAPS_QUERY_PARAM)
+  setBooleanSearchParam(url.searchParams, SHOW_CAPITALS_QUERY_PARAM, settings.showCapitals)
+  setBooleanSearchParam(url.searchParams, SHOW_COUNTRIES_QUERY_PARAM, settings.showCountries)
+  setBooleanSearchParam(url.searchParams, RANDOM_ROUTE_QUERY_PARAM, settings.randomRoute)
+
+  if (settings.randomRoute && settings.routeSeed) {
+    url.searchParams.set(ROUTE_SEED_QUERY_PARAM, settings.routeSeed)
+  } else {
+    url.searchParams.delete(ROUTE_SEED_QUERY_PARAM)
+  }
+
+  window.history.replaceState(null, '', urlPathWithQuery(url))
+}
+
+function routeOrderForSettings(currentSettings: QuizSettings): string[] {
+  if (!currentSettings.randomRoute || !currentSettings.routeSeed) {
+    return [...routeChallengeOrder]
+  }
+
+  const random = seededRandom(currentSettings.routeSeed)
+  const nextOrder = [...routeChallengeOrder]
+
+  for (let index = nextOrder.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1))
+    ;[nextOrder[index], nextOrder[swapIndex]] = [nextOrder[swapIndex], nextOrder[index]]
+  }
+
+  return nextOrder
+}
+
+syncSettingsUrl()
+
 const aliasMap = mode.answerKind === 'capital' ? capitalAliasToCountryId : aliasToCountryId
-const routePromptQueue = mode.layoutMode === 'route' ? [...routeChallengeOrder] : []
+const routePromptQueue = mode.layoutMode === 'route' ? routeOrderForSettings(settings) : []
 let currentPromptId = mode.layoutMode === 'route' ? routePromptQueue[0] ?? null : null
 const routeFlightOrder: string[] = []
 let skippedPromptCount = 0
@@ -148,10 +267,6 @@ function answerLabelForCountry(country: QuizCountry): string {
 function answerLabelForCountryId(countryId: string): string {
   const country = countriesById.get(countryId)
   return country ? answerLabelForCountry(country) : 'That answer'
-}
-
-function trackerNameForCountry(country: QuizCountry): string {
-  return mode.answerKind === 'capital' ? country.name : answerLabelForCountry(country)
 }
 
 function trackerPreviewLabelForCountry(country: QuizCountry, solved: boolean): string {
@@ -176,6 +291,48 @@ function answerThingPlural(): string {
   return mode.answerKind === 'capital' ? 'capital cities' : 'countries'
 }
 
+function preAnswerLabelMode(): PreAnswerLabelMode {
+  if (mode.answerKind === 'country') {
+    return settings.showCapitals ? 'capital' : 'none'
+  }
+
+  return settings.showCountries ? 'country' : 'none'
+}
+
+function renderModeLinksMarkup(options?: { settingsOpen?: boolean }): string {
+  return (['free', 'route', 'free-capitals', 'route-capitals'] satisfies ModeKey[])
+    .map((candidate) => {
+      const candidateMode = MODE_CONFIGS[candidate]
+      return `
+        <a
+          class="mode-switch__link ${modeKey === candidate ? 'mode-switch__link--active' : ''}"
+          href="${modeUrl(candidate, options)}"
+          title="${candidateMode.navTitle}"
+        >
+          ${candidateMode.navLabel}
+        </a>
+      `
+    })
+    .join('')
+}
+
+function renderModeDropdownLinksMarkup(): string {
+  return (['free', 'route', 'free-capitals', 'route-capitals'] satisfies ModeKey[])
+    .map((candidate) => {
+      const candidateMode = MODE_CONFIGS[candidate]
+      return `
+        <a
+          class="mode-dropdown__link ${modeKey === candidate ? 'mode-dropdown__link--active' : ''}"
+          href="${modeUrl(candidate)}"
+          title="${candidateMode.navTitle}"
+        >
+          ${candidateMode.navLabel}
+        </a>
+      `
+    })
+    .join('')
+}
+
 const app = document.querySelector<HTMLDivElement>('#app')
 
 if (!app) {
@@ -188,23 +345,35 @@ app.innerHTML = `
   <main class="shell">
     <section class="hero">
       <div class="hero__copy">
-        <nav class="mode-switch" aria-label="Game mode">
-          ${(['free', 'route', 'free-capitals', 'route-capitals'] satisfies ModeKey[])
-            .map((candidate) => {
-              const candidateMode = MODE_CONFIGS[candidate]
-              return `
-                <a
-                  class="mode-switch__link ${modeKey === candidate ? 'mode-switch__link--active' : ''}"
-                  href="${modeUrl(candidate)}"
-                  title="${candidateMode.navTitle}"
-                >
-                  ${candidateMode.navLabel}
-                </a>
-              `
-            })
-            .join('')}
-        </nav>
-        <h1>${mode.heading}</h1>
+        <div class="hero__header">
+          <div class="hero__topbar">
+            <button
+              id="settings-button"
+              class="settings-button"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="settings-modal"
+              aria-expanded="false"
+              title="Open settings"
+            >
+              <span aria-hidden="true">⚙</span>
+              <span class="settings-button__label">Settings</span>
+            </button>
+            <details class="mode-dropdown">
+              <summary class="mode-dropdown__trigger" aria-label="Game mode">
+                <span class="mode-dropdown__prefix">Game mode:</span>
+                <span class="mode-dropdown__label">${mode.navLabel}</span>
+                <span class="mode-dropdown__chevron" aria-hidden="true">▾</span>
+              </summary>
+              <nav class="mode-dropdown__menu" aria-label="Game mode">
+                ${renderModeDropdownLinksMarkup()}
+              </nav>
+            </details>
+          </div>
+          <div class="hero__headline">
+            <h1>${mode.heading}</h1>
+          </div>
+        </div>
         <div class="hero__stats">
           <article class="stat-card">
             <span class="stat-card__label">Score</span>
@@ -282,6 +451,58 @@ app.innerHTML = `
       <div id="continent-board" class="continent-board"></div>
     </section>
   </main>
+  <div id="settings-modal" class="settings-modal" hidden>
+    <section
+      class="settings-modal__panel"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="settings-title"
+    >
+      <div class="settings-modal__header">
+        <div>
+          <p class="eyebrow settings-modal__eyebrow">Settings</p>
+          <h2 id="settings-title" class="settings-modal__title">Quiz Options</h2>
+        </div>
+        <button id="settings-close" class="settings-close" type="button" aria-label="Close settings">×</button>
+      </div>
+      <section class="settings-modal__modes" aria-labelledby="settings-modes-title">
+        <p id="settings-modes-title" class="settings-modal__section-title">Mode</p>
+        <nav class="mode-switch mode-switch--settings" aria-label="Mobile game mode">
+          ${renderModeLinksMarkup({ settingsOpen: true })}
+        </nav>
+      </section>
+      <div class="settings-list">
+        <label class="settings-option" for="setting-show-flags">
+          <span class="settings-option__copy">
+            <span class="settings-option__title">Show flags</span>
+            <span class="settings-option__description">Show country flags on the globe before the answer is solved.</span>
+          </span>
+          <input id="setting-show-flags" class="settings-option__toggle" type="checkbox" ${settings.showFlags ? 'checked' : ''} />
+        </label>
+        <label class="settings-option ${mode.answerKind === 'country' ? '' : 'settings-option--disabled'}" for="setting-show-capitals">
+          <span class="settings-option__copy">
+            <span class="settings-option__title">Show capitals</span>
+            <span class="settings-option__description">In country entry modes, show capital-city labels before the country is solved.</span>
+          </span>
+          <input id="setting-show-capitals" class="settings-option__toggle" type="checkbox" ${settings.showCapitals ? 'checked' : ''} ${mode.answerKind === 'country' ? '' : 'disabled'} />
+        </label>
+        <label class="settings-option ${mode.answerKind === 'capital' ? '' : 'settings-option--disabled'}" for="setting-show-countries">
+          <span class="settings-option__copy">
+            <span class="settings-option__title">Show countries</span>
+            <span class="settings-option__description">In capital entry modes, show country-name labels before the capital is solved.</span>
+          </span>
+          <input id="setting-show-countries" class="settings-option__toggle" type="checkbox" ${settings.showCountries ? 'checked' : ''} ${mode.answerKind === 'capital' ? '' : 'disabled'} />
+        </label>
+        <label class="settings-option ${mode.layoutMode === 'route' ? '' : 'settings-option--disabled'}" for="setting-random-route">
+          <span class="settings-option__copy">
+            <span class="settings-option__title">Random route</span>
+            <span class="settings-option__description">In route drills, use a seeded random order instead of the travelling-salesman route.</span>
+          </span>
+          <input id="setting-random-route" class="settings-option__toggle" type="checkbox" ${settings.randomRoute ? 'checked' : ''} ${mode.layoutMode === 'route' ? '' : 'disabled'} />
+        </label>
+      </div>
+    </section>
+  </div>
 `
 
 const scoreElement = requireElement<HTMLElement>('#score')
@@ -302,6 +523,13 @@ const globeContainer = requireElement<HTMLElement>('#globe')
 const giveUpButton = requireElement<HTMLButtonElement>('#give-up-button')
 const compactGiveUpButton = requireElement<HTMLButtonElement>('#give-up-button-compact')
 const skipButton = document.querySelector<HTMLButtonElement>('#skip-button')
+const settingsButton = requireElement<HTMLButtonElement>('#settings-button')
+const settingsModal = requireElement<HTMLElement>('#settings-modal')
+const settingsCloseButton = requireElement<HTMLButtonElement>('#settings-close')
+const showFlagsInput = requireElement<HTMLInputElement>('#setting-show-flags')
+const showCapitalsInput = requireElement<HTMLInputElement>('#setting-show-capitals')
+const showCountriesInput = requireElement<HTMLInputElement>('#setting-show-countries')
+const randomRouteInput = requireElement<HTMLInputElement>('#setting-random-route')
 
 const answeredIds = new Set<string>()
 const cheatedIds = new Set<string>()
@@ -420,32 +648,53 @@ function createTrackerFlagNode(countryId: string, previewText: string): HTMLElem
   return anchor
 }
 
-function applySolvedCountrySlot(slot: HTMLLIElement, countryId: string): void {
-  const country = countriesById.get(countryId)
-
-  if (!country) {
-    return
+function trackerPrimaryText(country: QuizCountry, solved: boolean): string | null {
+  if (solved) {
+    return country.name
   }
 
-  const cheated = cheatedIds.has(countryId)
-  slot.className = cheated
-    ? 'country-slot country-slot--solved country-slot--cheated'
-    : 'country-slot country-slot--solved'
-  slot.replaceChildren()
-
-  const flagNode = createTrackerFlagNode(countryId, solvedPreviewLabelForCountry(country))
-  const name = document.createElement('span')
-  name.className = 'country-slot__name'
-  name.textContent = answerLabelForCountry(country)
-
-  if (flagNode) {
-    slot.append(flagNode)
+  if (mode.answerKind === 'capital' && settings.showCountries) {
+    return country.name
   }
 
-  slot.append(name)
+  return null
 }
 
-function applyCapitalTrackerSlot(slot: HTMLLIElement, countryId: string): void {
+function trackerSecondaryText(country: QuizCountry, solved: boolean): string | null {
+  if (solved) {
+    return country.capitalDisplayName
+  }
+
+  if (mode.answerKind === 'country' && settings.showCapitals) {
+    return country.capitalDisplayName
+  }
+
+  return null
+}
+
+function trackerShowsFlag(solved: boolean): boolean {
+  return solved || settings.showFlags
+}
+
+function trackerUsesDetailedSlot(country: QuizCountry): boolean {
+  const solved = answeredIds.has(country.id)
+  return Boolean(
+    solved ||
+    trackerPrimaryText(country, solved) ||
+    trackerSecondaryText(country, solved) ||
+    trackerShowsFlag(solved),
+  )
+}
+
+function trackerSlotChars(country: QuizCountry): number {
+  if (!trackerUsesDetailedSlot(country)) {
+    return Math.max(6, country.name.length)
+  }
+
+  return Math.max(12, country.name.length, country.capitalDisplayName.length)
+}
+
+function applyTrackerSlot(slot: HTMLLIElement, countryId: string): void {
   const country = countriesById.get(countryId)
 
   if (!country) {
@@ -454,37 +703,47 @@ function applyCapitalTrackerSlot(slot: HTMLLIElement, countryId: string): void {
 
   const solved = answeredIds.has(countryId)
   const cheated = cheatedIds.has(countryId)
+  const primaryText = trackerPrimaryText(country, solved)
+  const secondaryText = trackerSecondaryText(country, solved)
+  const showFlag = trackerShowsFlag(solved)
+  const detailedSlot = Boolean(primaryText || secondaryText || showFlag)
 
   slot.className = [
     'country-slot',
-    'country-slot--capital',
-    solved ? 'country-slot--solved' : 'country-slot--capital-pending',
+    detailedSlot ? 'country-slot--capital' : 'country-slot--empty',
+    detailedSlot ? (solved ? 'country-slot--solved' : 'country-slot--capital-pending') : '',
     cheated ? 'country-slot--cheated' : '',
   ]
     .filter(Boolean)
     .join(' ')
   slot.replaceChildren()
 
-  const flagNode = createTrackerFlagNode(countryId, trackerPreviewLabelForCountry(country, solved))
-  const name = document.createElement('span')
-  name.className = 'country-slot__name'
-  name.textContent = trackerNameForCountry(country)
-
-  const capital = document.createElement('span')
-  capital.className = solved
-    ? 'country-slot__capital'
-    : 'country-slot__capital country-slot__capital--hidden'
-  capital.textContent = country.capitalDisplayName
-
-  if (!solved) {
-    capital.setAttribute('aria-hidden', 'true')
+  if (!detailedSlot) {
+    return
   }
 
-  if (flagNode) {
-    slot.append(flagNode)
+  if (primaryText) {
+    const name = document.createElement('span')
+    name.className = 'country-slot__name'
+    name.textContent = primaryText
+    slot.append(name)
   }
 
-  slot.append(name, capital)
+  if (showFlag) {
+    const flagNode = createTrackerFlagNode(countryId, trackerPreviewLabelForCountry(country, solved))
+
+    if (flagNode) {
+      slot.append(flagNode)
+    }
+  }
+
+  if (secondaryText) {
+    const capital = document.createElement('span')
+    capital.className = 'country-slot__capital'
+    capital.textContent = secondaryText
+
+    slot.append(capital)
+  }
 }
 
 function formatTime(milliseconds: number): string {
@@ -543,11 +802,8 @@ function renderTracker(): void {
 
     for (const country of countries) {
       const slot = document.createElement('li')
-      const trackerLabel = trackerNameForCountry(country)
-      const slotChars = mode.answerKind === 'capital'
-        ? Math.max(12, trackerLabel.length)
-        : Math.max(6, trackerLabel.length)
-      slot.className = mode.answerKind === 'capital'
+      const slotChars = trackerSlotChars(country)
+      slot.className = trackerUsesDetailedSlot(country)
         ? 'country-slot country-slot--capital country-slot--capital-pending'
         : 'country-slot country-slot--empty'
       slot.style.setProperty('--chars', String(slotChars))
@@ -555,11 +811,7 @@ function renderTracker(): void {
       attachTrackerCheatInteractions(slot, country.id)
       trackerSlotByCountryId.set(country.id, slot)
 
-      if (mode.answerKind === 'capital') {
-        applyCapitalTrackerSlot(slot, country.id)
-      } else if (answeredIds.has(country.id)) {
-        applySolvedCountrySlot(slot, country.id)
-      }
+      applyTrackerSlot(slot, country.id)
 
       list.append(slot)
     }
@@ -577,11 +829,7 @@ function updateTracker(countryId: string): void {
     return
   }
 
-  if (mode.answerKind === 'capital') {
-    applyCapitalTrackerSlot(slot, countryId)
-  } else if (!slot.classList.contains('country-slot--solved')) {
-    applySolvedCountrySlot(slot, countryId)
-  }
+  applyTrackerSlot(slot, countryId)
 
   const count = trackerSolvedCountByContinent.get(country.continent)
 
@@ -630,12 +878,89 @@ function renderRoutePanel(): void {
     flightRouteElement.textContent = `Target ${answeredIds.size + 1} of ${totalCountryCount}`
   }
 
-  flightDistanceElement.textContent = `Default order: ${formatMiles(routeChallengeMetadata.estimatedMiles)} from the United Kingdom.`
+  flightDistanceElement.textContent = settings.randomRoute
+    ? `Random order from the United Kingdom${settings.routeSeed ? ` (seed ${settings.routeSeed})` : ''}.`
+    : `Default order: ${formatMiles(routeChallengeMetadata.estimatedMiles)} from the United Kingdom.`
   flightTotalElement.textContent =
     skippedPromptCount === 1 ? '1 skip used' : `${skippedPromptCount} skips used`
 
   if (skipButton) {
     skipButton.disabled = quizFinished || routePromptQueue.length < 2
+  }
+}
+
+function syncSettingsForm(): void {
+  showFlagsInput.checked = settings.showFlags
+  showCapitalsInput.checked = settings.showCapitals
+  showCountriesInput.checked = settings.showCountries
+  randomRouteInput.checked = settings.randomRoute
+}
+
+function syncSettingsDialogUrl(open: boolean): void {
+  const url = new URL(window.location.href)
+  setBooleanSearchParam(url.searchParams, SETTINGS_DIALOG_QUERY_PARAM, open)
+  window.history.replaceState(null, '', urlPathWithQuery(url))
+}
+
+function openSettings(): void {
+  settingsButton.setAttribute('aria-expanded', 'true')
+  settingsModal.hidden = false
+  document.body.dataset.settingsOpen = 'true'
+  syncSettingsDialogUrl(true)
+  settingsCloseButton.focus()
+}
+
+function closeSettings(): void {
+  settingsButton.setAttribute('aria-expanded', 'false')
+  settingsModal.hidden = true
+  delete document.body.dataset.settingsOpen
+  syncSettingsDialogUrl(false)
+  answerInput.focus()
+}
+
+function rebuildRoutePromptQueue(): void {
+  if (mode.layoutMode !== 'route') {
+    return
+  }
+
+  const nextOrder = routeOrderForSettings(settings).filter((countryId) => !answeredIds.has(countryId))
+  const keepCurrentPrompt = answeredIds.size > 0 && currentPromptId && nextOrder.includes(currentPromptId)
+
+  routePromptQueue.length = 0
+
+  if (keepCurrentPrompt && currentPromptId) {
+    routePromptQueue.push(currentPromptId, ...nextOrder.filter((countryId) => countryId !== currentPromptId))
+  } else {
+    routePromptQueue.push(...nextOrder)
+  }
+
+  currentPromptId = routePromptQueue[0] ?? null
+}
+
+function applySettings(nextSettings: QuizSettings): void {
+  const previousRandomRoute = settings.randomRoute
+  const previousRouteSeed = settings.routeSeed
+
+  settings = {
+    ...nextSettings,
+    routeSeed: nextSettings.randomRoute ? nextSettings.routeSeed ?? createRouteSeed() : null,
+  }
+  syncSettingsUrl()
+  syncSettingsForm()
+  renderTracker()
+
+  if (
+    mode.layoutMode === 'route' &&
+    (settings.randomRoute !== previousRandomRoute || settings.routeSeed !== previousRouteSeed)
+  ) {
+    rebuildRoutePromptQueue()
+  }
+
+  syncSolvedCountries()
+
+  if (mode.layoutMode === 'route') {
+    syncPromptedCountry({ focus: answeredIds.size === 0 })
+    renderRoutePanel()
   }
 }
 
@@ -647,10 +972,11 @@ function syncSolvedCountries(options?: { focusLatest?: boolean }): void {
   globe?.setAnswered(answeredIds, {
     cheatedIds,
     focusLatest: options?.focusLatest,
-    answerKind: 'country',
-    showCapitalSublabels: mode.answerKind === 'capital',
+    answerKind: mode.answerKind,
+    preAnswerLabelMode: preAnswerLabelMode(),
     layoutMode: mode.layoutMode,
-    showAllCountryLabels: mode.answerKind === 'capital',
+    showAllCountryLabels: preAnswerLabelMode() !== 'none' || settings.showFlags,
+    showPreAnswerFlags: settings.showFlags,
     skippedIds,
   })
 }
@@ -919,11 +1245,49 @@ zoomOutButton.addEventListener('click', () => globe?.zoomBy(0.8))
 giveUpButton.addEventListener('click', giveUp)
 compactGiveUpButton.addEventListener('click', giveUp)
 skipButton?.addEventListener('click', skipPrompt)
+settingsButton.addEventListener('click', openSettings)
+settingsCloseButton.addEventListener('click', closeSettings)
+settingsModal.addEventListener('click', (event: MouseEvent) => {
+  if (event.target === settingsModal) {
+    closeSettings()
+  }
+})
+showFlagsInput.addEventListener('change', () => {
+  applySettings({
+    ...settings,
+    showFlags: showFlagsInput.checked,
+  })
+})
+showCapitalsInput.addEventListener('change', () => {
+  applySettings({
+    ...settings,
+    showCapitals: showCapitalsInput.checked,
+  })
+})
+showCountriesInput.addEventListener('change', () => {
+  applySettings({
+    ...settings,
+    showCountries: showCountriesInput.checked,
+  })
+})
+randomRouteInput.addEventListener('change', () => {
+  applySettings({
+    ...settings,
+    randomRoute: randomRouteInput.checked,
+    routeSeed: randomRouteInput.checked ? settings.routeSeed ?? createRouteSeed() : null,
+  })
+})
+window.addEventListener('keydown', (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && !settingsModal.hidden) {
+    event.preventDefault()
+    closeSettings()
+  }
+})
 
 renderScore()
 renderTracker()
+syncSettingsForm()
 tick()
-answerInput.focus()
 
 if (mode.layoutMode === 'route') {
   renderRoutePanel()
@@ -989,4 +1353,10 @@ if (mode.layoutMode === 'route') {
   syncPromptedCountry({ focus: true })
 } else {
   renderClassicFlightStatus(globe.syncFlightPath(answerOrder, { animate: false }))
+}
+
+if (settingsOpenOnLoad) {
+  openSettings()
+} else {
+  answerInput.focus()
 }
