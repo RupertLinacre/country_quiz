@@ -303,7 +303,7 @@ const giveUpButton = requireElement<HTMLButtonElement>('#give-up-button')
 const compactGiveUpButton = requireElement<HTMLButtonElement>('#give-up-button-compact')
 const skipButton = document.querySelector<HTMLButtonElement>('#skip-button')
 
-const answeredIds = new Set<string>(mode.layoutMode === 'free' ? [STARTING_COUNTRY_ID] : [])
+const answeredIds = new Set<string>()
 const cheatedIds = new Set<string>()
 const skippedIds = new Set<string>()
 const answerOrder: string[] = []

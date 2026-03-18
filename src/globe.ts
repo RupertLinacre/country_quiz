@@ -18,7 +18,7 @@ import { feature, mesh } from 'topojson-client'
 import atlasUrl from './generated/globe-atlas.json?url'
 import interactionAtlasUrl from './generated/globe-interaction-atlas.json?url'
 import fallbackFeatures from './generated/country-geometry-fallbacks.json'
-import type { QuizCountry, SolvedAppearance } from './quiz-data'
+import type { QuizCountry } from './quiz-data'
 
 type AtlasFeature = GeoPermissibleObjects & {
   id?: string | number
@@ -165,17 +165,15 @@ const PLANE_LABEL_OFFSET_PX = -MAP_LABEL_FLAG_OFFSET_PX
 const PLANE_EMOJI = '✈️'
 const SEA_FILL = '#126aa6'
 const UNSOLVED_LAND_FILL = '#34393f'
-const LATEST_SOLVED_FILL = '#ffe45c'
+const PROMPTED_COUNTRY_FILL = '#ffe45c'
+const LATEST_SOLVED_FILL = '#3cff72'
+const SOLVED_COUNTRY_FILL = '#57c46f'
 const CHEATED_SOLVED_FILL = '#8f59ff'
-const ROUTE_SOLVED_FILL = '#57c46f'
+const ROUTE_SOLVED_FILL = SOLVED_COUNTRY_FILL
 const ROUTE_SKIPPED_FILL = '#8f59ff'
 const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
 const SOLVED_COUNTRY_OUTLINE_COLOR = 'rgba(8, 18, 28, 0.95)'
 const MAX_COUNTRY_POLYGON_AREA = Math.PI * 2
-
-function appearanceFill(appearance: SolvedAppearance): string {
-  return appearance.kind === 'flag' ? appearance.fallbackFill : appearance.fill
-}
 
 function latestAnsweredId(answeredIds: Set<string>): string | null {
   let latestId: string | null = null
@@ -1237,7 +1235,7 @@ export async function createGlobe(
           }
 
           return {
-            appearanceFill: LATEST_SOLVED_FILL,
+            appearanceFill: PROMPTED_COUNTRY_FILL,
             feature: countryFeature,
             id: promptedCountryId,
           }
@@ -1266,7 +1264,7 @@ export async function createGlobe(
                 ? CHEATED_SOLVED_FILL
                 : countryId === mostRecentAnsweredId
                   ? LATEST_SOLVED_FILL
-                  : appearanceFill(country.appearance),
+                  : SOLVED_COUNTRY_FILL,
           feature: countryFeature,
           id: countryId,
         }
@@ -1516,10 +1514,8 @@ export async function createGlobe(
     currentZoom = zoomForCountry(countryId)
   }
 
-  function resetGlobeView(): void {
+  function applyStartView(): void {
     const centroid = centroidForCountry(FLIGHT_START_COUNTRY_ID)
-
-    cancelFlyAnimation()
 
     if (centroid) {
       const [, , gamma] = projection.rotate()
@@ -1530,7 +1526,12 @@ export async function createGlobe(
       ])
     }
 
-    currentZoom = 1
+    currentZoom = zoomForCountry(FLIGHT_START_COUNTRY_ID)
+  }
+
+  function resetGlobeView(): void {
+    cancelFlyAnimation()
+    applyStartView()
     scheduleRender()
   }
 
@@ -1589,6 +1590,7 @@ export async function createGlobe(
   }
 
   planeCoordinates = centroidForCountry(FLIGHT_START_COUNTRY_ID)
+  applyStartView()
   desktopFlightTrailsMediaQuery.addEventListener('change', (event) => {
     showDesktopFlightTrails = event.matches
     scheduleRender()
