@@ -16,6 +16,7 @@ import {
 import { feature, mesh } from 'topojson-client'
 
 import atlasUrl from './generated/globe-atlas.json?url'
+import detailAtlasUrl from './generated/globe-detail-atlas.json?url'
 import interactionAtlasUrl from './generated/globe-interaction-atlas.json?url'
 import fallbackFeatures from './generated/country-geometry-fallbacks.json'
 import type { QuizCountry } from './quiz-data'
@@ -143,6 +144,8 @@ type FlightPerformanceAccumulator = {
   totalFrameMs: number
 }
 
+type MotionSource = 'drag' | 'flight' | 'pinch' | 'wheel'
+
 const BASE_SCALE_RATIO = 0.318
 const EARTH_RADIUS_MILES = 3958.7613
 const FLIGHT_PATH_SAMPLE_STEP_RADIANS = 0.045
@@ -159,6 +162,7 @@ const WHEEL_ZOOM_SENSITIVITY = 0.0034
 const MAX_WHEEL_DELTA = 80
 const MIN_PINCH_DISTANCE_PX = 24
 const MOBILE_CHEAT_HOLD_MS = 2000
+const SETTLED_OUTLINE_DELAY_MS = 140
 const MAP_LABEL_NAME_OFFSET_PX = -4
 const MAP_LABEL_FLAG_OFFSET_PX = 17
 const MAP_LABEL_FLAG_WIDTH_PX = 26
@@ -480,6 +484,17 @@ export async function createGlobe(
   ])
   const atlas = buildAtlasBundle(topology, countries)
   const interactionAtlas = buildAtlasBundle(interactionTopology, countries)
+  let detailAtlas: AtlasBundle | null = null
+  void fetch(detailAtlasUrl)
+    .then((response) => response.json() as Promise<Topology>)
+    .then((resolvedTopology) => {
+      detailAtlas = buildAtlasBundle(resolvedTopology, countries)
+
+      if (outlineDetailMode === 'settled') {
+        scheduleRender()
+      }
+    })
+    .catch(() => undefined)
   const fallbackFeatureByCountryId = new Map<string, AtlasFeature>()
   const fallbackLabelFeatureByCountryId = new Map<string, GeoPermissibleObjects>()
   const fallbackCentroidByCountryId = new Map<string, [number, number]>()
@@ -565,6 +580,10 @@ export async function createGlobe(
   let debugFlightSequence = 0
   let flightPerformance: GlobeFlightPerformance | null = null
   let flightPerformanceAccumulator: FlightPerformanceAccumulator | null = null
+  let outlineDetailMode: 'interactive' | 'settled' = 'settled'
+  let outlineMotionSources = new Set<MotionSource>()
+  let outlineSettleTimeoutId: number | null = null
+  let wheelMotionTimeoutId: number | null = null
   let pendingFlightCompletion:
     | ((performance: GlobeFlightPerformance | null) => void)
     | null = null
@@ -589,10 +608,67 @@ export async function createGlobe(
 
   function writeRenderState(): void {
     const [rotationLongitude, rotationLatitude] = projection.rotate()
-    container.dataset.detailMode = 'settled'
+    container.dataset.detailMode = outlineDetailMode
     container.dataset.rotationLon = rotationLongitude.toFixed(2)
     container.dataset.rotationLat = rotationLatitude.toFixed(2)
     container.dataset.zoom = currentZoom.toFixed(3)
+  }
+
+  function clearOutlineSettleTimeout(): void {
+    if (outlineSettleTimeoutId === null) {
+      return
+    }
+
+    window.clearTimeout(outlineSettleTimeoutId)
+    outlineSettleTimeoutId = null
+  }
+
+  function setOutlineDetailMode(nextMode: 'interactive' | 'settled'): void {
+    if (outlineDetailMode === nextMode) {
+      return
+    }
+
+    outlineDetailMode = nextMode
+    scheduleRender()
+  }
+
+  function beginOutlineMotion(source: MotionSource): void {
+    clearOutlineSettleTimeout()
+    outlineMotionSources.add(source)
+    setOutlineDetailMode('interactive')
+  }
+
+  function endOutlineMotion(
+    source: MotionSource,
+    delayMs = SETTLED_OUTLINE_DELAY_MS,
+  ): void {
+    outlineMotionSources.delete(source)
+
+    if (outlineMotionSources.size > 0) {
+      return
+    }
+
+    clearOutlineSettleTimeout()
+    outlineSettleTimeoutId = window.setTimeout(() => {
+      outlineSettleTimeoutId = null
+
+      if (outlineMotionSources.size === 0) {
+        setOutlineDetailMode('settled')
+      }
+    }, delayMs)
+  }
+
+  function pulseWheelOutlineMotion(): void {
+    beginOutlineMotion('wheel')
+
+    if (wheelMotionTimeoutId !== null) {
+      window.clearTimeout(wheelMotionTimeoutId)
+    }
+
+    wheelMotionTimeoutId = window.setTimeout(() => {
+      wheelMotionTimeoutId = null
+      endOutlineMotion('wheel')
+    }, SETTLED_OUTLINE_DELAY_MS)
   }
 
   function syncCanvasSize(): void {
@@ -627,6 +703,18 @@ export async function createGlobe(
   function featureForCountry(countryId: string): AtlasFeature | null {
     return (
       fallbackFeatureByCountryId.get(countryId) ??
+      atlas.featureByCountryId.get(countryId) ??
+      null
+    )
+  }
+
+  function displayFeatureForCountry(
+    countryId: string,
+    displayAtlas: AtlasBundle,
+  ): AtlasFeature | null {
+    return (
+      fallbackFeatureByCountryId.get(countryId) ??
+      displayAtlas.featureByCountryId.get(countryId) ??
       atlas.featureByCountryId.get(countryId) ??
       null
     )
@@ -1200,6 +1288,10 @@ export async function createGlobe(
     writeRenderState()
     const mostRecentAnsweredId = latestAnsweredId(answeredIds)
     const isFlightAnimating = Boolean(activeFlightSegmentId && activeFlightProgress < 1)
+    const displayAtlas =
+      outlineDetailMode === 'settled' && detailAtlas
+        ? detailAtlas
+        : atlas
 
     spherePath
       .attr('d', projectedPathData(sphere))
@@ -1215,7 +1307,7 @@ export async function createGlobe(
 
     countriesLayer
       .selectAll<SVGPathElement, GeoPermissibleObjects>('path')
-      .data([atlas.landFeature])
+      .data([displayAtlas.landFeature])
       .join('path')
       .attr('d', (featureEntry) => projectedPathData(featureEntry))
       .attr('fill', UNSOLVED_LAND_FILL)
@@ -1225,7 +1317,7 @@ export async function createGlobe(
       promptedCountryId && !answeredIds.has(promptedCountryId)
         ? (() => {
           const country = countryById.get(promptedCountryId)
-          const countryFeature = featureForCountry(promptedCountryId)
+          const countryFeature = displayFeatureForCountry(promptedCountryId, displayAtlas)
           const promptedCentroid = centroidForCountry(promptedCountryId)
 
           if (!country || !countryFeature) {
@@ -1247,7 +1339,7 @@ export async function createGlobe(
     const visibleSolvedFeatures = [...answeredIds]
       .map((countryId) => {
         const country = countryById.get(countryId)
-        const countryFeature = featureForCountry(countryId)
+        const countryFeature = displayFeatureForCountry(countryId, displayAtlas)
         const solvedCentroid = centroidForCountry(countryId)
 
         if (!country || !countryFeature) {
@@ -1278,7 +1370,7 @@ export async function createGlobe(
         ? [...skippedIds]
           .filter((countryId) => !answeredIds.has(countryId) && countryId !== promptedCountryId)
           .map((countryId) => {
-            const countryFeature = featureForCountry(countryId)
+            const countryFeature = displayFeatureForCountry(countryId, displayAtlas)
             const skippedCentroid = centroidForCountry(countryId)
 
             if (!countryFeature) {
@@ -1317,7 +1409,7 @@ export async function createGlobe(
     renderFlights()
 
     coastlinePath
-      .attr('d', projectedPathData(atlas.landFeature))
+      .attr('d', projectedPathData(displayAtlas.landFeature))
       .attr('fill', 'none')
       .attr('stroke', 'rgba(239, 247, 255, 0.76)')
       .attr('stroke-width', 1.3)
@@ -1325,7 +1417,7 @@ export async function createGlobe(
       .attr('stroke-linecap', 'round')
 
     borderPath
-      .attr('d', projectedPathData(atlas.borderMesh))
+      .attr('d', projectedPathData(displayAtlas.borderMesh))
       .attr('fill', 'none')
       .attr('stroke', 'rgba(227, 238, 247, 0.38)')
       .attr('stroke-width', 0.62)
@@ -1444,6 +1536,7 @@ export async function createGlobe(
     }
 
     settleActiveFlight()
+    endOutlineMotion('flight', 0)
 
     if (shouldCancelPerformance) {
       settleFlightPerformance('cancelled')
@@ -1558,6 +1651,7 @@ export async function createGlobe(
     activeFlightSegmentId = segment.id
     activeFlightProgress = 0
     planeCoordinates = segment.fromCoordinates
+    beginOutlineMotion('flight')
     startFlightPerformance(segment, startTime)
 
     const tick = (now: number) => {
@@ -1584,6 +1678,7 @@ export async function createGlobe(
       activeFlightProgress = 1
       activeFlightSegmentId = null
       flyFrame = null
+      endOutlineMotion('flight')
       settleFlightPerformance('complete')
       renderNow()
     }
@@ -1613,6 +1708,7 @@ export async function createGlobe(
       return !event.ctrlKey && event.button === 0
     })
     .on('start', () => {
+      beginOutlineMotion('drag')
       cancelFlyAnimation()
     })
     .on('drag', (event: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
@@ -1626,6 +1722,9 @@ export async function createGlobe(
         rotationGamma,
       ])
       scheduleRender()
+    })
+    .on('end', () => {
+      endOutlineMotion('drag')
     })
 
   mapSvg.call(dragBehavior)
@@ -1654,6 +1753,7 @@ export async function createGlobe(
     'wheel',
     (event: WheelEvent) => {
       event.preventDefault()
+      pulseWheelOutlineMotion()
       cancelFlyAnimation()
       applyZoom(currentZoom * wheelZoomFactor(event))
     },
@@ -1687,6 +1787,7 @@ export async function createGlobe(
       }
 
       event.preventDefault()
+      beginOutlineMotion('pinch')
       cancelFlyAnimation()
       pinchZoomState = {
         distance,
@@ -1727,12 +1828,14 @@ export async function createGlobe(
 
       event.preventDefault()
       event.stopImmediatePropagation()
+      beginOutlineMotion('pinch')
       applyZoom(pinchZoomState.zoom * (distance / pinchZoomState.distance))
     },
     { capture: true, passive: false },
   )
 
   const clearPinchZoomState = (): void => {
+    endOutlineMotion('pinch')
     pinchZoomState = null
   }
 

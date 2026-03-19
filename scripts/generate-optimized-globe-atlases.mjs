@@ -5,10 +5,12 @@ import { quantize } from 'topojson-client'
 import { presimplify, quantile, simplify } from 'topojson-simplify'
 
 import atlas50 from 'world-atlas/countries-50m.json' with { type: 'json' }
+import atlas10 from 'world-atlas/countries-10m.json' with { type: 'json' }
 
 const QUANTIZATION = 4e4
 const MAP_SIMPLIFY_QUANTILE = 0.2
 const INTERACTION_SIMPLIFY_QUANTILE = 0.08
+const DETAIL_SIMPLIFY_QUANTILE = 0.15
 
 function buildAtlas(sourceTopology, simplifyQuantile) {
   const topology = presimplify(structuredClone(sourceTopology))
@@ -29,3 +31,10 @@ const interactionSerialized = `${JSON.stringify(interactionAtlas)}\n`
 
 await fs.writeFile(interactionOutputPath, interactionSerialized)
 console.log(`Wrote src/generated/globe-interaction-atlas.json (${interactionSerialized.length} bytes)`)
+
+const detailAtlas = buildAtlas(atlas10, DETAIL_SIMPLIFY_QUANTILE)
+const detailOutputPath = path.resolve('src/generated/globe-detail-atlas.json')
+const detailSerialized = `${JSON.stringify(detailAtlas)}\n`
+
+await fs.writeFile(detailOutputPath, detailSerialized)
+console.log(`Wrote src/generated/globe-detail-atlas.json (${detailSerialized.length} bytes)`)
