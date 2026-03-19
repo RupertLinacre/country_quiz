@@ -313,6 +313,12 @@ h1 {
   gap: 0.75rem;
 }
 
+.stat-card__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .hero__copy h1 {
   margin-bottom: 0;
 }
@@ -368,27 +374,21 @@ h1 {
 }
 
 .answer-panel__heading {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
   gap: 1rem;
-}
-
-.answer-panel__label {
-  display: block;
-  margin-bottom: 0.55rem;
-  font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
-  font-size: 1rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  margin-bottom: 0.6rem;
 }
 
 .answer-panel__summary {
-  display: none;
+  display: inline-flex;
   align-items: baseline;
+  justify-content: flex-end;
   gap: 0.42rem;
   color: var(--ink-soft);
   white-space: nowrap;
+  margin-left: auto;
 }
 
 .answer-panel__summary-text {
@@ -440,7 +440,14 @@ h1 {
 }
 
 .give-up-button--compact {
-  display: none;
+  display: inline-flex;
+  padding: 0.26rem 0.48rem;
+  font-size: 0.64rem;
+  letter-spacing: 0.06em;
+}
+
+.skip-button--compact {
+  display: inline-flex;
   padding: 0.26rem 0.48rem;
   font-size: 0.64rem;
   letter-spacing: 0.06em;
@@ -502,7 +509,6 @@ h1 {
 .flight-panel__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 0.9rem;
 }
 
@@ -1172,18 +1178,13 @@ h1 {
   }
 
   .answer-panel__heading {
+    display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.35rem;
+    gap: 0.6rem;
+    margin-bottom: 0.15rem;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
-  }
-
-  .answer-panel__label {
-    order: 0;
-    margin-bottom: 0;
-    flex: 0 1 auto;
   }
 
   .answer-panel__summary {
@@ -1199,10 +1200,14 @@ h1 {
     margin-left: 0.12rem;
   }
 
+  .skip-button--desktop {
+    display: none;
+  }
+
   .status {
     order: 1;
-    margin: 0 0 0.35rem;
-    min-height: 1.2rem;
+    margin: 0 0 0.2rem;
+    min-height: 1rem;
   }
 
   .answer-panel__input {
@@ -1276,5 +1281,12 @@ h1 {
     min-height: 3rem;
     text-align: center;
     border-radius: 14px;
+  }
+}
+
+@media (min-width: 841px) {
+  .give-up-button--compact,
+  .skip-button--compact {
+    display: none;
   }
 }

@@ -53,7 +53,6 @@ type ModeConfig = {
   navLabel: string
   navTitle: string
   placeholder: string
-  routeStatusHint: string
   title: string
 }
 
@@ -67,7 +66,6 @@ const MODE_CONFIGS: Record<ModeKey, ModeConfig> = {
     navLabel: 'Countries',
     navTitle: 'Countries',
     placeholder: 'Start typing a country name...',
-    routeStatusHint: 'Type the highlighted country, or skip it for later.',
     title: 'Countries Quiz',
   },
   route: {
@@ -79,7 +77,6 @@ const MODE_CONFIGS: Record<ModeKey, ModeConfig> = {
     navLabel: 'Specific Countries',
     navTitle: 'Specific Countries',
     placeholder: 'Type the highlighted country...',
-    routeStatusHint: 'Type the highlighted country, or skip it for later.',
     title: 'Countries Quiz - Route Drill',
   },
   'free-capitals': {
@@ -91,7 +88,6 @@ const MODE_CONFIGS: Record<ModeKey, ModeConfig> = {
     navLabel: 'Capitals',
     navTitle: 'Capitals',
     placeholder: 'Start typing a capital city...',
-    routeStatusHint: "Type the highlighted country's capital city, or skip it for later.",
     title: 'Countries Quiz - Capital Cities',
   },
   'route-capitals': {
@@ -103,7 +99,6 @@ const MODE_CONFIGS: Record<ModeKey, ModeConfig> = {
     navLabel: 'Specific Capitals',
     navTitle: 'Specific Capitals',
     placeholder: "Type the highlighted country's capital city...",
-    routeStatusHint: "Type the highlighted country's capital city, or skip it for later.",
     title: 'Countries Quiz - Route Capitals',
   },
 }
@@ -383,7 +378,14 @@ app.innerHTML = `
           <article class="stat-card stat-card--timer">
             <div class="stat-card__header">
               <span class="stat-card__label">Time</span>
-              <button id="give-up-button" class="give-up-button" type="button">Give up</button>
+              <div class="stat-card__actions">
+                ${
+                  mode.layoutMode === 'route'
+                    ? '<button id="skip-button" class="skip-button skip-button--desktop" type="button">Skip</button>'
+                    : ''
+                }
+                <button id="give-up-button" class="give-up-button" type="button">Give up</button>
+              </div>
             </div>
             <strong id="timer" class="stat-card__value">00:00</strong>
             <span id="remaining" class="stat-card__meta">${totalCountryCount} left</span>
@@ -391,11 +393,15 @@ app.innerHTML = `
         </div>
         <div class="answer-panel">
           <div class="answer-panel__heading">
-            <label class="answer-panel__label" for="guess-input">${mode.inputLabel}</label>
             <div class="answer-panel__summary" aria-live="polite">
               <span id="score-compact" class="answer-panel__summary-text">0/${totalCountryCount}</span>
               <span class="answer-panel__summary-separator" aria-hidden="true">·</span>
               <span id="timer-compact" class="answer-panel__summary-text">00:00</span>
+              ${
+                mode.layoutMode === 'route'
+                  ? '<button id="skip-button-compact" class="skip-button skip-button--compact" type="button">Skip</button>'
+                  : ''
+              }
               <button
                 id="give-up-button-compact"
                 class="give-up-button give-up-button--compact"
@@ -416,6 +422,7 @@ app.innerHTML = `
             spellcheck="false"
             inputmode="search"
             enterkeyhint="search"
+            aria-label="${mode.inputLabel}"
             placeholder="${mode.placeholder}"
           />
           <p id="status" class="status" aria-live="polite"></p>
@@ -424,11 +431,6 @@ app.innerHTML = `
       <section class="flight-panel hero__flight-panel" aria-live="polite">
         <div class="flight-panel__header">
           <p id="flight-eyebrow" class="flight-panel__eyebrow">${mode.modeEyebrow}</p>
-          ${
-            mode.layoutMode === 'route'
-              ? '<button id="skip-button" class="skip-button" type="button">Skip</button>'
-              : ''
-          }
         </div>
         <strong id="flight-route" class="flight-panel__route"></strong>
         <span id="flight-distance" class="flight-panel__meta"></span>
@@ -522,7 +524,7 @@ const zoomOutButton = requireElement<HTMLButtonElement>('#zoom-out')
 const globeContainer = requireElement<HTMLElement>('#globe')
 const giveUpButton = requireElement<HTMLButtonElement>('#give-up-button')
 const compactGiveUpButton = requireElement<HTMLButtonElement>('#give-up-button-compact')
-const skipButton = document.querySelector<HTMLButtonElement>('#skip-button')
+const skipButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('#skip-button, #skip-button-compact'))
 const settingsButton = requireElement<HTMLButtonElement>('#settings-button')
 const settingsModal = requireElement<HTMLElement>('#settings-modal')
 const settingsCloseButton = requireElement<HTMLButtonElement>('#settings-close')
@@ -884,7 +886,7 @@ function renderRoutePanel(): void {
   flightTotalElement.textContent =
     skippedPromptCount === 1 ? '1 skip used' : `${skippedPromptCount} skips used`
 
-  if (skipButton) {
+  for (const skipButton of skipButtons) {
     skipButton.disabled = quizFinished || routePromptQueue.length < 2
   }
 }
@@ -1014,7 +1016,7 @@ function finishQuiz(
   giveUpButton.disabled = true
   compactGiveUpButton.disabled = true
 
-  if (skipButton) {
+  for (const skipButton of skipButtons) {
     skipButton.disabled = true
   }
 
@@ -1244,7 +1246,9 @@ zoomInButton.addEventListener('click', () => globe?.zoomBy(1.28))
 zoomOutButton.addEventListener('click', () => globe?.zoomBy(0.8))
 giveUpButton.addEventListener('click', giveUp)
 compactGiveUpButton.addEventListener('click', giveUp)
-skipButton?.addEventListener('click', skipPrompt)
+for (const skipButton of skipButtons) {
+  skipButton.addEventListener('click', skipPrompt)
+}
 settingsButton.addEventListener('click', openSettings)
 settingsCloseButton.addEventListener('click', closeSettings)
 settingsModal.addEventListener('click', (event: MouseEvent) => {
@@ -1291,7 +1295,7 @@ tick()
 
 if (mode.layoutMode === 'route') {
   renderRoutePanel()
-  renderStatus(mode.routeStatusHint)
+  renderStatus('')
 } else {
   renderClassicFlightStatus(null)
   renderStatus('')
