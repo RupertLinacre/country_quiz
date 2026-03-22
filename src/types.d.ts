@@ -10,6 +10,13 @@ declare module '*.json?url' {
   export default assetUrl
 }
 
+declare module 'd3-geo-projection' {
+  import type { GeoProjection } from 'd3'
+
+  export function geoMollweide(): GeoProjection
+  export function geoRobinson(): GeoProjection
+}
+
 interface Window {
   __countriesQuizDebug?: {
     benchmarkFlight: (

@@ -2,17 +2,27 @@ import {
   type D3DragEvent,
   type EnterElement,
   type GeoPermissibleObjects,
+  type GeoProjection,
   type Selection,
   drag,
+  geoAlbers,
   geoArea,
   geoCentroid,
+  geoConicConformal,
   geoDistance,
+  geoEqualEarth,
+  geoEquirectangular,
+  geoGraticule,
   geoInterpolate,
   geoGraticule10,
+  geoMercator,
+  geoNaturalEarth1,
   geoOrthographic,
   geoPath,
+  geoStereographic,
   select,
 } from 'd3'
+import { geoMollweide, geoRobinson } from 'd3-geo-projection'
 import { feature, mesh } from 'topojson-client'
 
 import atlasUrl from './generated/globe-atlas.json?url'
@@ -65,6 +75,7 @@ type GlobeController = {
     fromCountryId: string,
     toCountryId: string,
   ) => Promise<GlobeFlightPerformance | null>
+  describeFlightPath: (answerOrder: string[]) => GlobeFlightStatus | null
   setAnswered: (
     answeredIds: Set<string>,
     options?: {
@@ -97,6 +108,7 @@ type GlobeController = {
       countryIds?: Iterable<string>
     },
   ) => void
+  setProjection: (projectionKey: GlobeProjectionKey) => void
   zoomBy: (factor: number) => void
 }
 
@@ -153,6 +165,18 @@ type FlightPerformanceAccumulator = {
 
 type MotionSource = 'drag' | 'flight' | 'pinch' | 'wheel'
 
+export type GlobeProjectionKey =
+  | 'mercator'
+  | 'equirectangular'
+  | 'orthographic'
+  | 'albers'
+  | 'natural-earth'
+  | 'equal-earth'
+  | 'stereographic'
+  | 'conic-conformal'
+  | 'mollweide'
+  | 'robinson'
+
 const BASE_SCALE_RATIO = 0.318
 const EARTH_RADIUS_MILES = 3958.7613
 const FLIGHT_PATH_SAMPLE_STEP_RADIANS = 0.045
@@ -193,6 +217,120 @@ const ROUTE_SKIPPED_FILL = '#8f59ff'
 const SOLVED_COUNTRY_OUTLINE_WIDTH = 2.6
 const SOLVED_COUNTRY_OUTLINE_COLOR = 'rgba(8, 18, 28, 0.95)'
 const MAX_COUNTRY_POLYGON_AREA = Math.PI * 2
+const DEFAULT_ROTATION: [number, number, number] = [-12, -18, 0]
+const FIT_PADDING_RATIO = 0.08
+const MIN_FIT_PADDING_PX = 22
+const RECTANGULAR_WORLD_OUTLINE = geoGraticule()
+  .extent([
+    [-179.999, -85],
+    [179.999, 85],
+  ])
+  .outline() as GeoPermissibleObjects
+
+export const DEFAULT_GLOBE_PROJECTION: GlobeProjectionKey = 'orthographic'
+
+type ProjectionDefinition = {
+  clipAngle: number | null
+  createProjection: () => GeoProjection
+  defaultRotation: [number, number, number]
+  fitGeometry: GeoPermissibleObjects
+  interactionMode: 'globe' | 'map'
+  maxLatitude: number
+  usesHemisphereVisibility: boolean
+}
+
+const PROJECTION_DEFINITIONS: Record<GlobeProjectionKey, ProjectionDefinition> = {
+  mercator: {
+    clipAngle: null,
+    createProjection: () => geoMercator(),
+    defaultRotation: [0, 0, 0],
+    fitGeometry: RECTANGULAR_WORLD_OUTLINE,
+    interactionMode: 'map',
+    maxLatitude: 80,
+    usesHemisphereVisibility: false,
+  },
+  equirectangular: {
+    clipAngle: null,
+    createProjection: () => geoEquirectangular(),
+    defaultRotation: [0, 0, 0],
+    fitGeometry: RECTANGULAR_WORLD_OUTLINE,
+    interactionMode: 'map',
+    maxLatitude: 85,
+    usesHemisphereVisibility: false,
+  },
+  orthographic: {
+    clipAngle: 90,
+    createProjection: () => geoOrthographic(),
+    defaultRotation: DEFAULT_ROTATION,
+    fitGeometry: { type: 'Sphere' } as GeoPermissibleObjects,
+    interactionMode: 'globe',
+    maxLatitude: 75,
+    usesHemisphereVisibility: true,
+  },
+  albers: {
+    clipAngle: null,
+    createProjection: () => geoAlbers().center([0, 10]).parallels([-30, 60]),
+    defaultRotation: [0, 0, 0],
+    fitGeometry: RECTANGULAR_WORLD_OUTLINE,
+    interactionMode: 'map',
+    maxLatitude: 82,
+    usesHemisphereVisibility: false,
+  },
+  'natural-earth': {
+    clipAngle: null,
+    createProjection: () => geoNaturalEarth1(),
+    defaultRotation: [0, 0, 0],
+    fitGeometry: RECTANGULAR_WORLD_OUTLINE,
+    interactionMode: 'map',
+    maxLatitude: 85,
+    usesHemisphereVisibility: false,
+  },
+  'equal-earth': {
+    clipAngle: null,
+    createProjection: () => geoEqualEarth(),
+    defaultRotation: [0, 0, 0],
+    fitGeometry: RECTANGULAR_WORLD_OUTLINE,
+    interactionMode: 'map',
+    maxLatitude: 85,
+    usesHemisphereVisibility: false,
+  },
+  stereographic: {
+    clipAngle: 90,
+    createProjection: () => geoStereographic(),
+    defaultRotation: [0, 0, 0],
+    fitGeometry: { type: 'Sphere' } as GeoPermissibleObjects,
+    interactionMode: 'map',
+    maxLatitude: 80,
+    usesHemisphereVisibility: false,
+  },
+  'conic-conformal': {
+    clipAngle: null,
+    createProjection: () => geoConicConformal().center([0, 15]).parallels([20, 60]),
+    defaultRotation: [0, 0, 0],
+    fitGeometry: RECTANGULAR_WORLD_OUTLINE,
+    interactionMode: 'map',
+    maxLatitude: 82,
+    usesHemisphereVisibility: false,
+  },
+  mollweide: {
+    clipAngle: null,
+    createProjection: () => geoMollweide(),
+    defaultRotation: [0, 0, 0],
+    fitGeometry: RECTANGULAR_WORLD_OUTLINE,
+    interactionMode: 'map',
+    maxLatitude: 85,
+    usesHemisphereVisibility: false,
+  },
+  robinson: {
+    clipAngle: null,
+    createProjection: () => geoRobinson(),
+    defaultRotation: [0, 0, 0],
+    fitGeometry: RECTANGULAR_WORLD_OUTLINE,
+    interactionMode: 'map',
+    maxLatitude: 85,
+    usesHemisphereVisibility: false,
+  },
+}
 
 function latestAnsweredId(answeredIds: Set<string>): string | null {
   let latestId: string | null = null
@@ -516,6 +654,7 @@ export async function createGlobe(
   container: HTMLElement,
   countries: QuizCountry[],
   options?: {
+    initialProjection?: GlobeProjectionKey
     onCountryCheat?: (countryId: string) => void
     onFlightPerformanceChange?: (performance: GlobeFlightPerformance | null) => void
   },
@@ -592,9 +731,9 @@ export async function createGlobe(
   const planeMarker = planeLayer.append('g').attr('class', 'globe__plane')
   planeMarker.append('circle').attr('class', 'globe__plane-halo')
   planeMarker.append('text').attr('class', 'globe__plane-emoji').text(PLANE_EMOJI)
-  const projection = geoOrthographic().clipAngle(90).precision(0.6).rotate([-12, -18])
-  const measurementPath = geoPath(projection)
-  const sphere = { type: 'Sphere' } as GeoPermissibleObjects
+  let currentProjectionKey = options?.initialProjection ?? DEFAULT_GLOBE_PROJECTION
+  let projection = createProjection(currentProjectionKey)
+  let measurementPath = geoPath(projection)
   const graticule = geoGraticule10()
   const desktopFlightTrailsMediaQuery = window.matchMedia(DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY)
 
@@ -615,6 +754,9 @@ export async function createGlobe(
   let currentZoom = 1
   let cssWidth = 760
   let cssHeight = 760
+  let fittedBaseScale = Math.max(1, Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO)
+  let fittedBaseTranslate: [number, number] = [cssWidth / 2, cssHeight / 2]
+  let mapPanOffset: [number, number] = [0, 0]
   let flyFrame: number | null = null
   let framePending = false
   let planeCoordinates: [number, number] | null = null
@@ -632,8 +774,139 @@ export async function createGlobe(
     | ((performance: GlobeFlightPerformance | null) => void)
     | null = null
 
+  function projectionDefinition(projectionKey = currentProjectionKey): ProjectionDefinition {
+    return PROJECTION_DEFINITIONS[projectionKey]
+  }
+
+  function projectionInteractionMode(
+    projectionKey = currentProjectionKey,
+  ): ProjectionDefinition['interactionMode'] {
+    return projectionDefinition(projectionKey).interactionMode
+  }
+
+  function usesGlobeInteraction(projectionKey = currentProjectionKey): boolean {
+    return projectionInteractionMode(projectionKey) === 'globe'
+  }
+
+  function projectionRotation(): [number, number, number] {
+    if (usesGlobeInteraction()) {
+      return projection.rotate() as [number, number, number]
+    }
+
+    return projectionDefinition().defaultRotation
+  }
+
+  function createProjection(
+    projectionKey: GlobeProjectionKey,
+    rotation: [number, number, number] = projectionDefinition(projectionKey).defaultRotation,
+  ): GeoProjection {
+    const definition = projectionDefinition(projectionKey)
+    const nextProjection = definition.createProjection().precision(0.6)
+    nextProjection.clipAngle(definition.clipAngle)
+    nextProjection.rotate(rotation)
+    return nextProjection
+  }
+
   function currentScale(): number {
-    return Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO * currentZoom
+    return fittedBaseScale * currentZoom
+  }
+
+  function projectionLatitudeLimit(): number {
+    return projectionDefinition().maxLatitude
+  }
+
+  function clampProjectionLatitude(latitude: number): number {
+    const limit = projectionLatitudeLimit()
+    return Math.max(-limit, Math.min(limit, latitude))
+  }
+
+  function currentSurfaceGeometry(): GeoPermissibleObjects {
+    return projectionDefinition().fitGeometry
+  }
+
+  function currentTranslate(): [number, number] {
+    if (usesGlobeInteraction()) {
+      return fittedBaseTranslate
+    }
+
+    return [
+      fittedBaseTranslate[0] + mapPanOffset[0],
+      fittedBaseTranslate[1] + mapPanOffset[1],
+    ]
+  }
+
+  function applyProjectionTransform(nextProjection: GeoProjection): void {
+    nextProjection
+      .translate(currentTranslate())
+      .scale(currentScale())
+  }
+
+  function applyProjectionLayout(): void {
+    const rotation = projectionRotation()
+    const layoutProjection = createProjection(currentProjectionKey, rotation)
+    layoutProjection.scale(1).translate([0, 0])
+
+    const [[x0, y0], [x1, y1]] = geoPath(layoutProjection).bounds(currentSurfaceGeometry())
+
+    if (![x0, y0, x1, y1].every(Number.isFinite)) {
+      fittedBaseScale = Math.max(1, Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO)
+      fittedBaseTranslate = [cssWidth / 2, cssHeight / 2]
+      projection = layoutProjection
+      measurementPath = geoPath(projection)
+      applyProjectionTransform(projection)
+      return
+    }
+
+    const fitPadding = Math.max(
+      MIN_FIT_PADDING_PX,
+      Math.min(cssWidth, cssHeight) * FIT_PADDING_RATIO,
+    )
+    const geometryWidth = Math.max(0.000001, x1 - x0)
+    const geometryHeight = Math.max(0.000001, y1 - y0)
+
+    fittedBaseScale = Math.max(
+      0.000001,
+      Math.min(
+        Math.max(1, cssWidth - fitPadding * 2) / geometryWidth,
+        Math.max(1, cssHeight - fitPadding * 2) / geometryHeight,
+      ),
+    )
+
+    projection = layoutProjection
+    measurementPath = geoPath(projection)
+    fittedBaseTranslate = [
+      cssWidth / 2 - currentScale() * ((x0 + x1) / 2),
+      cssHeight / 2 - currentScale() * ((y0 + y1) / 2),
+    ]
+    applyProjectionTransform(projection)
+  }
+
+  function setViewCenter(center: [number, number]): void {
+    if (usesGlobeInteraction()) {
+      const [, , gamma] = projection.rotate()
+      projection.rotate([
+        shortestLongitudeTarget(projection.rotate()[0], -center[0]),
+        -clampProjectionLatitude(center[1]),
+        gamma,
+      ])
+      return
+    }
+
+    applyProjectionLayout()
+    const baseProjection = createProjection(currentProjectionKey, projectionDefinition().defaultRotation)
+    baseProjection
+      .translate(fittedBaseTranslate)
+      .scale(currentScale())
+    const projectedCenter = baseProjection(center)
+
+    if (!projectedCenter) {
+      return
+    }
+
+    mapPanOffset = [
+      cssWidth / 2 - projectedCenter[0],
+      cssHeight / 2 - projectedCenter[1],
+    ]
   }
 
   function publishFlightPerformance(): void {
@@ -653,6 +926,7 @@ export async function createGlobe(
   function writeRenderState(): void {
     const [rotationLongitude, rotationLatitude] = projection.rotate()
     container.dataset.detailMode = outlineDetailMode
+    container.dataset.projection = currentProjectionKey
     container.dataset.rotationLon = rotationLongitude.toFixed(2)
     container.dataset.rotationLat = rotationLatitude.toFixed(2)
     container.dataset.zoom = currentZoom.toFixed(3)
@@ -716,11 +990,19 @@ export async function createGlobe(
   }
 
   function syncCanvasSize(): void {
+    const viewportCenter =
+      !usesGlobeInteraction() ? (projection.invert?.([cssWidth / 2, cssHeight / 2]) ?? null) : null
     const bounds = container.getBoundingClientRect()
     cssWidth = Math.max(1, bounds.width)
     cssHeight = Math.max(1, bounds.height)
 
-    projection.translate([cssWidth / 2, cssHeight / 2]).scale(currentScale())
+    applyProjectionLayout()
+
+    if (viewportCenter) {
+      setViewCenter(viewportCenter)
+      applyProjectionLayout()
+    }
+
     mapSvg.attr('viewBox', `0 0 ${cssWidth} ${cssHeight}`)
     labelsSvg.attr('viewBox', `0 0 ${cssWidth} ${cssHeight}`)
     scheduleRender()
@@ -731,6 +1013,14 @@ export async function createGlobe(
   }
 
   function isVisible(coordinates: [number, number]): boolean {
+    if (!projection(coordinates)) {
+      return false
+    }
+
+    if (!projectionDefinition().usesHemisphereVisibility) {
+      return true
+    }
+
     const [rotationLongitude, rotationLatitude] = projection.rotate()
     const center: [number, number] = [-rotationLongitude, -rotationLatitude]
     return geoDistance(center, coordinates) < Math.PI / 2 - 0.05
@@ -795,7 +1085,7 @@ export async function createGlobe(
   }
 
   function zoomForAngularRadius(angularRadius: number, targetPixelRadius: number): number {
-    const baseScale = Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO
+    const baseScale = fittedBaseScale
     const targetZoom = targetPixelRadius / Math.max(baseScale * angularRadius, 0.0001)
     return clampZoom(targetZoom)
   }
@@ -1413,7 +1703,7 @@ export async function createGlobe(
   }
 
   function renderNow(): void {
-    projection.scale(currentScale())
+    applyProjectionLayout()
     writeRenderState()
     const mostRecentAnsweredId = latestAnsweredId(answeredIds)
     const isFlightAnimating = Boolean(activeFlightSegmentId && activeFlightProgress < 1)
@@ -1423,7 +1713,7 @@ export async function createGlobe(
         : atlas
 
     spherePath
-      .attr('d', projectedPathData(sphere))
+      .attr('d', projectedPathData(currentSurfaceGeometry()))
       .attr('fill', SEA_FILL)
       .attr('stroke', 'rgba(180, 225, 255, 0.55)')
       .attr('stroke-width', 2.2)
@@ -1676,7 +1966,20 @@ export async function createGlobe(
   }
 
   function applyZoom(nextZoom: number): void {
+    if (usesGlobeInteraction()) {
+      currentZoom = clampZoom(nextZoom)
+      scheduleRender()
+      return
+    }
+
+    const viewportCenter =
+      projection.invert?.([cssWidth / 2, cssHeight / 2]) ?? null
     currentZoom = clampZoom(nextZoom)
+
+    if (viewportCenter) {
+      setViewCenter(viewportCenter)
+    }
+
     scheduleRender()
   }
 
@@ -1732,12 +2035,7 @@ export async function createGlobe(
       return
     }
 
-    const [, , gamma] = projection.rotate()
-    projection.rotate([
-      shortestLongitudeTarget(projection.rotate()[0], -centroid[0]),
-      -centroid[1],
-      gamma,
-    ])
+    setViewCenter(centroid)
     currentZoom = zoomForCountry(countryId)
   }
 
@@ -1748,26 +2046,22 @@ export async function createGlobe(
       return null
     }
 
-    const [, , gamma] = projection.rotate()
-    projection.rotate([
-      shortestLongitudeTarget(projection.rotate()[0], -view.center[0]),
-      -view.center[1],
-      gamma,
-    ])
+    setViewCenter(view.center)
     currentZoom = view.zoom
     return view.center
   }
 
   function applyStartView(): void {
+    if (!usesGlobeInteraction()) {
+      mapPanOffset = [0, 0]
+      currentZoom = 1
+      return
+    }
+
     const centroid = centroidForCountry(FLIGHT_START_COUNTRY_ID)
 
     if (centroid) {
-      const [, , gamma] = projection.rotate()
-      projection.rotate([
-        shortestLongitudeTarget(projection.rotate()[0], -centroid[0]),
-        -centroid[1],
-        gamma,
-      ])
+      setViewCenter(centroid)
     }
 
     currentZoom = zoomForCountry(FLIGHT_START_COUNTRY_ID)
@@ -1785,9 +2079,58 @@ export async function createGlobe(
   ): void {
     cancelFlyAnimation()
 
+    if (!usesGlobeInteraction()) {
+      const startCenter =
+        projection.invert?.([cssWidth / 2, cssHeight / 2]) ?? segment.fromCoordinates
+      const targetCenter = segment.toCoordinates
+      const startZoom = currentZoom
+      const targetZoom = zoomForCountry(segment.toCountryId)
+      const startTime = performance.now()
+      const interpolateCenter = geoInterpolate(startCenter, targetCenter)
+      const interpolatePlaneCoordinates = geoInterpolate(
+        segment.fromCoordinates,
+        segment.toCoordinates,
+      )
+
+      pendingFlightCompletion = onComplete ?? null
+      activeFlightSegmentId = segment.id
+      activeFlightProgress = 0
+      planeCoordinates = segment.fromCoordinates
+      beginOutlineMotion('flight')
+      startFlightPerformance(segment, startTime)
+
+      const tick = (now: number) => {
+        sampleFlightPerformance(now)
+        const progress = Math.min(1, (now - startTime) / FLY_DURATION_MS)
+        const eased = easeInOutCubic(progress)
+
+        currentZoom = clampZoom(interpolateNumber(startZoom, targetZoom, eased))
+        setViewCenter(interpolateCenter(eased) as [number, number])
+        activeFlightProgress = eased
+        planeCoordinates = interpolatePlaneCoordinates(eased) as [number, number]
+        renderNow()
+
+        if (progress < 1) {
+          flyFrame = window.requestAnimationFrame(tick)
+          return
+        }
+
+        planeCoordinates = segment.toCoordinates
+        activeFlightProgress = 1
+        activeFlightSegmentId = null
+        flyFrame = null
+        endOutlineMotion('flight')
+        settleFlightPerformance('complete')
+        renderNow()
+      }
+
+      flyFrame = window.requestAnimationFrame(tick)
+      return
+    }
+
     const [startLongitude, startLatitude, startGamma] = projection.rotate()
     const targetLongitude = shortestLongitudeTarget(startLongitude, -segment.toCoordinates[0])
-    const targetLatitude = -segment.toCoordinates[1]
+    const targetLatitude = -clampProjectionLatitude(segment.toCoordinates[1])
     const startZoom = currentZoom
     const targetZoom = zoomForCountry(segment.toCountryId)
     const startTime = performance.now()
@@ -1861,9 +2204,15 @@ export async function createGlobe(
       cancelFlyAnimation()
     })
     .on('drag', (event: D3DragEvent<SVGSVGElement, unknown, unknown>) => {
+      if (!usesGlobeInteraction()) {
+        mapPanOffset = [mapPanOffset[0] + event.dx, mapPanOffset[1] + event.dy]
+        scheduleRender()
+        return
+      }
+
       const [rotationLongitude, rotationLatitude, rotationGamma] = projection.rotate()
-      const sensitivity = 72 / currentScale()
-      const nextLatitude = Math.max(-75, Math.min(75, rotationLatitude - event.dy * sensitivity))
+      const sensitivity = 72 / Math.max(currentScale(), 1)
+      const nextLatitude = -clampProjectionLatitude(-rotationLatitude + event.dy * sensitivity)
 
       projection.rotate([
         rotationLongitude + event.dx * sensitivity,
@@ -2027,6 +2376,9 @@ export async function createGlobe(
         animateFlight(segment, resolve)
       })
     },
+    describeFlightPath(answerOrder) {
+      return buildFlightSegments(answerOrder).status
+    },
     setAnswered(nextAnsweredIds: Set<string>, options) {
       answeredIds = new Set(nextAnsweredIds)
       activeCountryIds = new Set(options?.activeCountryIds ?? countries.map((country) => country.id))
@@ -2098,6 +2450,31 @@ export async function createGlobe(
 
       planeCoordinates = centroidForCountry(FLIGHT_START_COUNTRY_ID)
       resetGlobeView()
+    },
+    setProjection(projectionKey) {
+      if (projectionKey === currentProjectionKey) {
+        return
+      }
+
+      cancelFlyAnimation()
+      currentProjectionKey = projectionKey
+      projection = createProjection(
+        projectionKey,
+        projectionDefinition(projectionKey).defaultRotation,
+      )
+      measurementPath = geoPath(projection)
+      mapPanOffset = [0, 0]
+
+      const focusCountryId = promptedCountryId ?? latestAnsweredId(answeredIds)
+
+      if (focusCountryId) {
+        snapToCountry(focusCountryId)
+      } else {
+        applyStartView()
+      }
+
+      applyProjectionLayout()
+      scheduleRender()
     },
     zoomBy(factor: number) {
       cancelFlyAnimation()

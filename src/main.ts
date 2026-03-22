@@ -3,8 +3,10 @@ import { registerSW } from 'virtual:pwa-register'
 
 import {
   createGlobe,
+  DEFAULT_GLOBE_PROJECTION,
   type GlobeFlightPerformance,
   type GlobeFlightStatus,
+  type GlobeProjectionKey,
 } from './globe'
 import { normalizeAnswer } from './normalize'
 import {
@@ -33,6 +35,7 @@ const ROUTE_SEED_QUERY_PARAM = 'route-seed'
 const SETTINGS_DIALOG_QUERY_PARAM = 'settings'
 const CONTINENT_QUERY_PARAM = 'continent'
 const LEGACY_CONTINENTS_QUERY_PARAM = 'continents'
+const PROJECTION_QUERY_PARAM = 'projection'
 
 const CONTINENT_QUERY_VALUE_BY_CONTINENT: Record<Continent, string> = {
   Africa: 'africa',
@@ -50,6 +53,7 @@ type PreAnswerLabelMode = 'none' | 'country' | 'capital'
 type QuizScope = 'world' | Continent
 
 type QuizSettings = {
+  projection: GlobeProjectionKey
   randomRoute: boolean
   routeSeed: string | null
   scope: QuizScope
@@ -57,6 +61,22 @@ type QuizSettings = {
   showCountries: boolean
   showFlags: boolean
 }
+
+const PROJECTION_OPTIONS: Array<{
+  key: GlobeProjectionKey
+  label: string
+}> = [
+  { key: 'orthographic', label: 'Orthographic' },
+  { key: 'mercator', label: 'Mercator' },
+  { key: 'equirectangular', label: 'Equirectangular' },
+  { key: 'albers', label: 'Albers' },
+  { key: 'natural-earth', label: 'Natural Earth' },
+  { key: 'equal-earth', label: 'Equal Earth' },
+  { key: 'stereographic', label: 'Stereographic' },
+  { key: 'conic-conformal', label: 'Conic Conformal' },
+  { key: 'mollweide', label: 'Mollweide' },
+  { key: 'robinson', label: 'Robinson' },
+]
 
 type ModeConfig = {
   answerKind: AnswerKind
@@ -266,8 +286,13 @@ function aliasMapForCountryIds(baseMap: Map<string, string>, countryIds: Set<str
 function readSettings(): QuizSettings {
   const url = new URL(window.location.href)
   const randomRoute = readBooleanSearchParam(url.searchParams, RANDOM_ROUTE_QUERY_PARAM)
+  const rawProjection = url.searchParams.get(PROJECTION_QUERY_PARAM)
+  const projection =
+    PROJECTION_OPTIONS.find((option) => option.key === rawProjection)?.key ??
+    DEFAULT_GLOBE_PROJECTION
 
   return {
+    projection,
     scope: readScope(url.searchParams),
     showFlags:
       readBooleanSearchParam(url.searchParams, SHOW_FLAGS_QUERY_PARAM) ||
@@ -330,6 +355,12 @@ function syncSettingsUrl(): void {
     url.searchParams.set(ROUTE_SEED_QUERY_PARAM, settings.routeSeed)
   } else {
     url.searchParams.delete(ROUTE_SEED_QUERY_PARAM)
+  }
+
+  if (settings.projection === DEFAULT_GLOBE_PROJECTION) {
+    url.searchParams.delete(PROJECTION_QUERY_PARAM)
+  } else {
+    url.searchParams.set(PROJECTION_QUERY_PARAM, settings.projection)
   }
 
   window.history.replaceState(null, '', urlPathWithQuery(url))
@@ -412,11 +443,19 @@ function renderScopeOptionsMarkup(): string {
   ].join('')
 }
 
+function renderProjectionOptionsMarkup(): string {
+  return PROJECTION_OPTIONS
+    .map(
+      (option) =>
+        `<option value="${option.key}" ${settings.projection === option.key ? 'selected' : ''}>${option.label}</option>`,
+    )
+    .join('')
+}
+
 refreshActiveQuizScope()
 
 const routePromptQueue = mode.layoutMode === 'route' ? routeOrderForSettings(settings) : []
 let currentPromptId = mode.layoutMode === 'route' ? routePromptQueue[0] ?? null : null
-const routeFlightOrder: string[] = []
 let routeFlightStatus: GlobeFlightStatus | null = null
 let skippedPromptCount = 0
 
@@ -650,6 +689,18 @@ app.innerHTML = `
           </select>
         </label>
       </section>
+      <section class="settings-modal__scope" aria-labelledby="settings-projection-title">
+        <div class="settings-modal__section-heading">
+          <p id="settings-projection-title" class="settings-modal__section-title">Projection</p>
+          <p class="settings-modal__section-note">Switch between the 3D globe and flat map projections.</p>
+        </div>
+        <label class="scope-select" for="setting-projection">
+          <span class="scope-select__label">Map projection</span>
+          <select id="setting-projection" class="scope-select__control">
+            ${renderProjectionOptionsMarkup()}
+          </select>
+        </label>
+      </section>
       <div class="settings-list">
         <label class="settings-option" for="setting-show-flags">
           <span class="settings-option__copy">
@@ -720,6 +771,7 @@ const showCapitalsInput = requireElement<HTMLInputElement>('#setting-show-capita
 const showCountriesInput = requireElement<HTMLInputElement>('#setting-show-countries')
 const randomRouteInput = requireElement<HTMLInputElement>('#setting-random-route')
 const scopeSelect = requireElement<HTMLSelectElement>('#setting-scope')
+const projectionSelect = requireElement<HTMLSelectElement>('#setting-projection')
 const winOverlay = requireElement<HTMLElement>('#win-overlay')
 const winConfettiElement = requireElement<HTMLElement>('#win-confetti')
 const winTitleElement = requireElement<HTMLElement>('#win-title')
@@ -1087,19 +1139,26 @@ function showWinOverlay(message: string): void {
   winOverlayCloseButton.focus()
 }
 
-function renderFlightStatus(status: GlobeFlightStatus | null, eyebrow: string): void {
+function renderFlightStatus(
+  status: GlobeFlightStatus | null,
+  eyebrow: string,
+  options?: {
+    legLabel?: string
+  },
+): void {
+  const legLabel = options?.legLabel ?? 'Leg distance'
   flightEyebrowElement.textContent = eyebrow
 
   if (!status) {
     const startCountry = countriesById.get(STARTING_COUNTRY_ID)
     flightRouteElement.textContent = `Plane standing by in ${startCountry?.name ?? answerLabelForCountryId(STARTING_COUNTRY_ID)}`
-    flightDistanceElement.textContent = 'Leg distance: 0 miles'
+    flightDistanceElement.textContent = `${legLabel}: 0 miles`
     flightTotalElement.textContent = 'Total distance flown: 0 miles'
     return
   }
 
   flightRouteElement.textContent = `${status.fromName} to ${status.toName}`
-  flightDistanceElement.textContent = `Leg distance: ${formatMiles(status.legMiles)}`
+  flightDistanceElement.textContent = `${legLabel}: ${formatMiles(status.legMiles)}`
   flightTotalElement.textContent = `Total distance flown: ${formatMiles(status.totalMiles)}`
 }
 
@@ -1111,7 +1170,7 @@ function renderRoutePanel(): void {
   const skipSummary = skippedPromptCount === 1 ? '1 skip used' : `${skippedPromptCount} skips used`
   const eyebrow = skippedPromptCount > 0 ? `Route Drill · ${skipSummary}` : 'Route Drill'
 
-  renderFlightStatus(routeFlightStatus, eyebrow)
+  renderFlightStatus(routeFlightStatus, eyebrow, { legLabel: 'Previous leg' })
 
   for (const skipButton of skipButtons) {
     skipButton.disabled = quizFinished || !currentPromptId
@@ -1124,6 +1183,7 @@ function syncSettingsForm(): void {
   showCountriesInput.checked = settings.showCountries
   randomRouteInput.checked = settings.randomRoute
   scopeSelect.value = settings.scope === 'world' ? 'world' : continentQueryValue(settings.scope)
+  projectionSelect.value = settings.projection
 }
 
 function syncPageCopy(): void {
@@ -1159,7 +1219,6 @@ function resetQuiz(message = ''): void {
   cheatedIds.clear()
   skippedIds.clear()
   answerOrder.length = 0
-  routeFlightOrder.length = 0
   routeFlightStatus = null
   skippedPromptCount = 0
   quizStartedAt = null
@@ -1188,7 +1247,7 @@ function resetQuiz(message = ''): void {
   globe?.resetView(globeResetViewOptions())
 
   if (mode.layoutMode === 'route') {
-    syncPromptedCountry({ focus: true })
+    syncRouteFlight({ animate: false })
     renderRoutePanel()
   } else {
     renderClassicFlightStatus(globe?.syncFlightPath(answerOrder, { animate: false }) ?? null)
@@ -1224,6 +1283,7 @@ function rebuildRoutePromptQueue(): void {
 
 function applySettings(nextSettings: QuizSettings): void {
   const previousScopeKey = settingsScopeKey(settings)
+  const previousProjection = settings.projection
   const previousRandomRoute = settings.randomRoute
   const previousRouteSeed = settings.routeSeed
 
@@ -1235,6 +1295,9 @@ function applySettings(nextSettings: QuizSettings): void {
   syncSettingsUrl()
   syncSettingsForm()
   syncPageCopy()
+  if (settings.projection !== previousProjection) {
+    globe?.setProjection(settings.projection)
+  }
 
   if (settingsScopeKey(settings) !== previousScopeKey) {
     resetQuiz(`Quiz scope set to ${isWholeWorldScope(settings.scope) ? 'the whole world' : scopeDescription(settings.scope)}.`)
@@ -1253,7 +1316,7 @@ function applySettings(nextSettings: QuizSettings): void {
   syncSolvedCountries()
 
   if (mode.layoutMode === 'route') {
-    syncPromptedCountry({ focus: answeredIds.size === 0 })
+    syncRouteFlight({ animate: false })
     renderRoutePanel()
   }
 }
@@ -1285,6 +1348,32 @@ function syncPromptedCountry(options?: { focus?: boolean }): void {
   globe?.setPromptedCountry(currentPromptId, { focus: options?.focus })
 }
 
+function routePlaneFlightOrder(): string[] {
+  if (mode.layoutMode !== 'route') {
+    return []
+  }
+
+  return currentPromptId ? [...answerOrder, currentPromptId] : [...answerOrder]
+}
+
+function routeStatusFlightOrder(): string[] {
+  if (mode.layoutMode !== 'route') {
+    return []
+  }
+
+  return answerOrder[0] === STARTING_COUNTRY_ID ? answerOrder.slice(1) : [...answerOrder]
+}
+
+function syncRouteFlight(options?: { animate?: boolean }): void {
+  if (mode.layoutMode !== 'route') {
+    return
+  }
+
+  syncPromptedCountry()
+  globe?.syncFlightPath(routePlaneFlightOrder(), { animate: options?.animate })
+  routeFlightStatus = globe?.describeFlightPath(routeStatusFlightOrder()) ?? null
+}
+
 function globeResetViewOptions(): Parameters<NonNullable<typeof globe>['resetView']>[0] | undefined {
   if (mode.layoutMode !== 'free' || isWholeWorldScope(settings.scope)) {
     return undefined
@@ -1293,26 +1382,6 @@ function globeResetViewOptions(): Parameters<NonNullable<typeof globe>['resetVie
   return {
     countryIds: activeCountryIds,
   }
-}
-
-function advanceRouteFlight(options?: { animate?: boolean }): void {
-  if (mode.layoutMode !== 'route') {
-    return
-  }
-
-  const countryId = answerOrder.at(-1)
-
-  if (!countryId) {
-    return
-  }
-
-  if (routeFlightOrder.length === 0 && countryId === STARTING_COUNTRY_ID) {
-    routeFlightStatus = null
-    return
-  }
-
-  routeFlightOrder.push(countryId)
-  routeFlightStatus = globe?.syncFlightPath(routeFlightOrder, { animate: options?.animate }) ?? null
 }
 
 function finishQuiz(
@@ -1454,8 +1523,7 @@ function solveCountry(countryId: string, source: 'answer' | 'cheat' = 'answer'):
   updateTracker(countryId)
 
   if (mode.layoutMode === 'route') {
-    syncPromptedCountry()
-    advanceRouteFlight({ animate: Boolean(currentPromptId) })
+    syncRouteFlight({ animate: Boolean(currentPromptId) })
     renderRoutePanel()
   } else {
     renderClassicFlightStatus(globe?.syncFlightPath(answerOrder, { animate: true }) ?? null)
@@ -1511,8 +1579,7 @@ function skipPrompt(): void {
   updateTracker(skippedCountryId)
 
   if (mode.layoutMode === 'route') {
-    syncPromptedCountry()
-    advanceRouteFlight({ animate: Boolean(currentPromptId) })
+    syncRouteFlight({ animate: Boolean(currentPromptId) })
     renderRoutePanel()
   }
 
@@ -1659,6 +1726,16 @@ scopeSelect.addEventListener('change', () => {
     scope: nextScope,
   })
 })
+projectionSelect.addEventListener('change', () => {
+  const nextProjection =
+    PROJECTION_OPTIONS.find((option) => option.key === projectionSelect.value)?.key ??
+    DEFAULT_GLOBE_PROJECTION
+
+  applySettings({
+    ...settings,
+    projection: nextProjection,
+  })
+})
 winOverlayCloseButton.addEventListener('click', () => {
   hideWinOverlay()
 })
@@ -1690,6 +1767,7 @@ if (mode.layoutMode === 'route') {
 
 globe = await createGlobe(globeContainer, quizCountries, mode.layoutMode === 'free'
   ? {
+    initialProjection: settings.projection,
     onCountryCheat(countryId) {
       solveCountry(countryId, 'cheat')
     },
@@ -1698,6 +1776,7 @@ globe = await createGlobe(globeContainer, quizCountries, mode.layoutMode === 'fr
     },
   }
   : {
+    initialProjection: settings.projection,
     onFlightPerformanceChange(performance) {
       renderFlightPerformance(performance)
     },
@@ -1740,9 +1819,7 @@ window.__countriesQuizDebug = {
 syncSolvedCountries({ focusLatest: mode.layoutMode === 'free' })
 
 if (mode.layoutMode === 'route') {
-  globe.syncFlightPath([], { animate: false })
-  routeFlightStatus = null
-  syncPromptedCountry({ focus: true })
+  syncRouteFlight({ animate: false })
 } else {
   globe.resetView(globeResetViewOptions())
   renderClassicFlightStatus(globe.syncFlightPath(answerOrder, { animate: false }))
