@@ -1088,6 +1088,71 @@ h1 {
   }
 }
 
+@media (min-width: 1900px) {
+  .shell {
+    width: min(2450px, calc(100vw - 3rem));
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: minmax(34rem, 0.76fr) minmax(60rem, 1.24fr);
+    grid-template-areas:
+      "copy globe"
+      "flight globe"
+      "tracker globe";
+    gap: 1.4rem;
+    align-items: start;
+    padding: 1rem 0 1.6rem;
+  }
+
+  .hero {
+    display: contents;
+  }
+
+  .hero__copy {
+    grid-area: copy;
+    padding: 1.8rem;
+  }
+
+  .hero__flight-panel {
+    grid-area: flight;
+    margin-top: 0;
+  }
+
+  .globe-card {
+    grid-area: globe;
+    position: sticky;
+    top: 1rem;
+    padding: 1.15rem;
+    gap: 1rem;
+    align-self: start;
+  }
+
+  .globe-frame {
+    aspect-ratio: auto;
+    height: clamp(52rem, 60vw, 80rem);
+    max-height: calc(100vh - 7rem);
+  }
+
+  .tracker {
+    grid-area: tracker;
+    margin-top: 0;
+    padding: 1.3rem;
+  }
+
+  .continent-board {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .continent-section {
+    padding: 1.1rem 1.15rem;
+  }
+
+  .answer-panel__input {
+    font-size: 1.2rem;
+  }
+}
+
 @media (max-width: 840px) {
   .shell {
     width: min(100vw - 1rem, 100%);
