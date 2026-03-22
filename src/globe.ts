@@ -92,7 +92,11 @@ type GlobeController = {
       animate?: boolean
     },
   ) => GlobeFlightStatus | null
-  resetView: () => void
+  resetView: (
+    options?: {
+      countryIds?: Iterable<string>
+    },
+  ) => void
   zoomBy: (factor: number) => void
 }
 
@@ -157,6 +161,7 @@ const FLY_DURATION_MS = 1700
 const MIN_ZOOM = 0.78
 const MAX_ZOOM = 18
 const FOCUS_COUNTRY_RADIUS_PX = 124
+const FOCUS_REGION_RADIUS_RATIO = 0.26
 const MIN_COUNTRY_ANGULAR_RADIUS = 0.0025
 const DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY = '(min-width: 841px)'
 const PLANE_EMOJI_BASE_HEADING_DEGREES = -45
@@ -369,6 +374,36 @@ function featureAngularRadius(feature: GeoPermissibleObjects, centroid: [number,
   })
 
   return Math.max(maxDistance, MIN_COUNTRY_ANGULAR_RADIUS)
+}
+
+function toCartesian(coordinates: [number, number]): [number, number, number] {
+  const [longitude, latitude] = coordinates
+  const longitudeRadians = (longitude * Math.PI) / 180
+  const latitudeRadians = (latitude * Math.PI) / 180
+  const cosLatitude = Math.cos(latitudeRadians)
+
+  return [
+    cosLatitude * Math.cos(longitudeRadians),
+    cosLatitude * Math.sin(longitudeRadians),
+    Math.sin(latitudeRadians),
+  ]
+}
+
+function toSpherical([x, y, z]: [number, number, number]): [number, number] | null {
+  const magnitude = Math.hypot(x, y, z)
+
+  if (magnitude < 0.000001) {
+    return null
+  }
+
+  const normalizedX = x / magnitude
+  const normalizedY = y / magnitude
+  const normalizedZ = z / magnitude
+
+  return [
+    (Math.atan2(normalizedY, normalizedX) * 180) / Math.PI,
+    (Math.atan2(normalizedZ, Math.hypot(normalizedX, normalizedY)) * 180) / Math.PI,
+  ]
 }
 
 function primaryLabelFeature(feature: AtlasFeature): GeoPermissibleObjects {
@@ -756,9 +791,71 @@ export async function createGlobe(
 
   function zoomForCountry(countryId: string): number {
     const angularRadius = angularRadiusForCountry(countryId) ?? MIN_COUNTRY_ANGULAR_RADIUS
+    return zoomForAngularRadius(angularRadius, FOCUS_COUNTRY_RADIUS_PX)
+  }
+
+  function zoomForAngularRadius(angularRadius: number, targetPixelRadius: number): number {
     const baseScale = Math.min(cssWidth, cssHeight) * BASE_SCALE_RATIO
-    const targetZoom = FOCUS_COUNTRY_RADIUS_PX / Math.max(baseScale * angularRadius, 0.0001)
+    const targetZoom = targetPixelRadius / Math.max(baseScale * angularRadius, 0.0001)
     return clampZoom(targetZoom)
+  }
+
+  function regionView(countryIds: Iterable<string>): {
+    center: [number, number]
+    zoom: number
+  } | null {
+    let vectorX = 0
+    let vectorY = 0
+    let vectorZ = 0
+    let includedCountryCount = 0
+    const countriesWithGeometry: Array<{
+      angularRadius: number
+      centroid: [number, number]
+    }> = []
+
+    for (const countryId of countryIds) {
+      const centroid = centroidForCountry(countryId)
+
+      if (!centroid) {
+        continue
+      }
+
+      const [x, y, z] = toCartesian(centroid)
+      vectorX += x
+      vectorY += y
+      vectorZ += z
+      includedCountryCount += 1
+      countriesWithGeometry.push({
+        angularRadius: angularRadiusForCountry(countryId) ?? MIN_COUNTRY_ANGULAR_RADIUS,
+        centroid,
+      })
+    }
+
+    if (includedCountryCount === 0) {
+      return null
+    }
+
+    const center = toSpherical([vectorX, vectorY, vectorZ])
+
+    if (!center) {
+      return null
+    }
+
+    let maxAngularRadius = MIN_COUNTRY_ANGULAR_RADIUS
+
+    for (const country of countriesWithGeometry) {
+      maxAngularRadius = Math.max(
+        maxAngularRadius,
+        geoDistance(center, country.centroid) + country.angularRadius,
+      )
+    }
+
+    const targetPixelRadius = Math.min(cssWidth, cssHeight) * FOCUS_REGION_RADIUS_RATIO
+
+    return {
+      center,
+      zoom: zoomForAngularRadius(maxAngularRadius, targetPixelRadius),
+    }
   }
 
   function flightPathGeometry(
@@ -1644,6 +1741,23 @@ export async function createGlobe(
     currentZoom = zoomForCountry(countryId)
   }
 
+  function snapToRegion(countryIds: Iterable<string>): [number, number] | null {
+    const view = regionView(countryIds)
+
+    if (!view) {
+      return null
+    }
+
+    const [, , gamma] = projection.rotate()
+    projection.rotate([
+      shortestLongitudeTarget(projection.rotate()[0], -view.center[0]),
+      -view.center[1],
+      gamma,
+    ])
+    currentZoom = view.zoom
+    return view.center
+  }
+
   function applyStartView(): void {
     const centroid = centroidForCountry(FLIGHT_START_COUNTRY_ID)
 
@@ -1970,8 +2084,18 @@ export async function createGlobe(
       scheduleRender()
       return nextFlightState.status
     },
-    resetView() {
+    resetView(options) {
       flightSegments = []
+
+      const regionCenter = options?.countryIds ? snapToRegion(options.countryIds) : null
+
+      if (regionCenter) {
+        cancelFlyAnimation()
+        planeCoordinates = regionCenter
+        scheduleRender()
+        return
+      }
+
       planeCoordinates = centroidForCountry(FLIGHT_START_COUNTRY_ID)
       resetGlobeView()
     },

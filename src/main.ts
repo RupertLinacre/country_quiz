@@ -681,6 +681,15 @@ app.innerHTML = `
       </div>
     </section>
   </div>
+  <div id="win-overlay" class="win-overlay" hidden>
+    <div id="win-confetti" class="win-overlay__confetti" aria-hidden="true"></div>
+    <section class="win-overlay__card" role="dialog" aria-modal="true" aria-labelledby="win-title">
+      <p class="eyebrow win-overlay__eyebrow">Victory</p>
+      <h2 id="win-title" class="win-overlay__title">Challenge Complete</h2>
+      <p id="win-message" class="win-overlay__message"></p>
+      <button id="win-overlay-close" class="win-overlay__button" type="button">Return to game</button>
+    </section>
+  </div>
 `
 
 const headingElement = requireElement<HTMLElement>('#hero-heading')
@@ -710,6 +719,11 @@ const showCapitalsInput = requireElement<HTMLInputElement>('#setting-show-capita
 const showCountriesInput = requireElement<HTMLInputElement>('#setting-show-countries')
 const randomRouteInput = requireElement<HTMLInputElement>('#setting-random-route')
 const scopeSelect = requireElement<HTMLSelectElement>('#setting-scope')
+const winOverlay = requireElement<HTMLElement>('#win-overlay')
+const winConfettiElement = requireElement<HTMLElement>('#win-confetti')
+const winTitleElement = requireElement<HTMLElement>('#win-title')
+const winMessageElement = requireElement<HTMLElement>('#win-message')
+const winOverlayCloseButton = requireElement<HTMLButtonElement>('#win-overlay-close')
 
 const answeredIds = new Set<string>()
 const cheatedIds = new Set<string>()
@@ -1031,6 +1045,47 @@ function renderStatus(message: string): void {
   statusElement.dataset.tone = statusTone
 }
 
+function hideWinOverlay(): void {
+  winOverlay.hidden = true
+  winConfettiElement.replaceChildren()
+  delete document.body.dataset.winOverlayOpen
+}
+
+function populateWinConfetti(): void {
+  winConfettiElement.replaceChildren()
+  const fragment = document.createDocumentFragment()
+  const confettiColors = ['#f6c64d', '#57c46f', '#8f59ff', '#4cc9f0', '#ff6f91', '#fff4c8']
+
+  for (let index = 0; index < 88; index += 1) {
+    const piece = document.createElement('span')
+    piece.className = 'win-overlay__confetti-piece'
+    piece.style.setProperty('--burst-x', `${(Math.random() - 0.5) * 84}vw`)
+    piece.style.setProperty('--burst-y', `${-18 - Math.random() * 34}vh`)
+    piece.style.setProperty('--drift-x', `${(Math.random() - 0.5) * 28}vw`)
+    piece.style.setProperty('--rotation', `${(Math.random() - 0.5) * 920}deg`)
+    piece.style.setProperty('--delay', `${Math.random() * 260}ms`)
+    piece.style.setProperty('--duration', `${2200 + Math.random() * 1600}ms`)
+    piece.style.setProperty('--width', `${8 + Math.random() * 8}px`)
+    piece.style.setProperty('--height', `${12 + Math.random() * 12}px`)
+    piece.style.setProperty(
+      '--confetti-color',
+      confettiColors[index % confettiColors.length] ?? confettiColors[0],
+    )
+    fragment.append(piece)
+  }
+
+  winConfettiElement.append(fragment)
+}
+
+function showWinOverlay(message: string): void {
+  winTitleElement.textContent = assistedAnswerCount() === 0 ? 'Flawless Landing' : 'Challenge Complete'
+  winMessageElement.textContent = message
+  populateWinConfetti()
+  winOverlay.hidden = false
+  document.body.dataset.winOverlayOpen = 'true'
+  winOverlayCloseButton.focus()
+}
+
 function renderClassicFlightStatus(status: GlobeFlightStatus | null): void {
   flightEyebrowElement.textContent = 'Flight Path'
 
@@ -1107,6 +1162,7 @@ function closeSettings(): void {
 }
 
 function resetQuiz(message = ''): void {
+  hideWinOverlay()
   answeredIds.clear()
   cheatedIds.clear()
   skippedIds.clear()
@@ -1136,7 +1192,7 @@ function resetQuiz(message = ''): void {
   renderTracker()
   syncSolvedCountries()
   globe?.syncFlightPath([], { animate: false })
-  globe?.resetView()
+  globe?.resetView(globeResetViewOptions())
 
   if (mode.layoutMode === 'route') {
     syncPromptedCountry({ focus: true })
@@ -1236,6 +1292,16 @@ function syncPromptedCountry(options?: { focus?: boolean }): void {
   globe?.setPromptedCountry(currentPromptId, { focus: options?.focus })
 }
 
+function globeResetViewOptions(): Parameters<NonNullable<typeof globe>['resetView']>[0] | undefined {
+  if (mode.layoutMode !== 'free' || isWholeWorldScope(settings.scope)) {
+    return undefined
+  }
+
+  return {
+    countryIds: activeCountryIds,
+  }
+}
+
 function advanceRouteFlight(options?: { animate?: boolean }): void {
   if (mode.layoutMode !== 'route' || !currentPromptId) {
     return
@@ -1248,6 +1314,7 @@ function advanceRouteFlight(options?: { animate?: boolean }): void {
 function finishQuiz(
   message: string,
   options?: {
+    celebrate?: boolean
     timerText?: string
   },
 ): void {
@@ -1273,6 +1340,10 @@ function finishQuiz(
 
   if (mode.layoutMode === 'route') {
     renderRoutePanel()
+  }
+
+  if (options?.celebrate) {
+    showWinOverlay(message)
   }
 }
 
@@ -1321,7 +1392,7 @@ function giveUp(): void {
   syncSolvedCountries()
   syncPromptedCountry()
   globe?.syncFlightPath([], { animate: false })
-  globe?.resetView()
+  globe?.resetView(globeResetViewOptions())
   renderScore()
   renderTracker()
 
@@ -1390,6 +1461,7 @@ function solveCountry(countryId: string, source: 'answer' | 'cheat' = 'answer'):
     finishQuiz(
       `All ${activeTotalCountryCount} ${answerThingPlural()} solved in ${elapsedTimeText}.${assistedAnswerSummary()}`,
       {
+        celebrate: true,
         timerText: elapsedTimeText,
       },
     )
@@ -1444,6 +1516,7 @@ function skipPrompt(): void {
     finishQuiz(
       `All ${activeTotalCountryCount} ${answerThingPlural()} solved in ${elapsedTimeText}.${assistedAnswerSummary()}`,
       {
+        celebrate: true,
         timerText: elapsedTimeText,
       },
     )
@@ -1581,7 +1654,16 @@ scopeSelect.addEventListener('change', () => {
     scope: nextScope,
   })
 })
+winOverlayCloseButton.addEventListener('click', () => {
+  hideWinOverlay()
+})
 window.addEventListener('keydown', (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && !winOverlay.hidden) {
+    event.preventDefault()
+    hideWinOverlay()
+    return
+  }
+
   if (event.key === 'Escape' && !settingsModal.hidden) {
     event.preventDefault()
     closeSettings()
@@ -1656,6 +1738,7 @@ if (mode.layoutMode === 'route') {
   globe.syncFlightPath([], { animate: false })
   syncPromptedCountry({ focus: true })
 } else {
+  globe.resetView(globeResetViewOptions())
   renderClassicFlightStatus(globe.syncFlightPath(answerOrder, { animate: false }))
 }
 

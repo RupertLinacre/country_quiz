@@ -34,6 +34,10 @@ body[data-settings-open='true'] {
   overflow: hidden;
 }
 
+body[data-win-overlay-open='true'] {
+  overflow: hidden;
+}
+
 button,
 input {
   font: inherit;
@@ -495,6 +499,137 @@ h1 {
 
 .status[data-tone='muted'] {
   color: var(--danger);
+}
+
+.win-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 32;
+  display: grid;
+  place-items: center;
+  padding: 1.2rem;
+  background:
+    radial-gradient(circle at top, rgba(246, 198, 77, 0.22), transparent 24%),
+    radial-gradient(circle at bottom, rgba(143, 89, 255, 0.16), transparent 28%),
+    rgba(2, 10, 18, 0.72);
+  backdrop-filter: blur(18px);
+  overflow: hidden;
+}
+
+.win-overlay[hidden] {
+  display: none;
+}
+
+.win-overlay__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.win-overlay__confetti-piece {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--width);
+  height: var(--height);
+  border-radius: 3px;
+  background: var(--confetti-color);
+  opacity: 0;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.12);
+  animation: win-confetti-burst var(--duration) cubic-bezier(0.2, 0.84, 0.22, 1) forwards;
+  animation-delay: var(--delay);
+}
+
+.win-overlay__card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 39rem);
+  padding: 2rem 2rem 2.15rem;
+  border-radius: 30px;
+  text-align: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 244, 200, 0.2), transparent 34%),
+    linear-gradient(180deg, rgba(9, 28, 43, 0.96), rgba(4, 14, 24, 0.97));
+  border: 1px solid rgba(246, 198, 77, 0.28);
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 244, 200, 0.08);
+}
+
+.win-overlay__eyebrow {
+  margin-bottom: 0.55rem;
+  color: #fff2be;
+}
+
+.win-overlay__title {
+  margin: 0;
+  font-size: clamp(2.35rem, 7vw, 4.6rem);
+  line-height: 0.92;
+  color: #fff4c8;
+  text-wrap: balance;
+}
+
+.win-overlay__message {
+  margin: 1rem auto 0;
+  max-width: 28rem;
+  color: rgba(244, 240, 226, 0.9);
+  font-size: clamp(1rem, 2.6vw, 1.24rem);
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+.win-overlay__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.35rem;
+  padding: 0.72rem 1.15rem;
+  border: 1px solid rgba(246, 198, 77, 0.42);
+  border-radius: 999px;
+  background: rgba(246, 198, 77, 0.14);
+  color: #fff4c8;
+  font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    transform 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+.win-overlay__button:hover,
+.win-overlay__button:focus-visible {
+  background: rgba(246, 198, 77, 0.22);
+  border-color: rgba(255, 224, 122, 0.72);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+@keyframes win-confetti-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(0deg) scale(0.35);
+  }
+
+  14% {
+    opacity: 1;
+  }
+
+  30% {
+    opacity: 1;
+    transform:
+      translate(calc(-50% + var(--burst-x)), calc(-50% + var(--burst-y)))
+      rotate(calc(var(--rotation) * 0.32));
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate(calc(-50% + var(--burst-x) + var(--drift-x)), calc(-50% + 118vh))
+      rotate(var(--rotation));
+  }
 }
 
 .flight-panel {
@@ -1355,6 +1490,19 @@ h1 {
   .tracker {
     margin-top: 0.55rem;
     padding: 0.8rem;
+  }
+
+  .win-overlay {
+    padding: 0.8rem;
+  }
+
+  .win-overlay__card {
+    padding: 1.5rem 1.2rem 1.6rem;
+    border-radius: 24px;
+  }
+
+  .win-overlay__message {
+    max-width: 100%;
   }
 
   .flight-panel__header {
