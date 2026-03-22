@@ -1306,6 +1306,11 @@ function advanceRouteFlight(options?: { animate?: boolean }): void {
     return
   }
 
+  if (routeFlightOrder.length === 0 && countryId === STARTING_COUNTRY_ID) {
+    routeFlightStatus = null
+    return
+  }
+
   routeFlightOrder.push(countryId)
   routeFlightStatus = globe?.syncFlightPath(routeFlightOrder, { animate: options?.animate }) ?? null
 }
