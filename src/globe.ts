@@ -75,6 +75,7 @@ type GlobeController = {
       preAnswerLabelMode?: PreAnswerLabelMode
       showAllCountryLabels?: boolean
       showPreAnswerFlags?: boolean
+      showUnansweredMarkers?: boolean
       skippedIds?: Set<string>
     },
   ) => void
@@ -105,6 +106,7 @@ type GlobeLabel = {
   flagAssetUrl: string | null
   id: string
   detail: string | null
+  markerText: string | null
   name: string | null
   tone: 'answered' | 'default' | 'prompt' | 'skipped'
   x: number
@@ -163,12 +165,16 @@ const MAX_WHEEL_DELTA = 80
 const MIN_PINCH_DISTANCE_PX = 24
 const MOBILE_CHEAT_HOLD_MS = 2000
 const SETTLED_OUTLINE_DELAY_MS = 140
-const MAP_LABEL_NAME_OFFSET_PX = -4
-const MAP_LABEL_FLAG_OFFSET_PX = 17
+const MAP_LABEL_CENTER_ROW_OFFSET_PX = -4
+const MAP_LABEL_NAME_ROW_GAP_PX = 22
+const MAP_LABEL_DETAIL_ROW_GAP_PX = 18
+const MAP_LABEL_FLAG_OFFSET_PX = MAP_LABEL_CENTER_ROW_OFFSET_PX
+const MAP_LABEL_NAME_OFFSET_PX = MAP_LABEL_CENTER_ROW_OFFSET_PX - MAP_LABEL_NAME_ROW_GAP_PX
 const MAP_LABEL_FLAG_WIDTH_PX = 26
 const MAP_LABEL_FLAG_HEIGHT_PX = 18
-const MAP_LABEL_DETAIL_OFFSET_PX = 35
-const PLANE_LABEL_OFFSET_PX = -MAP_LABEL_FLAG_OFFSET_PX
+const MAP_LABEL_DETAIL_OFFSET_PX = MAP_LABEL_CENTER_ROW_OFFSET_PX + MAP_LABEL_DETAIL_ROW_GAP_PX
+const MAP_LABEL_MARKER_FONT_SIZE_PX = 19
+const PLANE_LABEL_OFFSET_PX = -17
 const PLANE_EMOJI = '✈️'
 const SEA_FILL = '#126aa6'
 const UNSOLVED_LAND_FILL = '#34393f'
@@ -568,6 +574,7 @@ export async function createGlobe(
   let preAnswerLabelMode: PreAnswerLabelMode = 'none'
   let showAllCountryLabels = false
   let showPreAnswerFlags = false
+  let showUnansweredMarkers = false
   let currentZoom = 1
   let cssWidth = 760
   let cssHeight = 760
@@ -1102,7 +1109,7 @@ export async function createGlobe(
   }
 
   function renderLabels(): void {
-    const labelIds: string[] = showAllCountryLabels
+    const labelIds: string[] = showAllCountryLabels || showUnansweredMarkers
       ? countries.map((country) => country.id)
       : renderMode === 'route'
         ? [...new Set([...answeredIds, ...skippedIds])]
@@ -1134,6 +1141,7 @@ export async function createGlobe(
                 : 'default'
         const answered = answeredIds.has(countryId)
         const skipped = skippedIds.has(countryId)
+        const showMarker = !answered && !skipped && showUnansweredMarkers
         const topLabel =
           answered || skipped || preAnswerLabelMode === 'country'
             ? country.name
@@ -1152,6 +1160,7 @@ export async function createGlobe(
                 : null
               : null,
           id: country.id,
+          markerText: showMarker ? '?' : null,
           name: topLabel,
           tone,
           x: projected[0],
@@ -1179,6 +1188,10 @@ export async function createGlobe(
               groupSelection
                 .append('image')
                 .attr('class', 'globe__label-flag-image')
+              groupSelection
+                .append('text')
+                .attr('class', 'globe__label-marker')
+                .attr('text-anchor', 'middle')
             }),
         (update: Selection<SVGGElement, GlobeLabel, SVGGElement, unknown>) => update,
         (exit: Selection<SVGGElement, GlobeLabel, SVGGElement, unknown>) => exit.remove(),
@@ -1232,6 +1245,22 @@ export async function createGlobe(
           .attr('height', MAP_LABEL_FLAG_HEIGHT_PX)
           .attr('preserveAspectRatio', 'xMidYMid meet')
           .attr('display', label.flagAssetUrl ? null : 'none')
+        groupSelection
+          .select<SVGTextElement>('.globe__label-marker')
+          .text(label.markerText ?? '')
+          .attr('x', 0)
+          .attr('y', MAP_LABEL_FLAG_OFFSET_PX)
+          .attr(
+            'fill',
+            label.tone === 'prompt'
+              ? '#ffe27a'
+              : 'rgba(231, 240, 248, 0.9)',
+          )
+          .attr('stroke', 'rgba(6, 15, 24, 0.92)')
+          .attr('font-size', MAP_LABEL_MARKER_FONT_SIZE_PX)
+          .attr('font-weight', 800)
+          .attr('opacity', label.markerText ? 0.96 : 0)
+          .attr('display', label.markerText ? null : 'none')
       })
   }
 
@@ -1887,6 +1916,7 @@ export async function createGlobe(
       preAnswerLabelMode = options?.preAnswerLabelMode ?? 'none'
       showAllCountryLabels = options?.showAllCountryLabels ?? false
       showPreAnswerFlags = options?.showPreAnswerFlags ?? false
+      showUnansweredMarkers = options?.showUnansweredMarkers ?? false
 
       if (options?.focusLatest) {
         const mostRecentAnsweredId = latestAnsweredId(answeredIds)

@@ -647,12 +647,14 @@ h1 {
 .globe__label,
 .globe__label-name,
 .globe__label-detail,
+.globe__label-marker,
 .globe__label-flag-image {
   pointer-events: none;
 }
 
 .globe__label-name,
-.globe__label-detail {
+.globe__label-detail,
+.globe__label-marker {
   fill: #fff4c8;
   font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
   font-weight: 700;
@@ -671,6 +673,11 @@ h1 {
 .globe__label-detail {
   font-size: 11px;
   letter-spacing: 0.03em;
+}
+
+.globe__label-marker {
+  font-size: 19px;
+  letter-spacing: 0;
 }
 
 .globe__label-flag-image {

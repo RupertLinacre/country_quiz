@@ -979,6 +979,7 @@ function syncSolvedCountries(options?: { focusLatest?: boolean }): void {
     layoutMode: mode.layoutMode,
     showAllCountryLabels: preAnswerLabelMode() !== 'none' || settings.showFlags,
     showPreAnswerFlags: settings.showFlags,
+    showUnansweredMarkers: !settings.showFlags,
     skippedIds,
   })
 }
