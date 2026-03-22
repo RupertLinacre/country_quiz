@@ -68,6 +68,7 @@ type GlobeController = {
   setAnswered: (
     answeredIds: Set<string>,
     options?: {
+      activeCountryIds?: Set<string>
       cheatedIds?: Set<string>
       focusLatest?: boolean
       answerKind?: 'country' | 'capital'
@@ -563,6 +564,7 @@ export async function createGlobe(
   const desktopFlightTrailsMediaQuery = window.matchMedia(DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY)
 
   let answeredIds = new Set<string>()
+  let activeCountryIds = new Set(countries.map((country) => country.id))
   let cheatedIds = new Set<string>()
   let skippedIds = new Set<string>()
   let flightSegments: FlightSegment[] = []
@@ -1109,10 +1111,11 @@ export async function createGlobe(
   }
 
   function renderLabels(): void {
+    const labelCountryIds = [...activeCountryIds]
     const labelIds: string[] = showAllCountryLabels || showUnansweredMarkers
-      ? countries.map((country) => country.id)
+      ? labelCountryIds
       : renderMode === 'route'
-        ? [...new Set([...answeredIds, ...skippedIds])]
+        ? [...new Set([...answeredIds, ...skippedIds])].filter((countryId) => activeCountryIds.has(countryId))
         : [...answeredIds]
 
     const visibleLabels: GlobeLabel[] = labelIds
@@ -1486,6 +1489,7 @@ export async function createGlobe(
       hitTargetLayer.style('pointer-events', 'none')
     } else {
       const hitTargetData = countries
+        .filter((country) => activeCountryIds.has(country.id))
         .map((country) => {
           const feature = interactionFeatureForCountry(country.id)
           const centroid = centroidForCountry(country.id)
@@ -1909,6 +1913,7 @@ export async function createGlobe(
     },
     setAnswered(nextAnsweredIds: Set<string>, options) {
       answeredIds = new Set(nextAnsweredIds)
+      activeCountryIds = new Set(options?.activeCountryIds ?? countries.map((country) => country.id))
       cheatedIds = new Set(options?.cheatedIds ?? [])
       skippedIds = new Set(options?.skippedIds ?? [])
       answerKind = options?.answerKind ?? 'country'

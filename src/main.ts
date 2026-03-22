@@ -10,10 +10,11 @@ import { normalizeAnswer } from './normalize'
 import {
   aliasToCountryId,
   capitalAliasToCountryId,
+  continentOrder,
   countriesByContinent,
   countriesById,
   quizCountries,
-  totalCountryCount,
+  type Continent,
   type QuizCountry,
 } from './quiz-data'
 import { routeChallengeMetadata, routeChallengeOrder } from './route-order'
@@ -30,15 +31,28 @@ const SHOW_COUNTRIES_QUERY_PARAM = 'countries'
 const RANDOM_ROUTE_QUERY_PARAM = 'random-route'
 const ROUTE_SEED_QUERY_PARAM = 'route-seed'
 const SETTINGS_DIALOG_QUERY_PARAM = 'settings'
+const CONTINENT_QUERY_PARAM = 'continent'
+const LEGACY_CONTINENTS_QUERY_PARAM = 'continents'
+
+const CONTINENT_QUERY_VALUE_BY_CONTINENT: Record<Continent, string> = {
+  Africa: 'africa',
+  Asia: 'asia',
+  Europe: 'europe',
+  'North America': 'north-america',
+  'South America': 'south-america',
+  Oceania: 'oceania',
+}
 
 type LayoutMode = 'free' | 'route'
 type AnswerKind = 'country' | 'capital'
 type ModeKey = 'free' | 'route' | 'free-capitals' | 'route-capitals'
 type PreAnswerLabelMode = 'none' | 'country' | 'capital'
+type QuizScope = 'world' | Continent
 
 type QuizSettings = {
   randomRoute: boolean
   routeSeed: string | null
+  scope: QuizScope
   showCapitals: boolean
   showCountries: boolean
   showFlags: boolean
@@ -156,6 +170,51 @@ function readBooleanSearchParam(searchParams: URLSearchParams, name: string): bo
   return value === '1' || value === 'true'
 }
 
+function continentQueryValue(continent: Continent): string {
+  return CONTINENT_QUERY_VALUE_BY_CONTINENT[continent]
+}
+
+function continentsForScope(scope: QuizScope): Continent[] {
+  return scope === 'world' ? [...continentOrder] : [scope]
+}
+
+function readLegacyScope(searchParams: URLSearchParams): QuizScope {
+  const rawValue = searchParams.get(LEGACY_CONTINENTS_QUERY_PARAM)
+
+  if (!rawValue) {
+    return 'world'
+  }
+
+  const requestedContinents = new Set(
+    rawValue
+      .split(',')
+      .map((entry) => entry.trim().toLowerCase())
+      .filter(Boolean),
+  )
+  const selectedContinents = continentOrder.filter((continent) =>
+    requestedContinents.has(continentQueryValue(continent)),
+  )
+
+  if (selectedContinents.length === 0 || selectedContinents.length === continentOrder.length) {
+    return 'world'
+  }
+
+  return selectedContinents[0]
+}
+
+function readScope(searchParams: URLSearchParams): QuizScope {
+  const rawValue = searchParams.get(CONTINENT_QUERY_PARAM)?.trim().toLowerCase()
+
+  if (!rawValue || rawValue === 'world') {
+    return rawValue === null ? readLegacyScope(searchParams) : 'world'
+  }
+
+  return (
+    continentOrder.find((continent) => continentQueryValue(continent) === rawValue) ??
+    readLegacyScope(searchParams)
+  )
+}
+
 function setBooleanSearchParam(searchParams: URLSearchParams, name: string, enabled: boolean): void {
   if (enabled) {
     searchParams.set(name, '1')
@@ -168,11 +227,48 @@ function urlPathWithQuery(url: URL): string {
   return `${url.pathname}${url.search}${url.hash}`
 }
 
+function isWholeWorldScope(scope: QuizScope): boolean {
+  return scope === 'world'
+}
+
+function scopeDescription(scope: QuizScope): string {
+  if (isWholeWorldScope(scope)) {
+    return 'the world'
+  }
+
+  return scope
+}
+
+function activeCountriesForSettings(currentSettings: QuizSettings): QuizCountry[] {
+  const selectedContinents = new Set(continentsForScope(currentSettings.scope))
+  return quizCountries.filter((country) => selectedContinents.has(country.continent))
+}
+
+function activeCountriesByContinentForSettings(
+  currentSettings: QuizSettings,
+): Array<{ continent: Continent; countries: QuizCountry[] }> {
+  const selectedContinents = new Set(continentsForScope(currentSettings.scope))
+
+  return countriesByContinent
+    .filter((entry) => selectedContinents.has(entry.continent))
+    .map((entry) => ({
+      continent: entry.continent,
+      countries: entry.countries.filter((country) => selectedContinents.has(country.continent)),
+    }))
+}
+
+function aliasMapForCountryIds(baseMap: Map<string, string>, countryIds: Set<string>): Map<string, string> {
+  return new Map(
+    [...baseMap.entries()].filter(([, countryId]) => countryIds.has(countryId)),
+  )
+}
+
 function readSettings(): QuizSettings {
   const url = new URL(window.location.href)
   const randomRoute = readBooleanSearchParam(url.searchParams, RANDOM_ROUTE_QUERY_PARAM)
 
   return {
+    scope: readScope(url.searchParams),
     showFlags:
       readBooleanSearchParam(url.searchParams, SHOW_FLAGS_QUERY_PARAM) ||
       readBooleanSearchParam(url.searchParams, LEGACY_SHOW_MAPS_QUERY_PARAM),
@@ -222,6 +318,14 @@ function syncSettingsUrl(): void {
   setBooleanSearchParam(url.searchParams, SHOW_COUNTRIES_QUERY_PARAM, settings.showCountries)
   setBooleanSearchParam(url.searchParams, RANDOM_ROUTE_QUERY_PARAM, settings.randomRoute)
 
+  if (isWholeWorldScope(settings.scope)) {
+    url.searchParams.delete(CONTINENT_QUERY_PARAM)
+  } else {
+    const scopedContinent = settings.scope as Continent
+    url.searchParams.set(CONTINENT_QUERY_PARAM, continentQueryValue(scopedContinent))
+  }
+  url.searchParams.delete(LEGACY_CONTINENTS_QUERY_PARAM)
+
   if (settings.randomRoute && settings.routeSeed) {
     url.searchParams.set(ROUTE_SEED_QUERY_PARAM, settings.routeSeed)
   } else {
@@ -232,12 +336,13 @@ function syncSettingsUrl(): void {
 }
 
 function routeOrderForSettings(currentSettings: QuizSettings): string[] {
+  const scopedCountryIds = new Set(activeCountriesForSettings(currentSettings).map((country) => country.id))
   if (!currentSettings.randomRoute || !currentSettings.routeSeed) {
-    return [...routeChallengeOrder]
+    return routeChallengeOrder.filter((countryId) => scopedCountryIds.has(countryId))
   }
 
   const random = seededRandom(currentSettings.routeSeed)
-  const nextOrder = [...routeChallengeOrder]
+  const nextOrder = routeChallengeOrder.filter((countryId) => scopedCountryIds.has(countryId))
 
   for (let index = nextOrder.length - 1; index > 0; index -= 1) {
     const swapIndex = Math.floor(random() * (index + 1))
@@ -249,7 +354,66 @@ function routeOrderForSettings(currentSettings: QuizSettings): string[] {
 
 syncSettingsUrl()
 
-const aliasMap = mode.answerKind === 'capital' ? capitalAliasToCountryId : aliasToCountryId
+const baseAliasMap = mode.answerKind === 'capital' ? capitalAliasToCountryId : aliasToCountryId
+let activeQuizCountries: QuizCountry[] = []
+let activeCountriesByContinent: Array<{ continent: Continent; countries: QuizCountry[] }> = []
+let activeCountryIds = new Set<string>()
+let activeAliasMap = new Map<string, string>()
+let activeTotalCountryCount = 0
+
+function refreshActiveQuizScope(): void {
+  activeQuizCountries = activeCountriesForSettings(settings)
+  activeCountryIds = new Set(activeQuizCountries.map((country) => country.id))
+  activeCountriesByContinent = activeCountriesByContinentForSettings(settings)
+  activeAliasMap = aliasMapForCountryIds(baseAliasMap, activeCountryIds)
+  activeTotalCountryCount = activeQuizCountries.length
+}
+
+function headingTextForSettings(currentSettings: QuizSettings): string {
+  const totalInScope = activeCountriesForSettings(currentSettings).length
+  const wholeWorld = isWholeWorldScope(currentSettings.scope)
+
+  if (mode.layoutMode === 'route') {
+    if (wholeWorld) {
+      return mode.heading
+    }
+
+      return mode.answerKind === 'capital'
+      ? `Name the highlighted capital city in ${scopeDescription(currentSettings.scope)}`
+      : `Name the highlighted country in ${scopeDescription(currentSettings.scope)}`
+  }
+
+  if (wholeWorld) {
+    return `Name all ${totalInScope} ${answerThingPlural()} in any order`
+  }
+
+  return `Name all ${totalInScope} ${answerThingPlural()} in ${scopeDescription(currentSettings.scope)}`
+}
+
+function documentTitleForSettings(currentSettings: QuizSettings): string {
+  if (isWholeWorldScope(currentSettings.scope)) {
+    return mode.title
+  }
+
+  return `${mode.title} - ${scopeDescription(currentSettings.scope)}`
+}
+
+function settingsScopeKey(currentSettings: QuizSettings): string {
+  return currentSettings.scope
+}
+
+function renderScopeOptionsMarkup(): string {
+  return [
+    `<option value="world" ${settings.scope === 'world' ? 'selected' : ''}>World</option>`,
+    ...continentOrder.map(
+      (continent) =>
+        `<option value="${continentQueryValue(continent)}" ${settings.scope === continent ? 'selected' : ''}>${continent}</option>`,
+    ),
+  ].join('')
+}
+
+refreshActiveQuizScope()
+
 const routePromptQueue = mode.layoutMode === 'route' ? routeOrderForSettings(settings) : []
 let currentPromptId = mode.layoutMode === 'route' ? routePromptQueue[0] ?? null : null
 const routeFlightOrder: string[] = []
@@ -334,7 +498,7 @@ if (!app) {
   throw new Error('App root not found')
 }
 
-document.title = mode.title
+document.title = documentTitleForSettings(settings)
 
 app.innerHTML = `
   <main class="shell">
@@ -366,13 +530,13 @@ app.innerHTML = `
             </details>
           </div>
           <div class="hero__headline">
-            <h1>${mode.heading}</h1>
+            <h1 id="hero-heading">${headingTextForSettings(settings)}</h1>
           </div>
         </div>
         <div class="hero__stats">
           <article class="stat-card">
             <span class="stat-card__label">Score</span>
-            <strong id="score" class="stat-card__value">0/${totalCountryCount} ${answerThingPlural()}</strong>
+            <strong id="score" class="stat-card__value">0/${activeTotalCountryCount} ${answerThingPlural()}</strong>
             <span class="stat-card__meta">${mode.answerKind === 'capital' ? 'capital cities solved' : 'countries found'}</span>
           </article>
           <article class="stat-card stat-card--timer">
@@ -388,13 +552,13 @@ app.innerHTML = `
               </div>
             </div>
             <strong id="timer" class="stat-card__value">00:00</strong>
-            <span id="remaining" class="stat-card__meta">${totalCountryCount} left</span>
+            <span id="remaining" class="stat-card__meta">${activeTotalCountryCount} left</span>
           </article>
         </div>
         <div class="answer-panel">
           <div class="answer-panel__heading">
             <div class="answer-panel__summary" aria-live="polite">
-              <span id="score-compact" class="answer-panel__summary-text">0/${totalCountryCount}</span>
+              <span id="score-compact" class="answer-panel__summary-text">0/${activeTotalCountryCount}</span>
               <span class="answer-panel__summary-separator" aria-hidden="true">·</span>
               <span id="timer-compact" class="answer-panel__summary-text">00:00</span>
               ${
@@ -473,6 +637,18 @@ app.innerHTML = `
           ${renderModeLinksMarkup({ settingsOpen: true })}
         </nav>
       </section>
+      <section class="settings-modal__scope" aria-labelledby="settings-scope-title">
+        <div class="settings-modal__section-heading">
+          <p id="settings-scope-title" class="settings-modal__section-title">Scope</p>
+          <p class="settings-modal__section-note">Choose the whole world or a single continent.</p>
+        </div>
+        <label class="scope-select" for="setting-scope">
+          <span class="scope-select__label">Quiz area</span>
+          <select id="setting-scope" class="scope-select__control">
+            ${renderScopeOptionsMarkup()}
+          </select>
+        </label>
+      </section>
       <div class="settings-list">
         <label class="settings-option" for="setting-show-flags">
           <span class="settings-option__copy">
@@ -507,6 +683,7 @@ app.innerHTML = `
   </div>
 `
 
+const headingElement = requireElement<HTMLElement>('#hero-heading')
 const scoreElement = requireElement<HTMLElement>('#score')
 const compactScoreElement = requireElement<HTMLElement>('#score-compact')
 const timerElement = requireElement<HTMLElement>('#timer')
@@ -532,6 +709,7 @@ const showFlagsInput = requireElement<HTMLInputElement>('#setting-show-flags')
 const showCapitalsInput = requireElement<HTMLInputElement>('#setting-show-capitals')
 const showCountriesInput = requireElement<HTMLInputElement>('#setting-show-countries')
 const randomRouteInput = requireElement<HTMLInputElement>('#setting-random-route')
+const scopeSelect = requireElement<HTMLSelectElement>('#setting-scope')
 
 const answeredIds = new Set<string>()
 const cheatedIds = new Set<string>()
@@ -773,7 +951,7 @@ function elapsedMilliseconds(): number {
 }
 
 function solvedCountByContinent(continent: string): number {
-  return countriesByContinent
+  return activeCountriesByContinent
     .find((entry) => entry.continent === continent)
     ?.countries.filter((country) => answeredIds.has(country.id)).length ?? 0
 }
@@ -783,7 +961,7 @@ function renderTracker(): void {
   trackerSlotByCountryId.clear()
   trackerSolvedCountByContinent.clear()
 
-  for (const { continent, countries } of countriesByContinent) {
+  for (const { continent, countries } of activeCountriesByContinent) {
     const section = document.createElement('section')
     section.className = 'continent-section'
 
@@ -837,15 +1015,15 @@ function updateTracker(countryId: string): void {
 
   if (count) {
     const totalForContinent =
-      countriesByContinent.find((entry) => entry.continent === country.continent)?.countries.length ?? 0
+      activeCountriesByContinent.find((entry) => entry.continent === country.continent)?.countries.length ?? 0
     count.textContent = `${solvedCountByContinent(country.continent)}/${totalForContinent}`
   }
 }
 
 function renderScore(): void {
-  scoreElement.textContent = `${answeredIds.size}/${totalCountryCount} ${answerThingPlural()}`
-  compactScoreElement.textContent = `${answeredIds.size}/${totalCountryCount}`
-  remainingElement.textContent = `${totalCountryCount - answeredIds.size} left`
+  scoreElement.textContent = `${answeredIds.size}/${activeTotalCountryCount} ${answerThingPlural()}`
+  compactScoreElement.textContent = `${answeredIds.size}/${activeTotalCountryCount}`
+  remainingElement.textContent = `${activeTotalCountryCount - answeredIds.size} left`
 }
 
 function renderStatus(message: string): void {
@@ -872,17 +1050,19 @@ function renderClassicFlightStatus(status: GlobeFlightStatus | null): void {
 function renderRoutePanel(): void {
   flightEyebrowElement.textContent = 'Route Drill'
 
-  if (quizFinished && answeredIds.size === totalCountryCount) {
+  if (quizFinished && answeredIds.size === activeTotalCountryCount) {
     flightRouteElement.textContent = 'Route complete'
   } else if (!currentPromptId) {
     flightRouteElement.textContent = 'No highlighted country queued'
   } else {
-    flightRouteElement.textContent = `Target ${answeredIds.size + 1} of ${totalCountryCount}`
+    flightRouteElement.textContent = `Target ${answeredIds.size + 1} of ${activeTotalCountryCount}`
   }
 
   flightDistanceElement.textContent = settings.randomRoute
     ? `Random order from the United Kingdom${settings.routeSeed ? ` (seed ${settings.routeSeed})` : ''}.`
-    : `Default order: ${formatMiles(routeChallengeMetadata.estimatedMiles)} from the United Kingdom.`
+    : isWholeWorldScope(settings.scope)
+      ? `Default order: ${formatMiles(routeChallengeMetadata.estimatedMiles)} from the United Kingdom.`
+      : `Default order across ${scopeDescription(settings.scope)}.`
   flightTotalElement.textContent =
     skippedPromptCount === 1 ? '1 skip used' : `${skippedPromptCount} skips used`
 
@@ -896,6 +1076,12 @@ function syncSettingsForm(): void {
   showCapitalsInput.checked = settings.showCapitals
   showCountriesInput.checked = settings.showCountries
   randomRouteInput.checked = settings.randomRoute
+  scopeSelect.value = settings.scope === 'world' ? 'world' : continentQueryValue(settings.scope)
+}
+
+function syncPageCopy(): void {
+  headingElement.textContent = headingTextForSettings(settings)
+  document.title = documentTitleForSettings(settings)
 }
 
 function syncSettingsDialogUrl(open: boolean): void {
@@ -920,6 +1106,54 @@ function closeSettings(): void {
   answerInput.focus()
 }
 
+function resetQuiz(message = ''): void {
+  answeredIds.clear()
+  cheatedIds.clear()
+  skippedIds.clear()
+  answerOrder.length = 0
+  routeFlightOrder.length = 0
+  skippedPromptCount = 0
+  quizStartedAt = null
+  quizFinished = false
+  latestFlightPerformance = null
+
+  if (mode.layoutMode === 'route') {
+    routePromptQueue.length = 0
+    routePromptQueue.push(...routeOrderForSettings(settings))
+    currentPromptId = routePromptQueue[0] ?? null
+  } else {
+    currentPromptId = null
+  }
+
+  answerInput.value = ''
+  answerInput.disabled = false
+  giveUpButton.disabled = false
+  compactGiveUpButton.disabled = false
+  window.clearInterval(intervalHandle)
+  intervalHandle = window.setInterval(tick, 250)
+
+  renderScore()
+  renderTracker()
+  syncSolvedCountries()
+  globe?.syncFlightPath([], { animate: false })
+  globe?.resetView()
+
+  if (mode.layoutMode === 'route') {
+    syncPromptedCountry({ focus: true })
+    renderRoutePanel()
+  } else {
+    renderClassicFlightStatus(globe?.syncFlightPath(answerOrder, { animate: false }) ?? null)
+  }
+
+  statusTone = 'neutral'
+  renderStatus(message)
+  tick()
+
+  if (settingsModal.hidden) {
+    answerInput.focus()
+  }
+}
+
 function rebuildRoutePromptQueue(): void {
   if (mode.layoutMode !== 'route') {
     return
@@ -940,6 +1174,7 @@ function rebuildRoutePromptQueue(): void {
 }
 
 function applySettings(nextSettings: QuizSettings): void {
+  const previousScopeKey = settingsScopeKey(settings)
   const previousRandomRoute = settings.randomRoute
   const previousRouteSeed = settings.routeSeed
 
@@ -947,8 +1182,16 @@ function applySettings(nextSettings: QuizSettings): void {
     ...nextSettings,
     routeSeed: nextSettings.randomRoute ? nextSettings.routeSeed ?? createRouteSeed() : null,
   }
+  refreshActiveQuizScope()
   syncSettingsUrl()
   syncSettingsForm()
+  syncPageCopy()
+
+  if (settingsScopeKey(settings) !== previousScopeKey) {
+    resetQuiz(`Quiz scope set to ${isWholeWorldScope(settings.scope) ? 'the whole world' : scopeDescription(settings.scope)}.`)
+    return
+  }
+
   renderTracker()
 
   if (
@@ -972,6 +1215,7 @@ function renderFlightPerformance(performance: GlobeFlightPerformance | null): vo
 
 function syncSolvedCountries(options?: { focusLatest?: boolean }): void {
   globe?.setAnswered(answeredIds, {
+    activeCountryIds,
     cheatedIds,
     focusLatest: options?.focusLatest,
     answerKind: mode.answerKind,
@@ -1038,7 +1282,7 @@ function giveUp(): void {
   }
 
   const solvedBeforeGiveUp = answeredIds.size
-  const remainingCountryIds = quizCountries
+  const remainingCountryIds = activeQuizCountries
     .map((country) => country.id)
     .filter((countryId) => !answeredIds.has(countryId))
 
@@ -1074,7 +1318,7 @@ function giveUp(): void {
   const elapsedTimeText = formatTime(elapsedMilliseconds())
   const itemNoun = remainingCountryIds.length === 1 ? answerThing() : answerThingPlural()
   finishQuiz(
-    `Gave up at ${solvedBeforeGiveUp}/${totalCountryCount}. Revealed ${remainingCountryIds.length} remaining ${itemNoun}.`,
+    `Gave up at ${solvedBeforeGiveUp}/${activeTotalCountryCount}. Revealed ${remainingCountryIds.length} remaining ${itemNoun}.`,
     {
       timerText: elapsedTimeText,
     },
@@ -1125,9 +1369,9 @@ function solveCountry(countryId: string, source: 'answer' | 'cheat' = 'answer'):
     renderClassicFlightStatus(globe?.syncFlightPath(answerOrder, { animate: true }) ?? null)
   }
 
-  if (answeredIds.size === totalCountryCount) {
+  if (answeredIds.size === activeTotalCountryCount) {
     const elapsedTimeText = formatTime(elapsedMilliseconds())
-    finishQuiz(`All ${totalCountryCount} ${answerThingPlural()} solved in ${elapsedTimeText}.`, {
+    finishQuiz(`All ${activeTotalCountryCount} ${answerThingPlural()} solved in ${elapsedTimeText}.`, {
       timerText: elapsedTimeText,
     })
     return
@@ -1175,7 +1419,7 @@ function maybeAcceptGuess(): void {
     return
   }
 
-  const matchedCountryId = aliasMap.get(normalizedGuess)
+  const matchedCountryId = activeAliasMap.get(normalizedGuess)
 
   if (!matchedCountryId || answeredIds.has(matchedCountryId)) {
     return
@@ -1199,7 +1443,7 @@ function submitGuess(): void {
     return
   }
 
-  const matchedCountryId = aliasMap.get(normalizedGuess)
+  const matchedCountryId = activeAliasMap.get(normalizedGuess)
 
   if (!matchedCountryId) {
     return
@@ -1280,6 +1524,18 @@ randomRouteInput.addEventListener('change', () => {
     ...settings,
     randomRoute: randomRouteInput.checked,
     routeSeed: randomRouteInput.checked ? settings.routeSeed ?? createRouteSeed() : null,
+  })
+})
+scopeSelect.addEventListener('change', () => {
+  const nextScopeValue = scopeSelect.value
+  const nextScope =
+    nextScopeValue === 'world'
+      ? 'world'
+      : continentOrder.find((continent) => continentQueryValue(continent) === nextScopeValue) ?? 'world'
+
+  applySettings({
+    ...settings,
+    scope: nextScope,
   })
 })
 window.addEventListener('keydown', (event: KeyboardEvent) => {

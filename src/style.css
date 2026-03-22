@@ -1004,6 +1004,20 @@ h1 {
   color: var(--accent);
 }
 
+.settings-modal__section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.settings-modal__section-note {
+  margin: 0 0 0.55rem;
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+}
+
 .mode-switch--settings {
   margin-bottom: 0;
 }
@@ -1035,6 +1049,43 @@ h1 {
 .settings-list {
   display: grid;
   gap: 0.9rem;
+}
+
+.scope-select {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.scope-select__label {
+  color: var(--ink-soft);
+  font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.scope-select__control {
+  width: 100%;
+  min-height: 3.3rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(245, 240, 224, 0.14);
+  border-radius: 18px;
+  background: rgba(245, 240, 224, 0.05);
+  color: #f4f0e2;
+  font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.scope-select__control:hover {
+  border-color: rgba(246, 198, 77, 0.3);
+  background: rgba(246, 198, 77, 0.08);
+}
+
+.scope-select__control:focus-visible {
+  outline: 2px solid rgba(246, 198, 77, 0.76);
+  outline-offset: 2px;
 }
 
 .settings-option {
@@ -1335,6 +1386,10 @@ h1 {
   .settings-option {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+
+  .scope-select__control {
+    min-height: 3.1rem;
   }
 
   .mode-switch--settings {
