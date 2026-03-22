@@ -17,7 +17,7 @@ import {
   type Continent,
   type QuizCountry,
 } from './quiz-data'
-import { routeChallengeMetadata, routeChallengeOrder } from './route-order'
+import { routeChallengeOrder } from './route-order'
 
 registerSW({ immediate: true })
 
@@ -417,6 +417,7 @@ refreshActiveQuizScope()
 const routePromptQueue = mode.layoutMode === 'route' ? routeOrderForSettings(settings) : []
 let currentPromptId = mode.layoutMode === 'route' ? routePromptQueue[0] ?? null : null
 const routeFlightOrder: string[] = []
+let routeFlightStatus: GlobeFlightStatus | null = null
 let skippedPromptCount = 0
 
 function answerLabelForCountry(country: QuizCountry): string {
@@ -1086,8 +1087,8 @@ function showWinOverlay(message: string): void {
   winOverlayCloseButton.focus()
 }
 
-function renderClassicFlightStatus(status: GlobeFlightStatus | null): void {
-  flightEyebrowElement.textContent = 'Flight Path'
+function renderFlightStatus(status: GlobeFlightStatus | null, eyebrow: string): void {
+  flightEyebrowElement.textContent = eyebrow
 
   if (!status) {
     const startCountry = countriesById.get(STARTING_COUNTRY_ID)
@@ -1102,24 +1103,15 @@ function renderClassicFlightStatus(status: GlobeFlightStatus | null): void {
   flightTotalElement.textContent = `Total distance flown: ${formatMiles(status.totalMiles)}`
 }
 
+function renderClassicFlightStatus(status: GlobeFlightStatus | null): void {
+  renderFlightStatus(status, 'Flight Path')
+}
+
 function renderRoutePanel(): void {
-  flightEyebrowElement.textContent = 'Route Drill'
+  const skipSummary = skippedPromptCount === 1 ? '1 skip used' : `${skippedPromptCount} skips used`
+  const eyebrow = skippedPromptCount > 0 ? `Route Drill · ${skipSummary}` : 'Route Drill'
 
-  if (quizFinished && answeredIds.size === activeTotalCountryCount) {
-    flightRouteElement.textContent = 'Route complete'
-  } else if (!currentPromptId) {
-    flightRouteElement.textContent = 'No highlighted country queued'
-  } else {
-    flightRouteElement.textContent = `Target ${answeredIds.size + 1} of ${activeTotalCountryCount}`
-  }
-
-  flightDistanceElement.textContent = settings.randomRoute
-    ? `Random order from the United Kingdom${settings.routeSeed ? ` (seed ${settings.routeSeed})` : ''}.`
-    : isWholeWorldScope(settings.scope)
-      ? `Default order: ${formatMiles(routeChallengeMetadata.estimatedMiles)} from the United Kingdom.`
-      : `Default order across ${scopeDescription(settings.scope)}.`
-  flightTotalElement.textContent =
-    skippedPromptCount === 1 ? '1 skip used' : `${skippedPromptCount} skips used`
+  renderFlightStatus(routeFlightStatus, eyebrow)
 
   for (const skipButton of skipButtons) {
     skipButton.disabled = quizFinished || !currentPromptId
@@ -1168,6 +1160,7 @@ function resetQuiz(message = ''): void {
   skippedIds.clear()
   answerOrder.length = 0
   routeFlightOrder.length = 0
+  routeFlightStatus = null
   skippedPromptCount = 0
   quizStartedAt = null
   quizFinished = false
@@ -1303,12 +1296,18 @@ function globeResetViewOptions(): Parameters<NonNullable<typeof globe>['resetVie
 }
 
 function advanceRouteFlight(options?: { animate?: boolean }): void {
-  if (mode.layoutMode !== 'route' || !currentPromptId) {
+  if (mode.layoutMode !== 'route') {
     return
   }
 
-  routeFlightOrder.push(currentPromptId)
-  globe?.syncFlightPath(routeFlightOrder, { animate: options?.animate })
+  const countryId = answerOrder.at(-1)
+
+  if (!countryId) {
+    return
+  }
+
+  routeFlightOrder.push(countryId)
+  routeFlightStatus = globe?.syncFlightPath(routeFlightOrder, { animate: options?.animate }) ?? null
 }
 
 function finishQuiz(
@@ -1392,6 +1391,7 @@ function giveUp(): void {
   syncSolvedCountries()
   syncPromptedCountry()
   globe?.syncFlightPath([], { animate: false })
+  routeFlightStatus = null
   globe?.resetView(globeResetViewOptions())
   renderScore()
   renderTracker()
@@ -1736,6 +1736,7 @@ syncSolvedCountries({ focusLatest: mode.layoutMode === 'free' })
 
 if (mode.layoutMode === 'route') {
   globe.syncFlightPath([], { animate: false })
+  routeFlightStatus = null
   syncPromptedCountry({ focus: true })
 } else {
   globe.resetView(globeResetViewOptions())
