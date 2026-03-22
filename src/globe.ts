@@ -893,19 +893,15 @@ export async function createGlobe(
     }
 
     applyProjectionLayout()
-    const baseProjection = createProjection(currentProjectionKey, projectionDefinition().defaultRotation)
-    baseProjection
-      .translate(fittedBaseTranslate)
-      .scale(currentScale())
-    const projectedCenter = baseProjection(center)
+    const projectedCenter = projection(center)
 
     if (!projectedCenter) {
       return
     }
 
     mapPanOffset = [
-      cssWidth / 2 - projectedCenter[0],
-      cssHeight / 2 - projectedCenter[1],
+      mapPanOffset[0] + (cssWidth / 2 - projectedCenter[0]),
+      mapPanOffset[1] + (cssHeight / 2 - projectedCenter[1]),
     ]
   }
 
@@ -927,6 +923,8 @@ export async function createGlobe(
     const [rotationLongitude, rotationLatitude] = projection.rotate()
     container.dataset.detailMode = outlineDetailMode
     container.dataset.projection = currentProjectionKey
+    container.dataset.panX = mapPanOffset[0].toFixed(2)
+    container.dataset.panY = mapPanOffset[1].toFixed(2)
     container.dataset.rotationLon = rotationLongitude.toFixed(2)
     container.dataset.rotationLat = rotationLatitude.toFixed(2)
     container.dataset.zoom = currentZoom.toFixed(3)
@@ -990,18 +988,11 @@ export async function createGlobe(
   }
 
   function syncCanvasSize(): void {
-    const viewportCenter =
-      !usesGlobeInteraction() ? (projection.invert?.([cssWidth / 2, cssHeight / 2]) ?? null) : null
     const bounds = container.getBoundingClientRect()
     cssWidth = Math.max(1, bounds.width)
     cssHeight = Math.max(1, bounds.height)
 
     applyProjectionLayout()
-
-    if (viewportCenter) {
-      setViewCenter(viewportCenter)
-      applyProjectionLayout()
-    }
 
     mapSvg.attr('viewBox', `0 0 ${cssWidth} ${cssHeight}`)
     labelsSvg.attr('viewBox', `0 0 ${cssWidth} ${cssHeight}`)
@@ -2035,8 +2026,8 @@ export async function createGlobe(
       return
     }
 
-    setViewCenter(centroid)
     currentZoom = zoomForCountry(countryId)
+    setViewCenter(centroid)
   }
 
   function snapToRegion(countryIds: Iterable<string>): [number, number] | null {
@@ -2046,25 +2037,20 @@ export async function createGlobe(
       return null
     }
 
-    setViewCenter(view.center)
     currentZoom = view.zoom
+    setViewCenter(view.center)
     return view.center
   }
 
   function applyStartView(): void {
-    if (!usesGlobeInteraction()) {
-      mapPanOffset = [0, 0]
-      currentZoom = 1
-      return
-    }
-
     const centroid = centroidForCountry(FLIGHT_START_COUNTRY_ID)
+
+    mapPanOffset = [0, 0]
+    currentZoom = zoomForCountry(FLIGHT_START_COUNTRY_ID)
 
     if (centroid) {
       setViewCenter(centroid)
     }
-
-    currentZoom = zoomForCountry(FLIGHT_START_COUNTRY_ID)
   }
 
   function resetGlobeView(): void {
@@ -2464,6 +2450,7 @@ export async function createGlobe(
       )
       measurementPath = geoPath(projection)
       mapPanOffset = [0, 0]
+      applyProjectionLayout()
 
       const focusCountryId = promptedCountryId ?? latestAnsweredId(answeredIds)
 
