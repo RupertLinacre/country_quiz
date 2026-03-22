@@ -1385,7 +1385,9 @@ export async function createGlobe(
         return {
           appearanceFill:
             renderMode === 'route'
-              ? ROUTE_SOLVED_FILL
+              ? cheatedIds.has(countryId) || skippedIds.has(countryId)
+                ? CHEATED_SOLVED_FILL
+                : ROUTE_SOLVED_FILL
               : cheatedIds.has(countryId)
                 ? CHEATED_SOLVED_FILL
                 : countryId === mostRecentAnsweredId

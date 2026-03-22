@@ -1067,7 +1067,7 @@ function renderRoutePanel(): void {
     skippedPromptCount === 1 ? '1 skip used' : `${skippedPromptCount} skips used`
 
   for (const skipButton of skipButtons) {
-    skipButton.disabled = quizFinished || routePromptQueue.length < 2
+    skipButton.disabled = quizFinished || !currentPromptId
   }
 }
 
@@ -1276,6 +1276,22 @@ function finishQuiz(
   }
 }
 
+function assistedAnswerCount(): number {
+  return new Set([...cheatedIds, ...skippedIds]).size
+}
+
+function assistedAnswerSummary(): string {
+  const assistedCount = assistedAnswerCount()
+
+  if (assistedCount === 0) {
+    return ''
+  }
+
+  return assistedCount === 1
+    ? ' 1 answer was revealed via cheat/skip.'
+    : ` ${assistedCount} answers were revealed via cheat/skip.`
+}
+
 function giveUp(): void {
   if (quizFinished) {
     return
@@ -1371,9 +1387,12 @@ function solveCountry(countryId: string, source: 'answer' | 'cheat' = 'answer'):
 
   if (answeredIds.size === activeTotalCountryCount) {
     const elapsedTimeText = formatTime(elapsedMilliseconds())
-    finishQuiz(`All ${activeTotalCountryCount} ${answerThingPlural()} solved in ${elapsedTimeText}.`, {
-      timerText: elapsedTimeText,
-    })
+    finishQuiz(
+      `All ${activeTotalCountryCount} ${answerThingPlural()} solved in ${elapsedTimeText}.${assistedAnswerSummary()}`,
+      {
+        timerText: elapsedTimeText,
+      },
+    )
     return
   }
 
@@ -1388,7 +1407,7 @@ function solveCountry(countryId: string, source: 'answer' | 'cheat' = 'answer'):
 }
 
 function skipPrompt(): void {
-  if (mode.layoutMode !== 'route' || quizFinished || !currentPromptId || routePromptQueue.length < 2) {
+  if (mode.layoutMode !== 'route' || quizFinished || !currentPromptId) {
     return
   }
 
@@ -1398,17 +1417,41 @@ function skipPrompt(): void {
     return
   }
 
-  routePromptQueue.push(skippedCountryId)
   currentPromptId = routePromptQueue[0] ?? null
+  answeredIds.add(skippedCountryId)
+  cheatedIds.add(skippedCountryId)
   skippedIds.add(skippedCountryId)
+  answerOrder.push(skippedCountryId)
   skippedPromptCount += 1
+
+  if (quizStartedAt === null) {
+    quizStartedAt = Date.now()
+  }
+
   answerInput.value = ''
-  statusTone = 'neutral'
-  renderStatus(`Skipped ${answerLabelForCountryId(skippedCountryId)}. It will come back later.`)
   syncSolvedCountries()
-  syncPromptedCountry()
-  advanceRouteFlight({ animate: true })
-  renderRoutePanel()
+  renderScore()
+  updateTracker(skippedCountryId)
+
+  if (mode.layoutMode === 'route') {
+    syncPromptedCountry()
+    advanceRouteFlight({ animate: Boolean(currentPromptId) })
+    renderRoutePanel()
+  }
+
+  if (answeredIds.size === activeTotalCountryCount) {
+    const elapsedTimeText = formatTime(elapsedMilliseconds())
+    finishQuiz(
+      `All ${activeTotalCountryCount} ${answerThingPlural()} solved in ${elapsedTimeText}.${assistedAnswerSummary()}`,
+      {
+        timerText: elapsedTimeText,
+      },
+    )
+    return
+  }
+
+  statusTone = 'neutral'
+  renderStatus(`Skipped ${answerLabelForCountryId(skippedCountryId)}. Counted as answered.`)
   answerInput.focus()
 }
 
