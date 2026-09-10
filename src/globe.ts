@@ -28,10 +28,13 @@ import { feature, mesh } from 'topojson-client'
 import atlasUrl from './generated/globe-atlas.json?url'
 import detailAtlasUrl from './generated/globe-detail-atlas.json?url'
 import interactionAtlasUrl from './generated/globe-interaction-atlas.json?url'
+import zoomFullUrl from './generated/zoom-lod-full.json?url'
+import zoomStandardUrl from './generated/zoom-lod-standard.json?url'
 import fallbackFeatures from './generated/country-geometry-fallbacks.json'
 import type { QuizCountry } from './quiz-data'
 import { createHemispherePath, prepareHemisphereGeometry, prepareHemisphereLabel } from './hemisphere-path'
 import { AdaptiveDetailExperiment, CanvasMapExperiment, preserveSmallIslands, readRenderExperiment, type ExperimentProbe, type ExperimentTopology } from './render-experiments'
+import { materializeZoomLevel, ZoomDetailSelector, type ZoomLevels } from './zoom-detail'
 
 type AtlasFeature = GeoPermissibleObjects & {
   id?: string | number
@@ -682,6 +685,14 @@ export async function createGlobe(
     if (labelFeature) prepareHemisphereLabel(labelFeature, Math.max(country.name.length, country.capitalDisplayName.length) * 10 + 40)
   }
   const detailAtlas = buildAtlasBundle(detailTopology, countries)
+  const zoomPreparationStart = experiment?.zoomPixels ? performance.now() : 0
+  const zoomData: ZoomLevels | null = experiment?.zoomPixels
+    ? await fetch(experiment.zoomBase === 'standard' ? zoomStandardUrl : zoomFullUrl).then(response => response.json()) : null
+  // Prepare outside animation: selecting a level during a flight only swaps a
+  // reference to geometry with its existing hemisphere/culling caches ready.
+  const zoomAtlases = zoomData?.levels.map(level => buildAtlasBundle(materializeZoomLevel(experiment?.zoomBase === 'standard' ? topology : detailTopology, level), countries))
+  const zoomPreparationMs = zoomData ? performance.now() - zoomPreparationStart : 0
+  const zoomSelector = new ZoomDetailSelector()
   const fallbackFeatureByCountryId = new Map<string, AtlasFeature>()
   const fallbackLabelFeatureByCountryId = new Map<string, GeoPermissibleObjects>()
   const fallbackCentroidByCountryId = new Map<string, [number, number]>()
@@ -735,6 +746,7 @@ export async function createGlobe(
   const hitTargetLayer = mapLayer.append('g').attr('class', 'globe__hit-targets')
   const adaptiveDetail = experiment?.adaptive ? new AdaptiveDetailExperiment() : null
   const experimentProbe: ExperimentProbe | null = experiment ? { name: experiment.name, frames: [], frameIntervals: [] } : null
+  if (experimentProbe && zoomData) experimentProbe.preparationMs = zoomPreparationMs
   if (experimentProbe) window.__renderExperiment = experimentProbe
   const experimentCanvas = experiment?.canvasScale !== null && experiment?.canvasScale !== undefined
     ? new CanvasMapExperiment(container, experiment.canvasScale) : null
@@ -1753,8 +1765,18 @@ export async function createGlobe(
     const mostRecentAnsweredId = latestAnsweredId(answeredIds)
     // Wide flights still benefit from the smaller atlas on slow CPUs. Keep all
     // projection/culling caches, and restore full detail as soon as flight ends.
-    const flightDetail = adaptiveDetail?.detail ?? experiment?.detail ?? 'standard'
-    const displayAtlas = !isFlightAnimating || flightDetail === 'full' ? detailAtlas : flightDetail === 'coarse' ? coarseExperimentAtlas : atlas
+    let flightDetail = adaptiveDetail?.detail ?? experiment?.detail ?? 'standard'
+    const zoomEnabled = Boolean(zoomData && isFlightAnimating && currentProjectionKey === 'orthographic' && (!adaptiveDetail || adaptiveDetail.detail === 'coarse'))
+    const zoomLevel = zoomEnabled ? zoomSelector.select(zoomData!.levels, currentScale(), experiment!.zoomPixels!) : null
+    const zoomError = zoomLevel === null ? 0 : zoomData!.levels[zoomLevel].maxError * currentScale()
+    let displayAtlas = !isFlightAnimating || flightDetail === 'full' ? detailAtlas : flightDetail === 'coarse' ? coarseExperimentAtlas : atlas
+    if (zoomData) {
+      flightDetail = zoomEnabled && zoomLevel !== null ? 'zoom' : experiment?.zoomBase ?? 'full'
+      displayAtlas = !isFlightAnimating ? detailAtlas : zoomEnabled && zoomLevel !== null ? zoomAtlases![zoomLevel] : experiment?.zoomBase === 'standard' ? atlas : detailAtlas
+      container.dataset.experimentLod = zoomLevel === null ? 'source' : String(zoomLevel)
+      container.dataset.experimentError = String(zoomError)
+      container.dataset.experimentScale = String(currentScale())
+    }
     if (experiment) {
       container.dataset.experiment = experiment.name
       container.dataset.experimentDetail = isFlightAnimating ? flightDetail : 'full'
@@ -1981,7 +2003,7 @@ export async function createGlobe(
     const rasterMs = experimentProbe ? performance.now() - rasterStart : 0
     renderLabels()
     renderPlane(mostRecentAnsweredId)
-    if (experimentProbe && isFlightAnimating) experimentProbe.frames.push({ renderMs: performance.now() - experimentStart, rasterMs, detail: flightDetail, backend: canvasActive ? 'canvas' : 'svg' })
+    if (experimentProbe && isFlightAnimating) experimentProbe.frames.push({ renderMs: performance.now() - experimentStart, rasterMs, detail: flightDetail, backend: canvasActive ? 'canvas' : 'svg', ...(zoomData ? { lod: zoomLevel, scale: currentScale(), maxErrorPx: zoomError } : {}) })
   }
 
   function scheduleRender(): void {

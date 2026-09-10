@@ -1,0 +1,26 @@
+[
+  {
+    "variant": "svg-standard",
+    "cpuRate": 6,
+    "readyMs": 1724.214625,
+    "preparationMs": 0,
+    "jsHeapBytes": 28585288,
+    "embedderHeapBytes": 2420432
+  },
+  {
+    "variant": "svg-zoom-adaptive",
+    "cpuRate": 6,
+    "readyMs": 2501.5250840000003,
+    "preparationMs": 816,
+    "jsHeapBytes": 43106824,
+    "embedderHeapBytes": 2555344
+  },
+  {
+    "variant": "svg-zoom-1",
+    "cpuRate": 6,
+    "readyMs": 3562.9922499999993,
+    "preparationMs": 1900.699999988079,
+    "jsHeapBytes": 63826896,
+    "embedderHeapBytes": 2468688
+  }
+]

@@ -1,0 +1,708 @@
+[
+  {
+    "name": "zoom-adaptiveFast-svg-zoom-adaptive",
+    "browser": "145.0.7632.6",
+    "cpuRate": 1,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 59.59,
+    "p95FrameMs": 17.6,
+    "repeatFps": [
+      59.42,
+      59.76
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 60.01
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 59.4
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 59.12
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 59.72
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 59.7
+      }
+    ],
+    "detailFrames": {
+      "standard": 1032
+    },
+    "levelFrames": {
+      "source": 1032
+    },
+    "maxSphereErrorPx": 0,
+    "preparationMs": 128.2000000178814,
+    "errors": []
+  },
+  {
+    "name": "zoom-adaptiveSlow-svg-zoom-adaptive",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 30.39,
+    "p95FrameMs": 50.6,
+    "repeatFps": [
+      29.9,
+      30.87
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 35.08
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 22.11
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 22.3
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 33.19
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 39.43
+      }
+    ],
+    "detailFrames": {
+      "standard": 160,
+      "zoom": 377
+    },
+    "levelFrames": {
+      "3": 226,
+      "4": 116,
+      "5": 35,
+      "source": 160
+    },
+    "maxSphereErrorPx": 1,
+    "preparationMs": 129.5,
+    "errors": []
+  },
+  {
+    "name": "zoom-confirmation-svg-standard",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 27.23,
+    "p95FrameMs": 67,
+    "repeatFps": [
+      27.12,
+      27.27,
+      27.29
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 33.58
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 17.37
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 17.34
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 28.83
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 39.22
+      }
+    ],
+    "detailFrames": {
+      "standard": 720
+    },
+    "levelFrames": {},
+    "maxSphereErrorPx": 0,
+    "errors": []
+  },
+  {
+    "name": "zoom-confirmation-svg-zoom-standard-1",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 29.85,
+    "p95FrameMs": 50.9,
+    "repeatFps": [
+      29.49,
+      29.94,
+      30.12
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 34.62
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 21.81
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 21.85
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 32.53
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 38.46
+      }
+    ],
+    "detailFrames": {
+      "standard": 238,
+      "zoom": 552
+    },
+    "levelFrames": {
+      "3": 334,
+      "4": 168,
+      "5": 50,
+      "source": 238
+    },
+    "maxSphereErrorPx": 1,
+    "preparationMs": 131.39999997615814,
+    "errors": []
+  },
+  {
+    "name": "zoom-fast-svg-standard",
+    "browser": "145.0.7632.6",
+    "cpuRate": 1,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 59.71,
+    "p95FrameMs": 17.7,
+    "repeatFps": [
+      59.53,
+      59.88
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 59.99
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 59.42
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 59.72
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 59.7
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 59.7
+      }
+    ],
+    "detailFrames": {
+      "standard": 1032
+    },
+    "levelFrames": {},
+    "maxSphereErrorPx": 0,
+    "errors": []
+  },
+  {
+    "name": "zoom-fast-svg-zoom-standard-1",
+    "browser": "145.0.7632.6",
+    "cpuRate": 1,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 59.82,
+    "p95FrameMs": 17.6,
+    "repeatFps": [
+      59.87,
+      59.77
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 59.7
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 60.01
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 59.44
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 59.99
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 59.99
+      }
+    ],
+    "detailFrames": {
+      "standard": 232,
+      "zoom": 804
+    },
+    "levelFrames": {
+      "3": 554,
+      "4": 195,
+      "5": 55,
+      "source": 232
+    },
+    "maxSphereErrorPx": 1,
+    "preparationMs": 130,
+    "errors": []
+  },
+  {
+    "name": "zoom-overview-svg-standard",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": true,
+    "fps": 20.4,
+    "p95FrameMs": 83.5,
+    "repeatFps": [
+      20.28,
+      20.51
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 13.98
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 15.81
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 15.15
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 24.07
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 32.92
+      }
+    ],
+    "detailFrames": {
+      "standard": 360
+    },
+    "levelFrames": {},
+    "maxSphereErrorPx": 0,
+    "errors": []
+  },
+  {
+    "name": "zoom-overview-svg-zoom-standard-1",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": true,
+    "fps": 24.97,
+    "p95FrameMs": 66.2,
+    "repeatFps": [
+      23.79,
+      26.15
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 19.9
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 20
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 20.77
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 30.16
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 34.09
+      }
+    ],
+    "detailFrames": {
+      "zoom": 375,
+      "standard": 64
+    },
+    "levelFrames": {
+      "1": 161,
+      "2": 53,
+      "3": 112,
+      "4": 40,
+      "5": 9,
+      "source": 64
+    },
+    "maxSphereErrorPx": 0.99,
+    "preparationMs": 132.2999999821186,
+    "errors": []
+  },
+  {
+    "name": "zoom-slow-svg-standard",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 27.01,
+    "p95FrameMs": 67,
+    "repeatFps": [
+      26.15,
+      26.35,
+      28.54
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 32.78
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 16.95
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 17.14
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 28.55
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 39.68
+      }
+    ],
+    "detailFrames": {
+      "standard": 715
+    },
+    "levelFrames": {},
+    "maxSphereErrorPx": 0,
+    "errors": []
+  },
+  {
+    "name": "zoom-slow-svg-zoom-standard-1",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 31.36,
+    "p95FrameMs": 50.7,
+    "repeatFps": [
+      31.17,
+      31.45,
+      31.46
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 36.43
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 22.57
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 22.41
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 33.99
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 41.37
+      }
+    ],
+    "detailFrames": {
+      "standard": 248,
+      "zoom": 577
+    },
+    "levelFrames": {
+      "3": 339,
+      "4": 184,
+      "5": 54,
+      "source": 248
+    },
+    "maxSphereErrorPx": 1,
+    "preparationMs": 128.80000001192093,
+    "errors": []
+  },
+  {
+    "name": "zoom-slow-svg-zoom-standard-2",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 30.97,
+    "p95FrameMs": 50.5,
+    "repeatFps": [
+      30.59,
+      30.53,
+      31.8
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 36.08
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 23.35
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 23.97
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 33.76
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 37.75
+      }
+    ],
+    "detailFrames": {
+      "standard": 76,
+      "zoom": 742
+    },
+    "levelFrames": {
+      "1": 356,
+      "2": 180,
+      "3": 46,
+      "4": 41,
+      "5": 119,
+      "source": 76
+    },
+    "maxSphereErrorPx": 2,
+    "preparationMs": 126.59999999403954,
+    "errors": []
+  },
+  {
+    "name": "zoom-solved-svg-standard",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 100,
+    "startOverview": false,
+    "fps": 21.48,
+    "p95FrameMs": 83.9,
+    "repeatFps": [
+      21.23,
+      21.73
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 27.9
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 12.86
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 13.27
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 22.79
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 30.58
+      }
+    ],
+    "detailFrames": {
+      "standard": 384
+    },
+    "levelFrames": {},
+    "maxSphereErrorPx": 0,
+    "errors": []
+  },
+  {
+    "name": "zoom-solved-svg-zoom-standard-1",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 100,
+    "startOverview": false,
+    "fps": 22.8,
+    "p95FrameMs": 67.6,
+    "repeatFps": [
+      22.52,
+      23.08
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 26.54
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 16.66
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 16.24
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 24.76
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 29.86
+      }
+    ],
+    "detailFrames": {
+      "standard": 121,
+      "zoom": 283
+    },
+    "levelFrames": {
+      "3": 169,
+      "4": 86,
+      "5": 28,
+      "source": 121
+    },
+    "maxSphereErrorPx": 1,
+    "preparationMs": 124.2000000178814,
+    "errors": []
+  },
+  {
+    "name": "zoom-pooled-svg-standard",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 27.12,
+    "p95FrameMs": 67,
+    "repeatFps": [
+      27.12,
+      27.27,
+      27.29,
+      26.15,
+      26.35,
+      28.54
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 33.18
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 17.16
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 17.24
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 28.69
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 39.45
+      }
+    ],
+    "detailFrames": {
+      "standard": 1435
+    },
+    "levelFrames": {},
+    "maxSphereErrorPx": 0,
+    "errors": []
+  },
+  {
+    "name": "zoom-pooled-svg-zoom-standard-1",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "startOverview": false,
+    "fps": 30.6,
+    "p95FrameMs": 50.8,
+    "repeatFps": [
+      29.49,
+      29.94,
+      30.12,
+      31.17,
+      31.45,
+      31.46
+    ],
+    "routes": [
+      {
+        "route": "GBR-USA",
+        "fps": 35.52
+      },
+      {
+        "route": "USA-CHN",
+        "fps": 22.19
+      },
+      {
+        "route": "CHN-USA",
+        "fps": 22.13
+      },
+      {
+        "route": "USA-AUS",
+        "fps": 33.26
+      },
+      {
+        "route": "AUS-GBR",
+        "fps": 39.91
+      }
+    ],
+    "detailFrames": {
+      "standard": 486,
+      "zoom": 1129
+    },
+    "levelFrames": {
+      "3": 673,
+      "4": 352,
+      "5": 104,
+      "source": 486
+    },
+    "maxSphereErrorPx": 1,
+    "preparationMs": 131.39999997615814,
+    "errors": []
+  }
+]

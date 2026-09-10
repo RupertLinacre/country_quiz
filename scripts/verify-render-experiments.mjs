@@ -9,7 +9,9 @@ const browser = await chromium.launch()
 const reference = new Map()
 let comparisons = 0
 try {
-  for (const variant of ['', 'svg-islands', 'svg-adaptive', 'canvas-100', 'canvas-50']) {
+  const variants = (process.env.VARIANTS ?? ',svg-islands,svg-adaptive,canvas-100,canvas-50').split(',')
+  assert.equal(variants[0], '', 'First variant must be the default reference')
+  for (const variant of variants) {
     const page = await browser.newPage({ viewport: { width: 1280, height: 1000 }, serviceWorkers: 'block' })
     const errors = []
     page.on('pageerror', error => errors.push(error.message))
@@ -88,8 +90,9 @@ try {
     console.log(`${variant || 'default'}: landing, zoom, pointer cancellation, drag, projection and resize verified`)
   }
   // Use real timing separately: a fake clock cannot measure rendering CPU cost.
+  const adaptiveVariant = process.env.ADAPTIVE_VARIANT ?? 'svg-adaptive'
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block' })
-  await page.goto(`${server.url}?renderExperiment=svg-adaptive`)
+  await page.goto(`${server.url}?renderExperiment=${adaptiveVariant}`)
   await page.waitForFunction(() => window.__countriesQuizDebug && document.querySelector('.globe__hit-target'))
   const cdp = await page.context().newCDPSession(page)
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 })
@@ -98,9 +101,10 @@ try {
   assert.equal(flight.status, 'complete')
   assert.equal(probe.startDetail, 'standard')
   assert(probe.transitions.some(({ from, to }) => from === 'standard' && to === 'coarse'), 'slow first flight must adapt')
-  assert(probe.frames.some(frame => frame.detail === 'standard') && probe.frames.some(frame => frame.detail === 'coarse'))
+  assert(probe.frames.some(frame => frame.detail === 'standard') && probe.frames.some(frame => frame.detail === (adaptiveVariant.includes('zoom') ? 'zoom' : 'coarse')))
+  if (adaptiveVariant.includes('zoom')) assert(probe.frames.every(frame => frame.maxErrorPx <= 1), 'FPS adaptation must not breach the zoom quality floor')
   assert.equal(await page.locator('.globe-frame').getAttribute('data-experiment-detail'), 'full')
   await mkdir('output/playwright', { recursive: true })
-  await writeFile('output/playwright/experiment-lifecycle.json', JSON.stringify({ comparisons, coldFlight: { ...flight, probe } }, null, 2))
+  await writeFile(`output/playwright/${process.env.RESULT_NAME ?? 'experiment-lifecycle'}.json`, JSON.stringify({ comparisons, coldFlight: { ...flight, probe } }, null, 2))
   console.log(`PASS: ${comparisons} exact settled SVG comparisons; cold flight adapts after frame ${probe.transitions[0].frame}`)
 } finally { await browser.close(); server.close() }

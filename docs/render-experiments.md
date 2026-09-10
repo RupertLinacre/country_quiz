@@ -1,5 +1,7 @@
 # Adaptive rendering experiments
 
+For the subsequent zoom-dependent work, see [Zoom-dependent map detail](zoom-dependent-detail.md).
+
 Experiments on `codex/adaptive-rendering-experiments`, based on main `88d9ef8`, 10 September 2026. Every renderer change is opt-in through a query parameter. A normal URL retains the shipped rendering policy.
 
 FPS-based selection of SVG geometry produced the best performance improvement tested. Lower-resolution bitmap rendering did not beat the existing SVG renderer. However, the extra geometry simplification visibly changes coastlines, especially close to Europe. **Keep the current production renderer for now:** these prototypes do not achieve a 30% overall improvement without a visible compromise. The branch provides reproducible comparisons for the actual old phone.

@@ -44,7 +44,15 @@ try {
   }
   const cdp = await context.newCDPSession(page)
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: Number(rate) })
-  const flight = (from, to) => page.evaluate(([a, b]) => window.__countriesQuizDebug.benchmarkFlight(a, b), [from, to])
+  const flight = async (from, to) => {
+    if (process.env.START_OVERVIEW) {
+      await page.evaluate(() => {
+        for (let i = 0; i < 20; i++) document.querySelector('.globe__map-svg').dispatchEvent(new WheelEvent('wheel', { deltaY: 160, bubbles: true }))
+      })
+      await page.waitForTimeout(250)
+    }
+    return page.evaluate(([a, b]) => window.__countriesQuizDebug.benchmarkFlight(a, b), [from, to])
+  }
   await flight('GBR', 'USA')
   await flight('USA', 'GBR')
   const results = []
@@ -74,7 +82,7 @@ try {
     meanRasterSubmitMs: samples.reduce((sum, frame) => sum + frame.rasterMs, 0) / samples.length,
     details: samples.reduce((counts, frame) => ({ ...counts, [frame.detail]: (counts[frame.detail] ?? 0) + 1 }), {}),
   } : undefined
-  const summary = { name, browser: browser.version(), cpuRate: Number(rate), device: device ?? 'desktop', pixelRatio, solvedCount, query, fps: frames / sampledMs * 1000, routeSummaries, experimentSummary, errors, results }
+  const summary = { name, browser: browser.version(), cpuRate: Number(rate), device: device ?? 'desktop', pixelRatio, solvedCount, startOverview: Boolean(process.env.START_OVERVIEW), query, fps: frames / sampledMs * 1000, routeSummaries, experimentSummary, errors, results }
   await writeFile(`${output}/${name}.json`, JSON.stringify(summary, null, 2))
   console.log(JSON.stringify({ ...summary, results: undefined }))
   if (process.env.PROFILE) {
