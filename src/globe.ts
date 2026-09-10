@@ -630,10 +630,20 @@ function buildAtlasBundle(topology: Topology, countries: QuizCountry[]): AtlasBu
       continue
     }
 
-    const matchedFeature = normaliseCountryFeature(matchedFeatureSource)
+    const primaryFeature = normaliseCountryFeature(matchedFeatureSource)
+    const additionalFeatures = (country.additionalAtlasNames ?? [])
+      .map((atlasName) => byName.get(atlasName))
+      .filter((additionalFeature): additionalFeature is AtlasFeature => Boolean(additionalFeature))
+      .map(normaliseCountryFeature)
+    const matchedFeature = additionalFeatures.length > 0
+      ? ({
+          type: 'FeatureCollection',
+          features: [primaryFeature, ...additionalFeatures],
+        } as unknown as AtlasFeature)
+      : primaryFeature
 
     featureByCountryId.set(country.id, matchedFeature)
-    const labelFeature = primaryLabelFeature(matchedFeature)
+    const labelFeature = primaryLabelFeature(primaryFeature)
     prepareHemisphereGeometry(matchedFeature)
     prepareHemisphereGeometry(labelFeature)
     labelFeatureByCountryId.set(country.id, labelFeature)

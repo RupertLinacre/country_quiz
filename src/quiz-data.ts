@@ -29,6 +29,7 @@ export type QuizCountry = {
   capitalAliases: string[]
   flagEmoji: string
   atlasName: string
+  additionalAtlasNames?: string[]
   continent: Continent
   aliases: string[]
   appearance: SolvedAppearance

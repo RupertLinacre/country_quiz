@@ -7,6 +7,7 @@ const INCLUDED_NON_UN_MEMBERS = new Set(['PSE', 'TWN', 'VAT', 'UNK'])
 
 const MANUAL_ALIASES = {
   ARE: ['uae'],
+  BIH: ['bosnia'],
   BOL: ['bolivia'],
   BRN: ['brunei'],
   CIV: ['ivory coast'],
@@ -37,6 +38,7 @@ const MANUAL_ALIASES = {
   TUR: ['turkey'],
   TLS: ['east timor', 'timor leste'],
   TZA: ['tanzania'],
+  TTO: ['trinidad'],
   USA: ['us', 'usa', 'united states of america', 'america'],
   VAT: ['holy see', 'vatican'],
   VCT: [
@@ -47,6 +49,10 @@ const MANUAL_ALIASES = {
   ],
   VEN: ['venezuela'],
   VNM: ['vietnam'],
+}
+
+const ADDITIONAL_ATLAS_NAMES = {
+  DNK: ['Greenland'],
 }
 
 const MANUAL_CAPITAL_ALIASES = {
@@ -161,6 +167,9 @@ const records = rawCountries
       capitalAliases: collectCapitalAliases(country),
       flagEmoji: country.flag,
       atlasName: atlasNameFor(country),
+      ...(ADDITIONAL_ATLAS_NAMES[country.cca3]
+        ? { additionalAtlasNames: ADDITIONAL_ATLAS_NAMES[country.cca3] }
+        : {}),
       continent: toContinent(country.region, country.subregion),
       aliases: collectAliases(country, name),
       appearance: {

@@ -2416,7 +2416,8 @@
     "continent": "Europe",
     "aliases": [
       "bosnia and herzegovina",
-      "bosnia herzegovina"
+      "bosnia herzegovina",
+      "bosnia"
     ],
     "appearance": {
       "kind": "flag",
@@ -2525,6 +2526,9 @@
     ],
     "flagEmoji": "🇩🇰",
     "atlasName": "Denmark",
+    "additionalAtlasNames": [
+      "Greenland"
+    ],
     "continent": "Europe",
     "aliases": [
       "denmark",
@@ -3786,7 +3790,8 @@
     "continent": "North America",
     "aliases": [
       "trinidad and tobago",
-      "republic of trinidad and tobago"
+      "republic of trinidad and tobago",
+      "trinidad"
     ],
     "appearance": {
       "kind": "flag",
