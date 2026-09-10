@@ -1,0 +1,53 @@
+{
+  "group": "overview",
+  "browser": "145.0.7632.6",
+  "cpuRate": 6,
+  "viewport": [
+    390,
+    844
+  ],
+  "dpr": 2,
+  "solvedCount": 0,
+  "holdOverview": true,
+  "summary": [
+    {
+      "variant": "svg-standard",
+      "fps": 16.63762531202756,
+      "runFps": [
+        16.857691738983096,
+        16.416526586680416
+      ],
+      "usaChinaFps": 14.930237031868879,
+      "meanRenderMs": 51.555443884988925,
+      "cartesianFrames": 0,
+      "frameCount": 597,
+      "flights": 20
+    },
+    {
+      "variant": "svg-zoom-standard-1",
+      "fps": 24.14941601132436,
+      "runFps": [
+        23.92565930908983,
+        24.372467004322047
+      ],
+      "usaChinaFps": 22.705021280534275,
+      "meanRenderMs": 34.772385428816115,
+      "cartesianFrames": 0,
+      "frameCount": 851,
+      "flights": 20
+    },
+    {
+      "variant": "svg-planet",
+      "fps": 33.62702682104458,
+      "runFps": [
+        33.6439676598816,
+        33.61010303415496
+      ],
+      "usaChinaFps": 31.528645299834505,
+      "meanRenderMs": 23.716411564093665,
+      "cartesianFrames": 1176,
+      "frameCount": 1176,
+      "flights": 20
+    }
+  ]
+}

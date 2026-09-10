@@ -52,7 +52,27 @@ try {
         } } : {}),
       }), Boolean(process.env.GEOMETRY))
       if (!labels.has(name)) labels.set(name, detail.labels)
-      else assert.equal(detail.labels, labels.get(name), `${variant}/${name}: labels and plane must remain identical`)
+      else if (process.env.LABEL_TOLERANCE) {
+        const difference = await page.evaluate(([a, b, tolerance]) => {
+          const parser = new DOMParser()
+          const nodes = source => [...parser.parseFromString(source, 'image/svg+xml').querySelectorAll('*')]
+          const x = nodes(a), y = nodes(b)
+          if (x.length !== y.length) return 'Node count changed'
+          const number = /-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/gi
+          for (let i = 0; i < x.length; i++) {
+            if (x[i].tagName !== y[i].tagName || x[i].textContent !== y[i].textContent || x[i].attributes.length !== y[i].attributes.length) return 'Label structure or text changed'
+            for (const attribute of x[i].attributes) {
+              const av = attribute.value, bv = y[i].getAttribute(attribute.name)
+              if (av === bv) continue
+              if (attribute.name !== 'transform' || !bv || av.replace(number, '#') !== bv.replace(number, '#')) return `Attribute ${attribute.name} changed`
+              const an = av.match(number).map(Number), bn = bv.match(number).map(Number)
+              if (an.some((n, j) => Math.abs(n - bn[j]) > tolerance)) return `Transform moved by more than ${tolerance}px`
+            }
+          }
+          return null
+        }, [detail.labels, labels.get(name), Number(process.env.LABEL_TOLERANCE)])
+        assert.equal(difference, null, `${variant}/${name}: ${difference}`)
+      } else assert.equal(detail.labels, labels.get(name), `${variant}/${name}: labels and plane must remain identical`)
       await page.locator('.globe-frame').screenshot({ path: `${output}/${variant}-${name}.png` })
       reports.push({ variant, name, ...detail, labels: undefined })
     }

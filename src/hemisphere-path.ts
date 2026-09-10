@@ -1,4 +1,5 @@
 import type { GeoJSON, LineString, Polygon } from 'geojson'
+import { createCartesianProjection, prepareCartesianGeometry } from './cartesian-projection.ts'
 import {
   geoArea, geoCentroid, geoClipRectangle, geoPath, geoStream, pathRound,
   type GeoPermissibleObjects, type GeoProjection, type GeoStream, type GeoStreamWrapper,
@@ -21,6 +22,12 @@ const chainClipPadding = 128
 const boundsLeafSize = 16
 const prepared = new WeakMap<object, Part[]>()
 const labelCoordinates = new WeakMap<object, number>()
+
+export function prepareHemisphereCartesian(geometry: GeoPermissibleObjects): void {
+  for (const part of prepareHemisphereGeometry(geometry)) {
+    if (part.geometry.type === 'Polygon' || part.geometry.type === 'LineString') prepareCartesianGeometry(part.geometry as Polygon | LineString)
+  }
+}
 
 function prepareRingBounds(coordinates: number[][]): BoundsTree {
   const cached = ringBounds.get(coordinates)
@@ -204,7 +211,7 @@ export function prepareHemisphereLabel(geometry: GeoPermissibleObjects, paddingX
 
 // This renderer is a snapshot of one orthographic frame. Recreate it after any
 // projection change; the immutable geometry bounds are shared across frames.
-export function createHemispherePath(projection: GeoProjection, viewport?: { width: number; height: number; clipPaths?: boolean; clipExtent?: boolean }) {
+export function createHemispherePath(projection: GeoProjection, viewport?: { width: number; height: number; clipPaths?: boolean; clipExtent?: boolean; cartesian?: boolean }) {
   let side: 'front' | 'back' | 'horizon' = 'horizon'
   let distinctVertices = true
   const streams = new WeakMap<GeoStream, GeoStream>()
@@ -273,6 +280,15 @@ export function createHemispherePath(projection: GeoProjection, viewport?: { wid
   const clip = viewport?.clipExtent && !sphereInsideViewport
     ? geoClipRectangle(-pathClipPadding, -pathClipPadding, viewport.width + pathClipPadding, viewport.height + pathClipPadding)
     : null
+  // Restrict the prototype to a globe that fits in the padded viewport. Close
+  // zooms, flat maps, and all horizon-crossing polygons retain the exact path.
+  const cartesian = viewport?.cartesian && sphereInsideViewport ? createCartesianProjection(projection) : null
+  let centroidGeometry: Polygon
+  const cartesianCentroid = cartesian ? geoPath({
+    stream(sink) {
+      return { ...sink, sphere() { cartesian.stream(centroidGeometry, sink) } }
+    },
+  }) : null
   const clippedStreams = new WeakMap<GeoStream, GeoStream>()
   const path = clip ? geoPath({
     stream(sink) {
@@ -414,6 +430,7 @@ export function createHemispherePath(projection: GeoProjection, viewport?: { wid
   }
 
   return {
+    cartesian: Boolean(cartesian),
     outsideViewport(geometry: GeoPermissibleObjects, paddingX: number, paddingY: number): boolean {
       const parts = prepareHemisphereGeometry(geometry)
       return parts.length === 1 && partOutsideViewport(parts[0], paddingX, paddingY)
@@ -425,6 +442,12 @@ export function createHemispherePath(projection: GeoProjection, viewport?: { wid
         distinctVertices = part.distinctVertices
         if (side === 'back') continue
         if (viewport?.clipPaths && partOutsideViewport(part, pathClipPadding, pathClipPadding, horizonOutsideViewport)) continue
+        if (cartesian && distinctVertices && ((part.geometry.type === 'LineString' && cartesian.canClip(part.geometry as LineString)) || (side === 'front' && part.geometry.type === 'Polygon'))) {
+          pathText = ''
+          cartesian.stream(part.geometry as Polygon | LineString, pathSink, side !== 'front')
+          result += pathText
+          continue
+        }
         const geometry = visibleGeometry(part)
         if (geometry !== part.geometry) {
           if (geometry.type === 'Polygon' && !(geometry as Polygon).coordinates.length) continue
@@ -454,6 +477,10 @@ export function createHemispherePath(projection: GeoProjection, viewport?: { wid
       // and all horizon cases on the unchanged D3 path.
       side = parts.length === 1 ? visibility(parts[0]) : 'horizon'
       distinctVertices = parts.length === 1 && parts[0].distinctVertices
+      if (cartesianCentroid && side === 'front' && distinctVertices && parts[0].geometry.type === 'Polygon') {
+        centroidGeometry = parts[0].geometry as Polygon
+        return cartesianCentroid.centroid({ type: 'Sphere' })
+      }
       return measurementPath.centroid(geometry)
     },
   }

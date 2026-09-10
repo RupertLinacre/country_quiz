@@ -32,7 +32,7 @@ import zoomFullUrl from './generated/zoom-lod-full.json?url'
 import zoomStandardUrl from './generated/zoom-lod-standard.json?url'
 import fallbackFeatures from './generated/country-geometry-fallbacks.json'
 import type { QuizCountry } from './quiz-data'
-import { createHemispherePath, prepareHemisphereGeometry, prepareHemisphereLabel } from './hemisphere-path'
+import { createHemispherePath, prepareHemisphereGeometry, prepareHemisphereLabel, prepareHemisphereCartesian } from './hemisphere-path'
 import { AdaptiveDetailExperiment, CanvasMapExperiment, preserveSmallIslands, readRenderExperiment, type ExperimentProbe, type ExperimentTopology } from './render-experiments'
 import { materializeZoomLevel, ZoomDetailSelector, type ZoomLevels } from './zoom-detail'
 
@@ -671,6 +671,10 @@ export async function createGlobe(
   },
 ): Promise<GlobeController> {
   const experiment = readRenderExperiment(window.location.search)
+  // Diagnostic switches only affect explicitly selected rendering experiments.
+  const experimentParams = new URLSearchParams(window.location.search)
+  const holdOverview = experiment && experimentParams.get('experimentZoom') === 'overview'
+  const profileStages = experiment && experimentParams.has('experimentProfile')
   const [topology, interactionTopology, detailTopology] = await Promise.all([
     fetch(atlasUrl).then((response) => response.json()) as Promise<Topology>,
     fetch(interactionAtlasUrl).then((response) => response.json()) as Promise<Topology>,
@@ -773,6 +777,14 @@ export async function createGlobe(
   const paintedCountryFills = new WeakMap<SVGPathElement, string>()
   const preloadedFlags = new Map<string, HTMLImageElement>()
   const graticule = geoGraticule10()
+  if (experiment?.cartesian) {
+    const preparationStart = performance.now()
+    for (const bundle of [atlas, ...(zoomAtlases ?? [])]) {
+      for (const geometry of [bundle.landFeature, bundle.borderMesh, ...bundle.featureByCountryId.values(), ...bundle.labelFeatureByCountryId.values()]) prepareHemisphereCartesian(geometry)
+    }
+    for (const geometry of [...fallbackFeatureByCountryId.values(), ...fallbackLabelFeatureByCountryId.values(), graticule]) prepareHemisphereCartesian(geometry)
+    experimentProbe!.preparationMs = zoomPreparationMs + performance.now() - preparationStart
+  }
   const desktopFlightTrailsMediaQuery = window.matchMedia(DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY)
 
   let answeredIds = new Set<string>()
@@ -1732,6 +1744,14 @@ export async function createGlobe(
 
   function renderNow(): void {
     const experimentStart = experimentProbe ? performance.now() : 0
+    let stageStart = experimentStart
+    const stages: Record<string, number> | undefined = profileStages ? {} : undefined
+    const markStage = (name: string) => {
+      if (!stages) return
+      const now = performance.now()
+      stages[name] = now - stageStart
+      stageStart = now
+    }
     const isFlightAnimating = Boolean(activeFlightSegmentId && activeFlightProgress < 1)
     const canvasActive = Boolean(experimentCanvas && isFlightAnimating && currentProjectionKey === 'orthographic')
     experimentCanvas?.begin(canvasActive, cssWidth, cssHeight, mapLayer.node()!)
@@ -1758,7 +1778,7 @@ export async function createGlobe(
       layer.attr('transform', flatTransform)
     }
     hemispherePath = currentProjectionKey === 'orthographic'
-      ? createHemispherePath(projection, { width: cssWidth, height: cssHeight, clipPaths: true, clipExtent: true })
+      ? createHemispherePath(projection, { width: cssWidth, height: cssHeight, clipPaths: true, clipExtent: true, cartesian: Boolean(experiment?.cartesian && isFlightAnimating) })
       : null
     projectedLabelPositions.clear()
     writeRenderState(isFlightAnimating)
@@ -1781,9 +1801,12 @@ export async function createGlobe(
       container.dataset.experiment = experiment.name
       container.dataset.experimentDetail = isFlightAnimating ? flightDetail : 'full'
       container.dataset.experimentBackend = canvasActive ? 'canvas' : 'svg'
+      container.dataset.experimentProjection = hemispherePath?.cartesian ? 'cartesian' : 'd3'
     }
     // The fill and coastline share exactly the same geometry and projection.
+    markStage('setup')
     const landPathData = projectedPathData(displayAtlas.landFeature)
+    markStage('land')
 
     spherePath
       .attr('d', projectedPathData(currentSurfaceGeometry(), false))
@@ -1792,7 +1815,7 @@ export async function createGlobe(
       .attr('stroke-width', 2.2)
 
     graticulePath
-      .attr('d', projectedPathData(graticule, false))
+      .attr('d', projectedPathData(graticule, Boolean(hemispherePath?.cartesian)))
       .attr('fill', 'none')
       .attr('stroke', 'rgba(168, 212, 244, 0.2)')
       .attr('stroke-width', 0.7)
@@ -1804,6 +1827,7 @@ export async function createGlobe(
       .each(function () { paintPath(this, landPathData) })
       .attr('fill', UNSOLVED_LAND_FILL)
       .attr('stroke', 'none')
+    markStage('surface')
 
     const promptedFeature =
       promptedCountryId && !answeredIds.has(promptedCountryId)
@@ -1908,6 +1932,7 @@ export async function createGlobe(
       })
 
     renderFlights()
+    markStage('solvedAndFlights')
 
     coastlinePath
       .each(function () { paintPath(this, landPathData) })
@@ -1922,6 +1947,7 @@ export async function createGlobe(
       .attr('fill', 'none')
       .attr('stroke', 'rgba(227, 238, 247, 0.38)')
       .attr('stroke-width', 0.62)
+    markStage('borders')
 
     const fallbackOutlineData = [...fallbackFeatureByCountryId.entries()]
       .map(([countryId, fallbackFeature]) => {
@@ -1953,6 +1979,7 @@ export async function createGlobe(
           : 'rgba(227, 238, 247, 0.7)',
       )
       .attr('stroke-width', (entry) => (entry.answered ? 0.85 : 0.95))
+    markStage('fallbacks')
 
     if (isFlightAnimating) {
       hitTargetLayer.style('pointer-events', 'none')
@@ -2001,9 +2028,12 @@ export async function createGlobe(
     const rasterStart = experimentProbe ? performance.now() : 0
     experimentCanvas?.draw(mapLayer.node()!)
     const rasterMs = experimentProbe ? performance.now() - rasterStart : 0
+    markStage('hitTargetsAndCanvas')
     renderLabels()
+    markStage('labels')
     renderPlane(mostRecentAnsweredId)
-    if (experimentProbe && isFlightAnimating) experimentProbe.frames.push({ renderMs: performance.now() - experimentStart, rasterMs, detail: flightDetail, backend: canvasActive ? 'canvas' : 'svg', ...(zoomData ? { lod: zoomLevel, scale: currentScale(), maxErrorPx: zoomError } : {}) })
+    markStage('plane')
+    if (experimentProbe && isFlightAnimating) experimentProbe.frames.push({ renderMs: performance.now() - experimentStart, rasterMs, detail: flightDetail, backend: canvasActive ? 'canvas' : 'svg', scale: currentScale(), cartesian: Boolean(hemispherePath?.cartesian), ...(stages ? { stages } : {}), ...(zoomData ? { lod: zoomLevel, maxErrorPx: zoomError } : {}) })
   }
 
   function scheduleRender(): void {
@@ -2211,7 +2241,7 @@ export async function createGlobe(
     const targetLongitude = shortestLongitudeTarget(startLongitude, -segment.toCoordinates[0])
     const targetLatitude = -clampProjectionLatitude(segment.toCoordinates[1])
     const startZoom = currentZoom
-    const targetZoom = zoomForCountry(segment.toCountryId)
+    const targetZoom = holdOverview ? MIN_ZOOM : zoomForCountry(segment.toCountryId)
     const startTime = performance.now()
     const interpolatePlaneCoordinates = geoInterpolate(
       segment.fromCoordinates,

@@ -1,0 +1,32 @@
+[
+  {
+    "scene": "overview",
+    "changedPixels": 0,
+    "width": 716,
+    "height": 716
+  },
+  {
+    "scene": "wide",
+    "changedPixels": 0,
+    "width": 716,
+    "height": 716
+  },
+  {
+    "scene": "europe",
+    "changedPixels": 0,
+    "width": 716,
+    "height": 716
+  },
+  {
+    "scene": "caribbean",
+    "changedPixels": 0,
+    "width": 716,
+    "height": 716
+  },
+  {
+    "scene": "landed",
+    "changedPixels": 0,
+    "width": 716,
+    "height": 716
+  }
+]

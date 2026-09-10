@@ -8,10 +8,13 @@ export type RenderExperiment = {
   preserveIslands?: boolean
   zoomPixels?: number
   zoomBase?: 'full' | 'standard'
+  cartesian?: boolean
 }
 
 export function readRenderExperiment(search: string): RenderExperiment | null {
   const name = new URLSearchParams(search).get('renderExperiment')
+  if (name === 'svg-planet') return { name, detail: 'zoom', canvasScale: null, zoomPixels: 1, zoomBase: 'standard', cartesian: true }
+  if (name === 'svg-cartesian') return { name, detail: 'standard', canvasScale: null, cartesian: true }
   if (name === 'svg-zoom-adaptive') return { name, detail: 'zoom', canvasScale: null, adaptive: true, zoomPixels: 1, zoomBase: 'standard' }
   const zoom = name?.match(/^svg-zoom-(standard-)?(05|1|2)$/)
   if (zoom) return { name: name!, detail: 'zoom', canvasScale: null, zoomPixels: zoom[2] === '05' ? 0.5 : Number(zoom[2]), zoomBase: zoom[1] ? 'standard' : 'full' }
@@ -59,7 +62,7 @@ export function preserveSmallIslands(standard: ExperimentTopology, coarse: Exper
   return { ...coarse, arcs: coarse.arcs.map((arc, id) => keep.has(id) ? standard.arcs[id] : arc) }
 }
 
-export type ExperimentFrame = { renderMs: number; rasterMs: number; detail: GeometryDetail; backend: string; lod?: number | null; scale?: number; maxErrorPx?: number }
+export type ExperimentFrame = { renderMs: number; rasterMs: number; detail: GeometryDetail; backend: string; lod?: number | null; scale?: number; maxErrorPx?: number; stages?: Record<string, number>; cartesian?: boolean }
 export type DetailTransition = { frame: number; from: GeometryDetail; to: GeometryDetail }
 export type ExperimentProbe = { name: string; frames: ExperimentFrame[]; frameIntervals: number[]; startDetail?: GeometryDetail; nextDetail?: GeometryDetail; transitions?: DetailTransition[]; preparationMs?: number }
 declare global {

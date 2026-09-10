@@ -1,0 +1,38 @@
+{
+  "group": "solved",
+  "browser": "145.0.7632.6",
+  "cpuRate": 6,
+  "viewport": [
+    390,
+    844
+  ],
+  "dpr": 2,
+  "solvedCount": 100,
+  "holdOverview": true,
+  "summary": [
+    {
+      "variant": "svg-zoom-standard-1",
+      "fps": 18.603124862787514,
+      "runFps": [
+        18.603124862787514
+      ],
+      "usaChinaFps": 17.40341106856944,
+      "meanRenderMs": 43.048795180507454,
+      "cartesianFrames": 0,
+      "frameCount": 332,
+      "flights": 10
+    },
+    {
+      "variant": "svg-planet",
+      "fps": 25.426176739026534,
+      "runFps": [
+        25.426176739026534
+      ],
+      "usaChinaFps": 23.37055310309011,
+      "meanRenderMs": 29.464523282323338,
+      "cartesianFrames": 451,
+      "frameCount": 451,
+      "flights": 10
+    }
+  ]
+}

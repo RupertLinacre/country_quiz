@@ -1,0 +1,53 @@
+[
+  {
+    "name": "standard",
+    "query": "?renderExperiment=svg-standard&experimentZoom=overview&experimentProfile=1",
+    "fps": 16.747381344803173,
+    "cpuRate": 6,
+    "stages": {
+      "setup": 0.44499999910593036,
+      "land": 17.073666666448116,
+      "surface": 9.072000001271565,
+      "solvedAndFlights": 0.12033333351214727,
+      "borders": 6.480333332320054,
+      "fallbacks": 5.739666666686535,
+      "hitTargetsAndCanvas": 0.020333333313465117,
+      "labels": 11.908666667044162,
+      "plane": 0.17866666664679845
+    }
+  },
+  {
+    "name": "zoom",
+    "query": "?renderExperiment=svg-zoom-standard-1&experimentZoom=overview&experimentProfile=1",
+    "fps": 24.01067605132253,
+    "cpuRate": 6,
+    "stages": {
+      "setup": 0.47500000022492317,
+      "land": 8.044103773064771,
+      "surface": 6.6172169811742485,
+      "solvedAndFlights": 0.0948113205157361,
+      "borders": 2.3108490578267933,
+      "fallbacks": 5.408726414700724,
+      "hitTargetsAndCanvas": 0.05188679245283019,
+      "labels": 11.77900943349836,
+      "plane": 0.16674528334219502
+    }
+  },
+  {
+    "name": "cartesian",
+    "query": "?renderExperiment=svg-planet&experimentZoom=overview&experimentProfile=1",
+    "fps": 33.416525345037265,
+    "cpuRate": 6,
+    "stages": {
+      "setup": 0.43595890450763375,
+      "land": 7.001369862166578,
+      "surface": 3.320719178766012,
+      "solvedAndFlights": 0.060445205397801856,
+      "borders": 1.5881849314558178,
+      "fallbacks": 2.265410959363392,
+      "hitTargetsAndCanvas": 0.03664383557561326,
+      "labels": 8.821061643427365,
+      "plane": 0.16849315059307504
+    }
+  }
+]

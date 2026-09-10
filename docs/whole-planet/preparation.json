@@ -1,0 +1,29 @@
+[
+  {
+    "variant": "svg-standard",
+    "cpuRate": 6,
+    "readyMs": 1778.8336250000002,
+    "preparationMs": 0,
+    "jsHeapBytes": 28566672,
+    "embedderHeapBytes": 2515536,
+    "backingStorageBytes": 406525
+  },
+  {
+    "variant": "svg-zoom-standard-1",
+    "cpuRate": 6,
+    "readyMs": 2461.4986670000003,
+    "preparationMs": 822.2999999821186,
+    "jsHeapBytes": 43078100,
+    "embedderHeapBytes": 2547896,
+    "backingStorageBytes": 406627
+  },
+  {
+    "variant": "svg-planet",
+    "cpuRate": 6,
+    "readyMs": 2594.6684999999998,
+    "preparationMs": 908.4000000357628,
+    "jsHeapBytes": 46199236,
+    "embedderHeapBytes": 2453464,
+    "backingStorageBytes": 5125618
+  }
+]
