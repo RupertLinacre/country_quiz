@@ -3,8 +3,8 @@ import { cp, mkdir, readFile, symlink, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { promisify } from 'node:util'
 
-// A separate production build projects every full-detail edge, with the same
-// final viewport clip. It disables only the new hidden-chain optimization.
+// A separate production build projects every edge of the selected atlas, with
+// the same final viewport clip. It disables only hidden-chain optimization.
 const directory = resolve('output/playwright/full-detail-reference-project')
 await mkdir(directory, { recursive: true })
 for (const file of ['src', 'public', 'package.json', 'package-lock.json', 'tsconfig.json', 'vite.config.ts', 'index.html']) {
@@ -21,4 +21,4 @@ if (source.split('clipPaths: true').length !== 2) throw new Error('Expected one 
 await writeFile(filename, source.replace('clipPaths: true', 'clipPaths: false'))
 const { stdout } = await promisify(execFile)('npm', ['run', 'build'], { cwd: directory })
 console.log(stdout.trim())
-console.log(`Full-detail reference: ${directory}/dist`)
+console.log(`Unculled atlas reference: ${directory}/dist`)

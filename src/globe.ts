@@ -927,9 +927,9 @@ export async function createGlobe(
     return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, nextZoom))
   }
 
-  function writeRenderState(): void {
+  function writeRenderState(isFlightAnimating: boolean): void {
     const [rotationLongitude, rotationLatitude] = projection.rotate()
-    container.dataset.detailMode = 'full'
+    container.dataset.detailMode = isFlightAnimating ? 'interactive' : 'full'
     container.dataset.projection = currentProjectionKey
     container.dataset.panX = mapPanOffset[0].toFixed(2)
     container.dataset.panY = mapPanOffset[1].toFixed(2)
@@ -1720,10 +1720,12 @@ export async function createGlobe(
       ? createHemispherePath(projection, { width: cssWidth, height: cssHeight, clipPaths: true, clipExtent: true })
       : null
     projectedLabelPositions.clear()
-    writeRenderState()
-    const mostRecentAnsweredId = latestAnsweredId(answeredIds)
     const isFlightAnimating = Boolean(activeFlightSegmentId && activeFlightProgress < 1)
-    const displayAtlas = detailAtlas
+    writeRenderState(isFlightAnimating)
+    const mostRecentAnsweredId = latestAnsweredId(answeredIds)
+    // Wide flights still benefit from the smaller atlas on slow CPUs. Keep all
+    // projection/culling caches, and restore full detail as soon as flight ends.
+    const displayAtlas = isFlightAnimating ? atlas : detailAtlas
     // The fill and coastline share exactly the same geometry and projection.
     const landPathData = projectedPathData(displayAtlas.landFeature)
 
@@ -1983,6 +1985,9 @@ export async function createGlobe(
 
     if (shouldCancelPerformance) {
       settleFlightPerformance('cancelled')
+      // A drag can cancel a flight before the pointer moves. Restore the
+      // detailed map even when the interaction produces no further frames.
+      scheduleRender()
     }
   }
 

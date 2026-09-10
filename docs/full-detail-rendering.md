@@ -1,5 +1,9 @@
 # Full detail during motion
 
+This is the historical report for `5f0ee2a` (merged in `c752cca`). Flight-time
+simplification has since been restored while retaining these optimizations; see
+[flight detail restoration](flight-detail-restoration.md) for current behavior.
+
 The previous renderer used the 1:50m atlas while flying, dragging or zooming,
 then switched to the existing 1:10m atlas after motion stopped. This change uses
 the 1:10m atlas throughout. Its source geometry and preprocessing are unchanged;

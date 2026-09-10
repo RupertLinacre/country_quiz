@@ -8,6 +8,8 @@ import { serveBuild } from './lib/serve-build.mjs'
 const [directory = 'dist', name = 'current', rate = '6', repeats = '3', device] = process.argv.slice(2)
 const solvedCount = Number(process.env.SOLVED_COUNT ?? 0)
 const query = process.env.QUERY ?? ''
+const routes = (process.env.ROUTES ?? 'GBR,USA,AUS,JPN,BRB,FRA,GBR').split(',')
+if (routes.length < 2 || routes.some(id => !/^[A-Z]{3}$/.test(id))) throw new Error('ROUTES must contain at least two comma-separated country IDs')
 if (!Number.isInteger(solvedCount) || solvedCount < 0 || solvedCount > 196) throw new Error('SOLVED_COUNT must be 0–196')
 const output = resolve('output/playwright')
 await mkdir(output, { recursive: true })
@@ -43,7 +45,6 @@ try {
   const flight = (from, to) => page.evaluate(([a, b]) => window.__countriesQuizDebug.benchmarkFlight(a, b), [from, to])
   await flight('GBR', 'USA')
   await flight('USA', 'GBR')
-  const routes = ['GBR', 'USA', 'AUS', 'JPN', 'BRB', 'FRA', 'GBR']
   const results = []
   for (let repeat = 0; repeat < Number(repeats); repeat++) {
     for (let i = 1; i < routes.length; i++) {

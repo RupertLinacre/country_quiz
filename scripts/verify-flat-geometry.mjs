@@ -7,8 +7,11 @@ import { serveBuild } from './lib/serve-build.mjs'
 
 // Check the app's actual cached SVG against a fresh D3 projection at each
 // camera transform, using the same or finer precision than the old renderer.
-const atlas = JSON.parse(await readFile(new URL('../src/generated/globe-detail-atlas.json', import.meta.url)))
-const geometries = [feature(atlas, atlas.objects.land), mesh(atlas, atlas.objects.countries, (a, b) => a !== b)]
+const geometriesByDetail = {}
+for (const [mode, name] of [['full', 'globe-detail-atlas'], ['interactive', 'globe-atlas']]) {
+  const atlas = JSON.parse(await readFile(new URL(`../src/generated/${name}.json`, import.meta.url)))
+  geometriesByDetail[mode] = [feature(atlas, atlas.objects.land), mesh(atlas, atlas.objects.countries, (a, b) => a !== b)]
+}
 const server = await serveBuild(process.argv[2] ?? 'dist')
 const browser = await chromium.launch()
 let checkedPoints = 0
@@ -29,6 +32,7 @@ try {
         const actual = await page.locator('.globe-frame').evaluate(el => {
           const paths = [...el.querySelectorAll('.globe__coastlines, .globe__borders')]
           return {
+            detailMode: el.dataset.detailMode,
             referenceScale: Number(el.dataset.pathReferenceScale),
             paths: paths.map(path => {
               const { a, b, c, d, e, f } = path.transform.baseVal.consolidate().matrix
@@ -42,7 +46,7 @@ try {
           assert(ratio > 0 && ratio <= 1)
           const projection = createProjection().clipAngle(null).rotate([0, 0, 0])
             .scale(actual.referenceScale * ratio).translate([x, y]).precision(0.6 * ratio)
-          const expected = geoPath(projection).digits(null)(geometries[i]) ?? ''
+          const expected = geoPath(projection).digits(null)(geometriesByDetail[actual.detailMode][i]) ?? ''
           const tokenize = value => value.match(/[MLZ]|-?\d*\.?\d+(?:e[-+]?\d+)?/gi) ?? []
           const a = tokenize(path.d)
           const b = tokenize(expected)

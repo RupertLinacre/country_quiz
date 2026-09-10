@@ -97,7 +97,8 @@ try {
         const capture = async (state, screenshot = false) => {
           const key = `${scenario.name}-${state}`
           if (clippedPaths && build === 'current') {
-            assert.equal(await page.locator('.globe-frame').getAttribute('data-detail-mode'), 'full', `${key}: full detail must stay enabled`)
+            const moving = await page.evaluate(() => window.__countriesQuizDebug.getFlightPerformance()?.status === 'running')
+            assert.equal(await page.locator('.globe-frame').getAttribute('data-detail-mode'), moving ? 'interactive' : 'full', `${key}: detail must follow flight state`)
           }
           if (screenshot) {
             // Clicking controls below the map can scroll the page. Settle that
