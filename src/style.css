@@ -38,6 +38,10 @@ body[data-win-overlay-open='true'] {
   overflow: hidden;
 }
 
+body[data-resume-modal-open='true'] {
+  overflow: hidden;
+}
+
 button,
 input {
   font: inherit;
@@ -605,6 +609,105 @@ h1 {
   border-color: rgba(255, 224, 122, 0.72);
   outline: none;
   transform: translateY(-1px);
+}
+
+.resume-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 1.2rem;
+  background:
+    radial-gradient(circle at top, rgba(246, 198, 77, 0.2), transparent 28%),
+    rgba(2, 10, 18, 0.8);
+  backdrop-filter: blur(18px);
+}
+
+.resume-modal[hidden] {
+  display: none;
+}
+
+.resume-modal__card {
+  width: min(100%, 38rem);
+  padding: 2rem;
+  border: 1px solid rgba(246, 198, 77, 0.3);
+  border-radius: 30px;
+  text-align: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 244, 200, 0.17), transparent 36%),
+    linear-gradient(180deg, rgba(9, 28, 43, 0.98), rgba(4, 14, 24, 0.98));
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 244, 200, 0.08);
+}
+
+.resume-modal__eyebrow {
+  margin-bottom: 0.55rem;
+  color: #fff2be;
+}
+
+.resume-modal__title {
+  margin: 0;
+  font-size: clamp(2.1rem, 6vw, 3.8rem);
+  line-height: 0.95;
+  color: #fff4c8;
+  text-wrap: balance;
+}
+
+.resume-modal__message {
+  margin: 1rem auto 0;
+  max-width: 29rem;
+  color: rgba(244, 240, 226, 0.9);
+  font-size: clamp(1rem, 2.6vw, 1.15rem);
+  line-height: 1.5;
+  text-wrap: balance;
+}
+
+.resume-modal__actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin-top: 1.45rem;
+}
+
+.resume-modal__button {
+  min-height: 2.85rem;
+  padding: 0.72rem 1.15rem;
+  border: 1px solid rgba(246, 198, 77, 0.46);
+  border-radius: 999px;
+  background: rgba(246, 198, 77, 0.16);
+  color: #fff4c8;
+  font-family: "Avenir Next Condensed", "Arial Narrow", sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    transform 140ms ease,
+    background 140ms ease,
+    border-color 140ms ease;
+}
+
+.resume-modal__button:hover,
+.resume-modal__button:focus-visible {
+  background: rgba(246, 198, 77, 0.26);
+  border-color: rgba(255, 224, 122, 0.78);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.resume-modal__button--secondary {
+  background: rgba(244, 240, 226, 0.07);
+  border-color: rgba(244, 240, 226, 0.2);
+  color: var(--ink-soft);
+}
+
+.resume-modal__button--secondary:hover,
+.resume-modal__button--secondary:focus-visible {
+  background: rgba(244, 240, 226, 0.12);
+  border-color: rgba(244, 240, 226, 0.38);
 }
 
 @keyframes win-confetti-burst {
