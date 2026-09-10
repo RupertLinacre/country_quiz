@@ -1,0 +1,729 @@
+[
+  {
+    "name": "experiment-dense-canvas-100",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 3,
+    "solvedCount": 0,
+    "repeats": 2,
+    "fps": 16.55,
+    "repeatFps": [
+      16.18,
+      16.92
+    ],
+    "p95FrameMs": 116.8,
+    "renderCpuMs": 32.28,
+    "rasterSubmitMs": 2.09,
+    "details": {
+      "standard": 302
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 22.76
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 9.08
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 9.77
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 17.31
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 24.35
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-dense-canvas-50",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 3,
+    "solvedCount": 0,
+    "repeats": 2,
+    "fps": 20.25,
+    "repeatFps": [
+      20.2,
+      20.31
+    ],
+    "p95FrameMs": 99.3,
+    "renderCpuMs": 30.9,
+    "rasterSubmitMs": 1.99,
+    "details": {
+      "standard": 363
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 26.48
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 11.94
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 12.06
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 21.07
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 29.72
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-dense-svg-standard",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 3,
+    "solvedCount": 0,
+    "repeats": 2,
+    "fps": 28.38,
+    "repeatFps": [
+      28.21,
+      28.55
+    ],
+    "p95FrameMs": 66.7,
+    "renderCpuMs": 30.52,
+    "rasterSubmitMs": 0,
+    "details": {
+      "standard": 501
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 35.21
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 17.88
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 17.88
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 30.57
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 40.47
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-fast-svg-adaptive",
+    "browser": "145.0.7632.6",
+    "cpuRate": 1,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "repeats": 2,
+    "fps": 59.83,
+    "repeatFps": [
+      59.77,
+      59.88
+    ],
+    "p95FrameMs": 17.6,
+    "renderCpuMs": 5.97,
+    "rasterSubmitMs": 0,
+    "details": {
+      "standard": 1033
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 59.99
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 59.42
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 59.74
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 60.01
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 59.99
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-fast-svg-full",
+    "browser": "145.0.7632.6",
+    "cpuRate": 1,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "repeats": 2,
+    "fps": 48.75,
+    "repeatFps": [
+      48.71,
+      48.79
+    ],
+    "p95FrameMs": 33.4,
+    "renderCpuMs": 13.43,
+    "rasterSubmitMs": 0,
+    "details": {
+      "full": 846
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 54.7
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 38.55
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 38.74
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 52.15
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 59.72
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-fast-svg-standard",
+    "browser": "145.0.7632.6",
+    "cpuRate": 1,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "repeats": 2,
+    "fps": 59.82,
+    "repeatFps": [
+      59.77,
+      59.86
+    ],
+    "p95FrameMs": 17.6,
+    "renderCpuMs": 6.1,
+    "rasterSubmitMs": 0,
+    "details": {
+      "standard": 1033
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 59.99
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 59.42
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 59.7
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 60.01
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 59.97
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-slow-canvas-100",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "repeats": 3,
+    "fps": 18.92,
+    "repeatFps": [
+      19.58,
+      18.67,
+      18.51
+    ],
+    "p95FrameMs": 100.2,
+    "renderCpuMs": 30.95,
+    "rasterSubmitMs": 2.07,
+    "details": {
+      "standard": 508
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 25.72
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 11.24
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 11.51
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 19.11
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 27.1
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-slow-canvas-50",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "repeats": 3,
+    "fps": 21.07,
+    "repeatFps": [
+      21.04,
+      20.77,
+      21.39
+    ],
+    "p95FrameMs": 83.9,
+    "renderCpuMs": 32.77,
+    "rasterSubmitMs": 2.21,
+    "details": {
+      "standard": 563
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 28.28
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 13.04
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 13.1
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 21.17
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 29.91
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-slow-canvas-75",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "repeats": 3,
+    "fps": 19.63,
+    "repeatFps": [
+      19.62,
+      20.08,
+      19.2
+    ],
+    "p95FrameMs": 100.1,
+    "renderCpuMs": 31.9,
+    "rasterSubmitMs": 2.17,
+    "details": {
+      "standard": 525
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 25.53
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 11.78
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 11.77
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 20.46
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 28.75
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-slow-svg-adaptive",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "repeats": 3,
+    "fps": 31.47,
+    "repeatFps": [
+      31.57,
+      30.64,
+      32.2
+    ],
+    "p95FrameMs": 50.8,
+    "renderCpuMs": 27.16,
+    "rasterSubmitMs": 0,
+    "details": {
+      "coarse": 830
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 35.81
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 21.72
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 22.07
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 34.84
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 43.12
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-slow-svg-coarse",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "repeats": 3,
+    "fps": 31.43,
+    "repeatFps": [
+      30,
+      32.2,
+      32.07
+    ],
+    "p95FrameMs": 50.6,
+    "renderCpuMs": 27.03,
+    "rasterSubmitMs": 0,
+    "details": {
+      "coarse": 831
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 36.46
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 22.92
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 23.55
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 33
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 41.29
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-slow-svg-islands",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "repeats": 3,
+    "fps": 31.06,
+    "repeatFps": [
+      30.75,
+      31.1,
+      31.33
+    ],
+    "p95FrameMs": 50.8,
+    "renderCpuMs": 27.42,
+    "rasterSubmitMs": 0,
+    "details": {
+      "coarse": 819
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 36.77
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 21.15
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 21.67
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 34.08
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 41.81
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-slow-svg-standard",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 0,
+    "repeats": 3,
+    "fps": 29.04,
+    "repeatFps": [
+      29.13,
+      29.03,
+      28.97
+    ],
+    "p95FrameMs": 66.7,
+    "renderCpuMs": 29.82,
+    "rasterSubmitMs": 0,
+    "details": {
+      "standard": 766
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 35.83
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 18.72
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 18.47
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 30.89
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 41.42
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-solved-svg-adaptive",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 100,
+    "repeats": 2,
+    "fps": 24.75,
+    "repeatFps": [
+      24.58,
+      24.91
+    ],
+    "p95FrameMs": 67.5,
+    "renderCpuMs": 32.86,
+    "rasterSubmitMs": 0,
+    "details": {
+      "coarse": 438
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 30.73
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 16.82
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 16.52
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 26.26
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 33.34
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  },
+  {
+    "name": "experiment-solved-svg-standard",
+    "browser": "145.0.7632.6",
+    "cpuRate": 6,
+    "pixelRatio": 2,
+    "solvedCount": 100,
+    "repeats": 2,
+    "fps": 21.51,
+    "repeatFps": [
+      21.35,
+      21.67
+    ],
+    "p95FrameMs": 83.9,
+    "renderCpuMs": 38.58,
+    "rasterSubmitMs": 0,
+    "details": {
+      "standard": 382
+    },
+    "routes": [
+      {
+        "from": "GBR",
+        "to": "USA",
+        "fps": 28.57
+      },
+      {
+        "from": "USA",
+        "to": "CHN",
+        "fps": 13.2
+      },
+      {
+        "from": "CHN",
+        "to": "USA",
+        "fps": 12.76
+      },
+      {
+        "from": "USA",
+        "to": "AUS",
+        "fps": 22.33
+      },
+      {
+        "from": "AUS",
+        "to": "GBR",
+        "fps": 30.74
+      }
+    ],
+    "transitions": [],
+    "errors": []
+  }
+]

@@ -8,6 +8,8 @@ import { serveBuild } from './lib/serve-build.mjs'
 const [directory = 'dist', name = 'current', rate = '6', repeats = '3', device] = process.argv.slice(2)
 const solvedCount = Number(process.env.SOLVED_COUNT ?? 0)
 const query = process.env.QUERY ?? ''
+const pixelRatio = Number(process.env.DPR ?? (device === 'mobile' ? 2 : 1))
+if (!Number.isFinite(pixelRatio) || pixelRatio <= 0 || pixelRatio > 4) throw new Error('DPR must be greater than 0 and at most 4')
 const routes = (process.env.ROUTES ?? 'GBR,USA,AUS,JPN,BRB,FRA,GBR').split(',')
 if (routes.length < 2 || routes.some(id => !/^[A-Z]{3}$/.test(id))) throw new Error('ROUTES must contain at least two comma-separated country IDs')
 if (!Number.isInteger(solvedCount) || solvedCount < 0 || solvedCount > 196) throw new Error('SOLVED_COUNT must be 0–196')
@@ -18,7 +20,7 @@ const browser = await chromium.launch()
 try {
   const context = await browser.newContext({
     viewport: device === 'mobile' ? { width: 390, height: 844 } : { width: 1280, height: 1000 },
-    deviceScaleFactor: device === 'mobile' ? 2 : 1,
+    deviceScaleFactor: pixelRatio,
     isMobile: device === 'mobile', hasTouch: device === 'mobile', serviceWorkers: 'block',
   })
   const page = await context.newPage()
@@ -50,7 +52,8 @@ try {
     for (let i = 1; i < routes.length; i++) {
       const result = await flight(routes[i - 1], routes[i])
       if (!result || result.status !== 'complete') throw new Error('Flight failed')
-      results.push({ repeat, ...result })
+      const experiment = await page.evaluate(() => window.__renderExperiment ?? null)
+      results.push({ repeat, ...result, ...(experiment ? { experiment } : {}) })
       await page.waitForTimeout(250)
     }
     console.log(`${name}: completed repeat ${repeat + 1}`)
@@ -64,7 +67,14 @@ try {
     const sampledMs = flights.reduce((n, result) => n + result.frameCount * result.averageFrameMs, 0)
     return { from, to, fps: frames / sampledMs * 1000 }
   })
-  const summary = { name, browser: browser.version(), cpuRate: Number(rate), device: device ?? 'desktop', solvedCount, query, fps: frames / sampledMs * 1000, routeSummaries, errors, results }
+  const samples = results.flatMap(result => result.experiment?.frames ?? [])
+  const experimentSummary = samples.length ? {
+    frames: samples.length,
+    meanRenderMs: samples.reduce((sum, frame) => sum + frame.renderMs, 0) / samples.length,
+    meanRasterSubmitMs: samples.reduce((sum, frame) => sum + frame.rasterMs, 0) / samples.length,
+    details: samples.reduce((counts, frame) => ({ ...counts, [frame.detail]: (counts[frame.detail] ?? 0) + 1 }), {}),
+  } : undefined
+  const summary = { name, browser: browser.version(), cpuRate: Number(rate), device: device ?? 'desktop', pixelRatio, solvedCount, query, fps: frames / sampledMs * 1000, routeSummaries, experimentSummary, errors, results }
   await writeFile(`${output}/${name}.json`, JSON.stringify(summary, null, 2))
   console.log(JSON.stringify({ ...summary, results: undefined }))
   if (process.env.PROFILE) {

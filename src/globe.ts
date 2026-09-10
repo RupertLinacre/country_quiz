@@ -31,6 +31,7 @@ import interactionAtlasUrl from './generated/globe-interaction-atlas.json?url'
 import fallbackFeatures from './generated/country-geometry-fallbacks.json'
 import type { QuizCountry } from './quiz-data'
 import { createHemispherePath, prepareHemisphereGeometry, prepareHemisphereLabel } from './hemisphere-path'
+import { AdaptiveDetailExperiment, CanvasMapExperiment, preserveSmallIslands, readRenderExperiment, type ExperimentProbe, type ExperimentTopology } from './render-experiments'
 
 type AtlasFeature = GeoPermissibleObjects & {
   id?: string | number
@@ -39,12 +40,7 @@ type AtlasFeature = GeoPermissibleObjects & {
   }
 }
 
-type Topology = {
-  objects: {
-    countries: object
-    land: object
-  }
-}
+type Topology = ExperimentTopology
 
 type AtlasBundle = {
   borderMesh: GeoPermissibleObjects
@@ -671,6 +667,7 @@ export async function createGlobe(
     onFlightPerformanceChange?: (performance: GlobeFlightPerformance | null) => void
   },
 ): Promise<GlobeController> {
+  const experiment = readRenderExperiment(window.location.search)
   const [topology, interactionTopology, detailTopology] = await Promise.all([
     fetch(atlasUrl).then((response) => response.json()) as Promise<Topology>,
     fetch(interactionAtlasUrl).then((response) => response.json()) as Promise<Topology>,
@@ -678,6 +675,8 @@ export async function createGlobe(
   ])
   const atlas = buildAtlasBundle(topology, countries)
   const interactionAtlas = buildAtlasBundle(interactionTopology, countries)
+  const coarseExperimentAtlas = experiment?.preserveIslands
+    ? buildAtlasBundle(preserveSmallIslands(topology, interactionTopology), countries) : interactionAtlas
   for (const country of countries) {
     const labelFeature = atlas.labelFeatureByCountryId.get(country.id)
     if (labelFeature) prepareHemisphereLabel(labelFeature, Math.max(country.name.length, country.capitalDisplayName.length) * 10 + 40)
@@ -734,6 +733,11 @@ export async function createGlobe(
   const borderPath = mapLayer.append('path').attr('class', 'globe__borders')
   const fallbackOutlineLayer = mapLayer.append('g').attr('class', 'globe__fallback-outlines')
   const hitTargetLayer = mapLayer.append('g').attr('class', 'globe__hit-targets')
+  const adaptiveDetail = experiment?.adaptive ? new AdaptiveDetailExperiment() : null
+  const experimentProbe: ExperimentProbe | null = experiment ? { name: experiment.name, frames: [], frameIntervals: [] } : null
+  if (experimentProbe) window.__renderExperiment = experimentProbe
+  const experimentCanvas = experiment?.canvasScale !== null && experiment?.canvasScale !== undefined
+    ? new CanvasMapExperiment(container, experiment.canvasScale) : null
   const labelLayer = labelsSvg.append('g').attr('class', 'globe__labels')
   const planeLayer = labelsSvg.append('g').attr('class', 'globe__plane-layer').attr('aria-hidden', 'true')
   const planeMarker = planeLayer.append('g').attr('class', 'globe__plane')
@@ -973,6 +977,7 @@ export async function createGlobe(
   }
 
   function paintPath(node: SVGPathElement, data: string): void {
+    if (experimentCanvas?.paintPath(node, data)) return
     if (paintedPaths.get(node) === data) return
     node.setAttribute('d', data)
     paintedPaths.set(node, data)
@@ -1233,6 +1238,12 @@ export async function createGlobe(
   }
 
   function startFlightPerformance(segment: FlightSegment, startTime: number): void {
+    if (experimentProbe) { experimentProbe.frames = []; experimentProbe.frameIntervals = [] }
+    adaptiveDetail?.start()
+    if (experimentProbe && adaptiveDetail) {
+      experimentProbe.startDetail = adaptiveDetail.detail
+      experimentProbe.transitions = adaptiveDetail.transitions
+    }
     flightPerformance = {
       averageFps: null,
       averageFrameMs: null,
@@ -1266,6 +1277,8 @@ export async function createGlobe(
 
     if (accumulator.lastFrameTime !== null) {
       const frameMs = now - accumulator.lastFrameTime
+      experimentProbe?.frameIntervals.push(frameMs)
+      adaptiveDetail?.observe(frameMs, experimentProbe?.frames.at(-1)?.renderMs ?? 0, !document.hidden)
       accumulator.sampledFrameCount += 1
       accumulator.totalFrameMs += frameMs
       accumulator.maxFrameMs = Math.max(accumulator.maxFrameMs, frameMs)
@@ -1326,6 +1339,8 @@ export async function createGlobe(
       status,
     }
     flightPerformanceAccumulator = null
+    adaptiveDetail?.finish(status === 'complete')
+    if (experimentProbe && adaptiveDetail) experimentProbe.nextDetail = adaptiveDetail.nextDetail
     publishFlightPerformance()
 
     const snapshot = {
@@ -1704,6 +1719,10 @@ export async function createGlobe(
   }
 
   function renderNow(): void {
+    const experimentStart = experimentProbe ? performance.now() : 0
+    const isFlightAnimating = Boolean(activeFlightSegmentId && activeFlightProgress < 1)
+    const canvasActive = Boolean(experimentCanvas && isFlightAnimating && currentProjectionKey === 'orthographic')
+    experimentCanvas?.begin(canvasActive, cssWidth, cssHeight, mapLayer.node()!)
     applyProjectionLayout()
     let flatTransform: string | null = null
     if (usesGlobeInteraction()) {
@@ -1730,12 +1749,17 @@ export async function createGlobe(
       ? createHemispherePath(projection, { width: cssWidth, height: cssHeight, clipPaths: true, clipExtent: true })
       : null
     projectedLabelPositions.clear()
-    const isFlightAnimating = Boolean(activeFlightSegmentId && activeFlightProgress < 1)
     writeRenderState(isFlightAnimating)
     const mostRecentAnsweredId = latestAnsweredId(answeredIds)
     // Wide flights still benefit from the smaller atlas on slow CPUs. Keep all
     // projection/culling caches, and restore full detail as soon as flight ends.
-    const displayAtlas = isFlightAnimating ? atlas : detailAtlas
+    const flightDetail = adaptiveDetail?.detail ?? experiment?.detail ?? 'standard'
+    const displayAtlas = !isFlightAnimating || flightDetail === 'full' ? detailAtlas : flightDetail === 'coarse' ? coarseExperimentAtlas : atlas
+    if (experiment) {
+      container.dataset.experiment = experiment.name
+      container.dataset.experimentDetail = isFlightAnimating ? flightDetail : 'full'
+      container.dataset.experimentBackend = canvasActive ? 'canvas' : 'svg'
+    }
     // The fill and coastline share exactly the same geometry and projection.
     const landPathData = projectedPathData(displayAtlas.landFeature)
 
@@ -1952,8 +1976,12 @@ export async function createGlobe(
         })
     }
 
+    const rasterStart = experimentProbe ? performance.now() : 0
+    experimentCanvas?.draw(mapLayer.node()!)
+    const rasterMs = experimentProbe ? performance.now() - rasterStart : 0
     renderLabels()
     renderPlane(mostRecentAnsweredId)
+    if (experimentProbe && isFlightAnimating) experimentProbe.frames.push({ renderMs: performance.now() - experimentStart, rasterMs, detail: flightDetail, backend: canvasActive ? 'canvas' : 'svg' })
   }
 
   function scheduleRender(): void {
