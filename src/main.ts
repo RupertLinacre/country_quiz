@@ -36,6 +36,8 @@ const SETTINGS_DIALOG_QUERY_PARAM = 'settings'
 const CONTINENT_QUERY_PARAM = 'continent'
 const LEGACY_CONTINENTS_QUERY_PARAM = 'continents'
 const PROJECTION_QUERY_PARAM = 'projection'
+const QUIZ_PROGRESS_STORAGE_KEY = 'countries-quiz.progress.v1'
+const QUIZ_PROGRESS_VERSION = 1
 
 const CONTINENT_QUERY_VALUE_BY_CONTINENT: Record<Continent, string> = {
   Africa: 'africa',
@@ -60,6 +62,19 @@ type QuizSettings = {
   showCapitals: boolean
   showCountries: boolean
   showFlags: boolean
+}
+
+type SavedQuizProgress = {
+  answeredIds: string[]
+  cheatedIds: string[]
+  elapsedMilliseconds: number
+  modeKey: ModeKey
+  randomRoute: boolean
+  routePromptQueue: string[]
+  routeSeed: string | null
+  scope: QuizScope
+  skippedIds: string[]
+  version: number
 }
 
 const PROJECTION_OPTIONS: Array<{
@@ -733,6 +748,17 @@ app.innerHTML = `
       </div>
     </section>
   </div>
+  <div id="resume-modal" class="resume-modal" hidden>
+    <section class="resume-modal__card" role="dialog" aria-modal="true" aria-labelledby="resume-title">
+      <p class="eyebrow resume-modal__eyebrow">Welcome back</p>
+      <h2 id="resume-title" class="resume-modal__title">Continue your quiz?</h2>
+      <p id="resume-message" class="resume-modal__message"></p>
+      <div class="resume-modal__actions">
+        <button id="resume-start-new" class="resume-modal__button resume-modal__button--secondary" type="button">Start new</button>
+        <button id="resume-continue" class="resume-modal__button" type="button">Continue quiz</button>
+      </div>
+    </section>
+  </div>
   <div id="win-overlay" class="win-overlay" hidden>
     <div id="win-confetti" class="win-overlay__confetti" aria-hidden="true"></div>
     <section class="win-overlay__card" role="dialog" aria-modal="true" aria-labelledby="win-title">
@@ -772,6 +798,10 @@ const showCountriesInput = requireElement<HTMLInputElement>('#setting-show-count
 const randomRouteInput = requireElement<HTMLInputElement>('#setting-random-route')
 const scopeSelect = requireElement<HTMLSelectElement>('#setting-scope')
 const projectionSelect = requireElement<HTMLSelectElement>('#setting-projection')
+const resumeModal = requireElement<HTMLElement>('#resume-modal')
+const resumeMessageElement = requireElement<HTMLElement>('#resume-message')
+const resumeStartNewButton = requireElement<HTMLButtonElement>('#resume-start-new')
+const resumeContinueButton = requireElement<HTMLButtonElement>('#resume-continue')
 const winOverlay = requireElement<HTMLElement>('#win-overlay')
 const winConfettiElement = requireElement<HTMLElement>('#win-confetti')
 const winTitleElement = requireElement<HTMLElement>('#win-title')
@@ -790,6 +820,121 @@ let globe: Awaited<ReturnType<typeof createGlobe>> | null = null
 let latestFlightPerformance: GlobeFlightPerformance | null = null
 const trackerSlotByCountryId = new Map<string, HTMLLIElement>()
 const trackerSolvedCountByContinent = new Map<string, HTMLElement>()
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string')
+}
+
+function isSavedQuizProgress(value: unknown): value is SavedQuizProgress {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    value.version === QUIZ_PROGRESS_VERSION &&
+    typeof value.modeKey === 'string' &&
+    typeof value.scope === 'string' &&
+    typeof value.randomRoute === 'boolean' &&
+    isStringArray(value.routePromptQueue) &&
+    (typeof value.routeSeed === 'string' || value.routeSeed === null) &&
+    typeof value.elapsedMilliseconds === 'number' &&
+    Number.isFinite(value.elapsedMilliseconds) &&
+    value.elapsedMilliseconds >= 0 &&
+    isStringArray(value.answeredIds) &&
+    isStringArray(value.cheatedIds) &&
+    isStringArray(value.skippedIds)
+  )
+}
+
+function readSavedQuizProgress(): SavedQuizProgress | null {
+  try {
+    const savedValue = window.localStorage.getItem(QUIZ_PROGRESS_STORAGE_KEY)
+
+    if (!savedValue) {
+      return null
+    }
+
+    const parsedValue: unknown = JSON.parse(savedValue)
+    return isSavedQuizProgress(parsedValue) ? parsedValue : null
+  } catch {
+    return null
+  }
+}
+
+function savedProgressMatchesCurrentQuiz(progress: SavedQuizProgress): boolean {
+  return (
+    progress.modeKey === modeKey &&
+    progress.scope === settings.scope &&
+    progress.randomRoute === settings.randomRoute &&
+    progress.routeSeed === settings.routeSeed
+  )
+}
+
+function savedCountryIds(countryIds: string[], allowedIds = activeCountryIds): string[] {
+  const uniqueIds = new Set<string>()
+
+  for (const countryId of countryIds) {
+    if (allowedIds.has(countryId)) {
+      uniqueIds.add(countryId)
+    }
+  }
+
+  return [...uniqueIds]
+}
+
+function readSavedQuizProgressForCurrentQuiz(): SavedQuizProgress | null {
+  const savedProgress = readSavedQuizProgress()
+
+  if (!savedProgress || !savedProgressMatchesCurrentQuiz(savedProgress)) {
+    return null
+  }
+
+  return savedCountryIds(savedProgress.answeredIds).length > 0 ? savedProgress : null
+}
+
+function clearSavedQuizProgress(): void {
+  try {
+    window.localStorage.removeItem(QUIZ_PROGRESS_STORAGE_KEY)
+  } catch {
+    // Storage can be unavailable in private browsing modes; the quiz still works normally.
+  }
+}
+
+function saveQuizProgress(): void {
+  if (pendingSavedQuizProgress) {
+    return
+  }
+
+  if (quizFinished || answeredIds.size === 0) {
+    clearSavedQuizProgress()
+    return
+  }
+
+  const progress: SavedQuizProgress = {
+    answeredIds: [...answeredIds],
+    cheatedIds: [...cheatedIds],
+    elapsedMilliseconds: elapsedMilliseconds(),
+    modeKey,
+    randomRoute: settings.randomRoute,
+    routePromptQueue: [...routePromptQueue],
+    routeSeed: settings.routeSeed,
+    scope: settings.scope,
+    skippedIds: [...skippedIds],
+    version: QUIZ_PROGRESS_VERSION,
+  }
+
+  try {
+    window.localStorage.setItem(QUIZ_PROGRESS_STORAGE_KEY, JSON.stringify(progress))
+  } catch {
+    // Storage can be unavailable in private browsing modes; the quiz still works normally.
+  }
+}
+
+let pendingSavedQuizProgress = readSavedQuizProgressForCurrentQuiz()
 
 function attachTrackerCheatInteractions(slot: HTMLLIElement, countryId: string): void {
   if (mode.layoutMode !== 'free') {
@@ -1017,6 +1162,92 @@ function elapsedMilliseconds(): number {
   return Math.max(0, Date.now() - quizStartedAt)
 }
 
+function resumeMessageForProgress(progress: SavedQuizProgress): string {
+  const restoredCount = savedCountryIds(progress.answeredIds).length
+
+  return `You had found ${restoredCount} of ${activeTotalCountryCount} ${answerThingPlural()} in ${formatTime(progress.elapsedMilliseconds)}. Pick up where you left off, or begin a fresh quiz.`
+}
+
+function showResumeDialog(progress: SavedQuizProgress): void {
+  pendingSavedQuizProgress = progress
+  resumeMessageElement.textContent = resumeMessageForProgress(progress)
+  resumeModal.hidden = false
+  document.body.dataset.resumeModalOpen = 'true'
+  resumeContinueButton.focus()
+}
+
+function hideResumeDialog(): void {
+  resumeModal.hidden = true
+  delete document.body.dataset.resumeModalOpen
+}
+
+function restoreSavedQuizProgress(progress: SavedQuizProgress): void {
+  const restoredAnswerIds = savedCountryIds(progress.answeredIds)
+  const restoredAnsweredSet = new Set(restoredAnswerIds)
+  const restoredCheatedIds = savedCountryIds(progress.cheatedIds, restoredAnsweredSet)
+  const restoredSkippedIds = savedCountryIds(progress.skippedIds, restoredAnsweredSet)
+
+  answeredIds.clear()
+  cheatedIds.clear()
+  skippedIds.clear()
+  answerOrder.length = 0
+
+  for (const countryId of restoredAnswerIds) {
+    answeredIds.add(countryId)
+    answerOrder.push(countryId)
+  }
+
+  for (const countryId of restoredCheatedIds) {
+    cheatedIds.add(countryId)
+  }
+
+  for (const countryId of restoredSkippedIds) {
+    skippedIds.add(countryId)
+  }
+
+  quizStartedAt = restoredAnswerIds.length > 0 ? Date.now() - progress.elapsedMilliseconds : null
+  quizFinished = false
+  routeFlightStatus = null
+  skippedPromptCount = skippedIds.size
+  answerInput.value = ''
+  answerInput.disabled = false
+  giveUpButton.disabled = false
+  compactGiveUpButton.disabled = false
+
+  if (mode.layoutMode === 'route') {
+    const remainingCountryIds = new Set(
+      routeOrderForSettings(settings).filter((countryId) => !answeredIds.has(countryId)),
+    )
+    const restoredRouteQueue = savedCountryIds(progress.routePromptQueue, remainingCountryIds)
+    const queuedCountryIds = new Set(restoredRouteQueue)
+
+    routePromptQueue.length = 0
+    routePromptQueue.push(
+      ...restoredRouteQueue,
+      ...[...remainingCountryIds].filter((countryId) => !queuedCountryIds.has(countryId)),
+    )
+    currentPromptId = routePromptQueue[0] ?? null
+  } else {
+    currentPromptId = null
+  }
+
+  renderScore()
+  renderTracker()
+  syncSolvedCountries({ focusLatest: mode.layoutMode === 'free' })
+
+  if (mode.layoutMode === 'route') {
+    syncRouteFlight({ animate: false })
+    renderRoutePanel()
+  } else {
+    renderClassicFlightStatus(globe?.syncFlightPath(answerOrder, { animate: false }) ?? null)
+  }
+
+  statusTone = 'neutral'
+  renderStatus(`Resumed with ${restoredAnswerIds.length}/${activeTotalCountryCount} ${answerThingPlural()} solved.`)
+  tick()
+  saveQuizProgress()
+}
+
 function solvedCountByContinent(continent: string): number {
   return activeCountriesByContinent
     .find((entry) => entry.continent === continent)
@@ -1214,6 +1445,7 @@ function closeSettings(): void {
 }
 
 function resetQuiz(message = ''): void {
+  clearSavedQuizProgress()
   hideWinOverlay()
   answeredIds.clear()
   cheatedIds.clear()
@@ -1319,6 +1551,8 @@ function applySettings(nextSettings: QuizSettings): void {
     syncRouteFlight({ animate: false })
     renderRoutePanel()
   }
+
+  saveQuizProgress()
 }
 
 function renderFlightPerformance(performance: GlobeFlightPerformance | null): void {
@@ -1396,6 +1630,7 @@ function finishQuiz(
   }
 
   quizFinished = true
+  clearSavedQuizProgress()
   window.clearInterval(intervalHandle)
   answerInput.disabled = true
   giveUpButton.disabled = true
@@ -1549,6 +1784,7 @@ function solveCountry(countryId: string, source: 'answer' | 'cheat' = 'answer'):
         ? `${country.capitalDisplayName} accepted for ${country.name}.`
         : `${country.name} accepted.`,
   )
+  saveQuizProgress()
 }
 
 function skipPrompt(): void {
@@ -1597,6 +1833,7 @@ function skipPrompt(): void {
 
   statusTone = 'neutral'
   renderStatus(`Skipped ${answerLabelForCountryId(skippedCountryId)}. Counted as answered.`)
+  saveQuizProgress()
   answerInput.focus()
 }
 
@@ -1736,10 +1973,39 @@ projectionSelect.addEventListener('change', () => {
     projection: nextProjection,
   })
 })
+resumeContinueButton.addEventListener('click', () => {
+  if (!pendingSavedQuizProgress) {
+    return
+  }
+
+  restoreSavedQuizProgress(pendingSavedQuizProgress)
+  pendingSavedQuizProgress = null
+  hideResumeDialog()
+  answerInput.focus()
+})
+resumeStartNewButton.addEventListener('click', () => {
+  pendingSavedQuizProgress = null
+  clearSavedQuizProgress()
+  hideResumeDialog()
+  statusTone = 'neutral'
+  renderStatus('A new quiz is ready.')
+  answerInput.focus()
+})
 winOverlayCloseButton.addEventListener('click', () => {
   hideWinOverlay()
 })
+window.addEventListener('pagehide', saveQuizProgress)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') {
+    saveQuizProgress()
+  }
+})
 window.addEventListener('keydown', (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && !resumeModal.hidden) {
+    event.preventDefault()
+    return
+  }
+
   if (event.key === 'Escape' && !winOverlay.hidden) {
     event.preventDefault()
     hideWinOverlay()
@@ -1825,7 +2091,9 @@ if (mode.layoutMode === 'route') {
   renderClassicFlightStatus(globe.syncFlightPath(answerOrder, { animate: false }))
 }
 
-if (settingsOpenOnLoad) {
+if (pendingSavedQuizProgress) {
+  showResumeDialog(pendingSavedQuizProgress)
+} else if (settingsOpenOnLoad) {
   openSettings()
 } else {
   answerInput.focus()
