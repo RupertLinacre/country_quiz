@@ -65,7 +65,9 @@ try {
         const errors = []
         page.on('pageerror', e => errors.push(e.message))
         await page.clock.install({ time: new Date('2026-09-10T12:00:00Z') })
-        await page.goto(server.url + scenario.query)
+        const query = new URLSearchParams(scenario.query)
+        if (build === 'baseline' && process.env.BASELINE_EXPERIMENT) query.set('renderExperiment', process.env.BASELINE_EXPERIMENT)
+        await page.goto(server.url + (query.size ? `?${query}` : ''))
         await page.waitForFunction(() => window.__countriesQuizDebug && document.querySelector('.globe__hit-target'))
         const stylesheets = await page.locator('link[rel="stylesheet"]').evaluateAll(links => links.map(link => link.href))
         const css = await page.evaluate(urls => Promise.all(urls.map(url => fetch(url).then(response => response.text()))), stylesheets)

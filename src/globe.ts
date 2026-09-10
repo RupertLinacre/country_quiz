@@ -33,7 +33,7 @@ import zoomStandardUrl from './generated/zoom-lod-standard.json?url'
 import fallbackFeatures from './generated/country-geometry-fallbacks.json'
 import type { QuizCountry } from './quiz-data'
 import { createHemispherePath, prepareHemisphereGeometry, prepareHemisphereLabel, prepareHemisphereCartesian } from './hemisphere-path'
-import { AdaptiveDetailExperiment, CanvasMapExperiment, preserveSmallIslands, readRenderExperiment, type ExperimentProbe, type ExperimentTopology } from './render-experiments'
+import { AdaptiveDetailExperiment, CanvasMapExperiment, DEFAULT_FLIGHT_RENDERING, preserveSmallIslands, readRenderExperiment, type ExperimentProbe, type ExperimentTopology } from './render-experiments'
 import { materializeZoomLevel, ZoomDetailSelector, type ZoomLevels } from './zoom-detail'
 
 type AtlasFeature = GeoPermissibleObjects & {
@@ -671,6 +671,7 @@ export async function createGlobe(
   },
 ): Promise<GlobeController> {
   const experiment = readRenderExperiment(window.location.search)
+  const rendering = experiment ?? DEFAULT_FLIGHT_RENDERING
   // Diagnostic switches only affect explicitly selected rendering experiments.
   const experimentParams = new URLSearchParams(window.location.search)
   const holdOverview = experiment && experimentParams.get('experimentZoom') === 'overview'
@@ -689,12 +690,12 @@ export async function createGlobe(
     if (labelFeature) prepareHemisphereLabel(labelFeature, Math.max(country.name.length, country.capitalDisplayName.length) * 10 + 40)
   }
   const detailAtlas = buildAtlasBundle(detailTopology, countries)
-  const zoomPreparationStart = experiment?.zoomPixels ? performance.now() : 0
-  const zoomData: ZoomLevels | null = experiment?.zoomPixels
-    ? await fetch(experiment.zoomBase === 'standard' ? zoomStandardUrl : zoomFullUrl).then(response => response.json()) : null
+  const zoomPreparationStart = rendering.zoomPixels ? performance.now() : 0
+  const zoomData: ZoomLevels | null = rendering.zoomPixels
+    ? await fetch(rendering.zoomBase === 'standard' ? zoomStandardUrl : zoomFullUrl).then(response => response.json()) : null
   // Prepare outside animation: selecting a level during a flight only swaps a
   // reference to geometry with its existing hemisphere/culling caches ready.
-  const zoomAtlases = zoomData?.levels.map(level => buildAtlasBundle(materializeZoomLevel(experiment?.zoomBase === 'standard' ? topology : detailTopology, level), countries))
+  const zoomAtlases = zoomData?.levels.map(level => buildAtlasBundle(materializeZoomLevel(rendering.zoomBase === 'standard' ? topology : detailTopology, level), countries))
   const zoomPreparationMs = zoomData ? performance.now() - zoomPreparationStart : 0
   const zoomSelector = new ZoomDetailSelector()
   const fallbackFeatureByCountryId = new Map<string, AtlasFeature>()
@@ -777,13 +778,13 @@ export async function createGlobe(
   const paintedCountryFills = new WeakMap<SVGPathElement, string>()
   const preloadedFlags = new Map<string, HTMLImageElement>()
   const graticule = geoGraticule10()
-  if (experiment?.cartesian) {
+  if (rendering.cartesian) {
     const preparationStart = performance.now()
     for (const bundle of [atlas, ...(zoomAtlases ?? [])]) {
       for (const geometry of [bundle.landFeature, bundle.borderMesh, ...bundle.featureByCountryId.values(), ...bundle.labelFeatureByCountryId.values()]) prepareHemisphereCartesian(geometry)
     }
     for (const geometry of [...fallbackFeatureByCountryId.values(), ...fallbackLabelFeatureByCountryId.values(), graticule]) prepareHemisphereCartesian(geometry)
-    experimentProbe!.preparationMs = zoomPreparationMs + performance.now() - preparationStart
+    if (experimentProbe) experimentProbe.preparationMs = zoomPreparationMs + performance.now() - preparationStart
   }
   const desktopFlightTrailsMediaQuery = window.matchMedia(DESKTOP_FLIGHT_TRAILS_MEDIA_QUERY)
 
@@ -1778,24 +1779,26 @@ export async function createGlobe(
       layer.attr('transform', flatTransform)
     }
     hemispherePath = currentProjectionKey === 'orthographic'
-      ? createHemispherePath(projection, { width: cssWidth, height: cssHeight, clipPaths: true, clipExtent: true, cartesian: Boolean(experiment?.cartesian && isFlightAnimating) })
+      ? createHemispherePath(projection, { width: cssWidth, height: cssHeight, clipPaths: true, clipExtent: true, cartesian: Boolean(rendering.cartesian && isFlightAnimating) })
       : null
     projectedLabelPositions.clear()
     writeRenderState(isFlightAnimating)
     const mostRecentAnsweredId = latestAnsweredId(answeredIds)
     // Wide flights still benefit from the smaller atlas on slow CPUs. Keep all
     // projection/culling caches, and restore full detail as soon as flight ends.
-    let flightDetail = adaptiveDetail?.detail ?? experiment?.detail ?? 'standard'
+    let flightDetail = adaptiveDetail?.detail ?? rendering.detail
     const zoomEnabled = Boolean(zoomData && isFlightAnimating && currentProjectionKey === 'orthographic' && (!adaptiveDetail || adaptiveDetail.detail === 'coarse'))
-    const zoomLevel = zoomEnabled ? zoomSelector.select(zoomData!.levels, currentScale(), experiment!.zoomPixels!) : null
+    const zoomLevel = zoomEnabled ? zoomSelector.select(zoomData!.levels, currentScale(), rendering.zoomPixels!) : null
     const zoomError = zoomLevel === null ? 0 : zoomData!.levels[zoomLevel].maxError * currentScale()
     let displayAtlas = !isFlightAnimating || flightDetail === 'full' ? detailAtlas : flightDetail === 'coarse' ? coarseExperimentAtlas : atlas
     if (zoomData) {
-      flightDetail = zoomEnabled && zoomLevel !== null ? 'zoom' : experiment?.zoomBase ?? 'full'
-      displayAtlas = !isFlightAnimating ? detailAtlas : zoomEnabled && zoomLevel !== null ? zoomAtlases![zoomLevel] : experiment?.zoomBase === 'standard' ? atlas : detailAtlas
-      container.dataset.experimentLod = zoomLevel === null ? 'source' : String(zoomLevel)
-      container.dataset.experimentError = String(zoomError)
-      container.dataset.experimentScale = String(currentScale())
+      flightDetail = zoomEnabled && zoomLevel !== null ? 'zoom' : rendering.zoomBase ?? 'full'
+      displayAtlas = !isFlightAnimating ? detailAtlas : zoomEnabled && zoomLevel !== null ? zoomAtlases![zoomLevel] : rendering.zoomBase === 'standard' ? atlas : detailAtlas
+      if (experiment) {
+        container.dataset.experimentLod = zoomLevel === null ? 'source' : String(zoomLevel)
+        container.dataset.experimentError = String(zoomError)
+        container.dataset.experimentScale = String(currentScale())
+      }
     }
     if (experiment) {
       container.dataset.experiment = experiment.name

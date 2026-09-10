@@ -2,7 +2,9 @@
 
 The new prototype roughly doubles FPS at a fixed whole-planet view, with matching screenshots. It combines the previous one-pixel zoom-dependent geometry with a faster orthographic projection. The additional gain comes from reusing 3D coordinates, without further simplifying the map or reducing bitmap resolution.
 
-This is opt-in on `codex/adaptive-rendering-experiments`. Normal URLs retain the existing renderer. Nothing has been merged to main or deployed.
+The measured combination is now the default flight renderer, with full detail restored after landing. The measurements below were collected on `codex/adaptive-rendering-experiments` before promotion. Explicit experiment URLs remain available for comparisons; normal play does not collect experiment telemetry.
+
+The production rollout also includes remote main's saved-game change (`7dcb4c4`). Normal play matched the opt-in renderer across **150 exact SVG states and 66 pixel-identical screenshots**, including desktop, mobile, 100 answered countries, overview, route mode, Mercator and Equal Earth. Reload/resume, starting a new quiz, answer acceptance and full-detail landing passed the production smoke test. [Rendering checks](whole-planet/production-verification.json), [smoke checks](whole-planet/production-smoke.json).
 
 ## Measured results
 
@@ -62,4 +64,4 @@ VARIANTS=',svg-cartesian,svg-planet' ADAPTIVE_VARIANT=svg-zoom-adaptive RESULT_N
 VARIANTS=svg-standard,svg-zoom-standard-1,svg-planet RESULT_NAME=planet-preparation node scripts/measure-zoom-preparation.mjs
 ```
 
-Use `?renderExperiment=svg-planet` to try the combined prototype, or `?renderExperiment=svg-cartesian` to isolate the projection shortcut with the existing standard flight geometry. The benchmark adds `&experimentZoom=overview` and zooms out before each flight. `&experimentProfile=1` adds stage timers for diagnosis; it is omitted from the confirmed FPS runs.
+Normal URLs use the combined renderer. Use `?renderExperiment=svg-planet` to enable its diagnostic telemetry, or `?renderExperiment=svg-cartesian` to isolate the projection shortcut with the former standard flight geometry. The benchmark adds `&experimentZoom=overview` and zooms out before each flight. `&experimentProfile=1` adds stage timers for diagnosis; it is omitted from the confirmed FPS runs.

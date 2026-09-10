@@ -1,0 +1,11 @@
+{
+  "url": "http://127.0.0.1:56105/country_quiz/",
+  "defaultLodLoaded": true,
+  "telemetryDisabled": true,
+  "acceptedAnswers": true,
+  "resumePassed": true,
+  "startNewPassed": true,
+  "fullDetailAfterLanding": true,
+  "errors": [],
+  "failedAssets": []
+}

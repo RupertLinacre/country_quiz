@@ -1,4 +1,4 @@
-// Opt-in experiments on this branch. Normal URLs keep the shipped renderer.
+// Optional comparison renderers; normal URLs use DEFAULT_FLIGHT_RENDERING.
 export type GeometryDetail = 'full' | 'standard' | 'coarse' | 'zoom'
 export type RenderExperiment = {
   name: string
@@ -11,9 +11,15 @@ export type RenderExperiment = {
   cartesian?: boolean
 }
 
+// The tested one-pixel LOD and cached orthographic projection are the default
+// during flights. Diagnostics remain opt-in; settled maps retain full detail.
+export const DEFAULT_FLIGHT_RENDERING: Readonly<Omit<RenderExperiment, 'name'>> = {
+  detail: 'zoom', canvasScale: null, zoomPixels: 1, zoomBase: 'standard', cartesian: true,
+}
+
 export function readRenderExperiment(search: string): RenderExperiment | null {
   const name = new URLSearchParams(search).get('renderExperiment')
-  if (name === 'svg-planet') return { name, detail: 'zoom', canvasScale: null, zoomPixels: 1, zoomBase: 'standard', cartesian: true }
+  if (name === 'svg-planet') return { name, ...DEFAULT_FLIGHT_RENDERING }
   if (name === 'svg-cartesian') return { name, detail: 'standard', canvasScale: null, cartesian: true }
   if (name === 'svg-zoom-adaptive') return { name, detail: 'zoom', canvasScale: null, adaptive: true, zoomPixels: 1, zoomBase: 'standard' }
   const zoom = name?.match(/^svg-zoom-(standard-)?(05|1|2)$/)
